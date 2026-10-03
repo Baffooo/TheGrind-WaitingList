@@ -63,11 +63,15 @@
   <!-- HEADER -->
   <header class="sticky top-0 z-30 bg-brand-black/90 backdrop-blur-md border-b border-brand-border px-4 py-3 flex justify-between items-center">
     <div class="flex items-center gap-3">
-      <!-- Logo The Grind caricato da GitHub -->
-      <img src="logo.jpg" alt="The Grind Logo" class="w-10 h-10 object-contain rounded-lg border border-brand-border shrink-0 bg-black">
+      <!-- Container Logo Quadrato e Centrato -->
+      <div class="w-10 h-10 rounded-lg bg-black border border-brand-border p-1 flex items-center justify-center shrink-0 overflow-hidden">
+        <img src="logo.jpg" alt="The Grind Logo" class="max-w-full max-h-full object-contain">
+      </div>
       <div>
-        <h1 class="text-base font-bold tracking-wider text-white uppercase leading-tight">The Grind Waiting List</h1>
-        <p class="text-[11px] text-brand-muted font-medium leading-tight">Tattoo Client Priority System</p>
+        <!-- Titolo su due righe -->
+        <h1 class="text-sm font-extrabold tracking-wider text-white uppercase leading-none">THE GRIND</h1>
+        <h2 class="text-xs font-bold tracking-widest text-neutral-300 uppercase leading-tight mt-0.5">WAITING LIST</h2>
+        <p class="text-[10px] text-brand-muted font-medium leading-tight mt-0.5">Tattoo Client Priority System</p>
       </div>
     </div>
     <div class="flex items-center gap-2">
@@ -101,6 +105,8 @@
         <option value="The Grind">The Grind</option>
         <option value="Milano City Ink">Milano City Ink</option>
         <option value="Convention">Convention</option>
+        <option value="Seminario Cla">Seminario Cla</option>
+        <option value="Seminario Pos">Seminario Pos</option>
       </select>
     </div>
 
@@ -161,6 +167,8 @@
             <option value="The Grind">The Grind</option>
             <option value="Milano City Ink">Milano City Ink</option>
             <option value="Convention">Convention</option>
+            <option value="Seminario Cla">Seminario Cla</option>
+            <option value="Seminario Pos">Seminario Pos</option>
           </select>
         </div>
 
@@ -195,7 +203,6 @@
     // =========================================================================
     // 1. CONFIGURAZIONE FIREBASE (Sostituisci i dati con la tua console Firebase)
     // =========================================================================
-
 const firebaseConfig = {
   apiKey: "AIzaSyDccFCqeRlOxyR9SkHGYBKVkruL4XOA1SQ",
   authDomain: "thegrind-waitinglist.firebaseapp.com",
@@ -498,6 +505,10 @@ const firebaseConfig = {
         document.getElementById('field-location').value = 'Milano City Ink';
       } else if (text.includes('convention')) {
         document.getElementById('field-location').value = 'Convention';
+      } else if (text.includes('cla')) {
+        document.getElementById('field-location').value = 'Seminario Cla';
+      } else if (text.includes('pos')) {
+        document.getElementById('field-location').value = 'Seminario Pos';
       } else {
         document.getElementById('field-location').value = 'The Grind';
       }
