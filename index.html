@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>Tattoo Waiting List</title>
+  <title>The Grind Waiting List</title>
   
   <!-- Web App PWA Setup -->
   <meta name="apple-mobile-web-app-capable" content="yes">
@@ -56,10 +56,14 @@
 <body class="min-h-screen flex flex-col pb-10">
 
   <!-- HEADER -->
-  <header class="sticky top-0 z-30 bg-brand-black/90 backdrop-blur-md border-b border-brand-border px-4 py-4 flex justify-between items-center">
-    <div>
-      <h1 class="text-xl font-bold tracking-wider text-white uppercase">Waiting List</h1>
-      <p class="text-xs text-brand-muted" id="status-indicator">Inizializzazione...</p>
+  <header class="sticky top-0 z-30 bg-brand-black/90 backdrop-blur-md border-b border-brand-border px-4 py-3 flex justify-between items-center">
+    <div class="flex items-center gap-3">
+      <!-- Logo The Grind -->
+      <img src="Logo colori_The grind.jpg" alt="The Grind Logo" class="w-10 h-10 object-contain rounded-md">
+      <div>
+        <h1 class="text-base font-bold tracking-wider text-white uppercase leading-tight">The Grind Waiting List</h1>
+        <p class="text-[11px] text-brand-muted font-medium leading-tight">Tattoo Client Priority System</p>
+      </div>
     </div>
     <div class="flex items-center gap-2">
       <button id="voice-btn" onclick="startVoiceRecognition()" class="p-2.5 rounded-full bg-brand-card border border-brand-border text-white hover:border-white transition-all active:scale-95 relative" title="Comando Vocale">
@@ -74,6 +78,12 @@
 
   <!-- CONTENUTO PRINCIPALE -->
   <main class="flex-1 max-w-2xl w-full mx-auto p-4 space-y-4">
+
+    <!-- STATO SINCRO / LOCALE -->
+    <div class="flex justify-between items-center text-xs px-1 text-brand-muted">
+      <span id="status-indicator">Inizializzazione...</span>
+      <span>Priorità: ASAP > Relax</span>
+    </div>
 
     <!-- FILTRI E RICERCA -->
     <div class="flex gap-2">
@@ -180,7 +190,7 @@
     // =========================================================================
     // 1. CONFIGURAZIONE FIREBASE (Sostituisci i dati con la tua console Firebase)
     // =========================================================================
-    const firebaseConfig = {
+const firebaseConfig = {
   apiKey: "AIzaSyDccFCqeRlOxyR9SkHGYBKVkruL4XOA1SQ",
   authDomain: "thegrind-waitinglist.firebaseapp.com",
   projectId: "thegrind-waitinglist",
@@ -189,6 +199,7 @@
   appId: "1:977596767778:web:24202c4d719a2f7e14f47b",
   measurementId: "G-L2SMGSKYFV"
 };
+
     let db = null;
     let useLocalStorage = false;
     let clientsData = [];
@@ -467,7 +478,7 @@
     function parseVoiceCommand(text) {
       openModal();
 
-      // Estrazione Nome (cerca dopo "aggiungi" o prende le prime parole)
+      // Estrazione Nome
       let nameMatch = text.match(/(?:aggiungi|cliente)\s+([a-zàèéìòù\s]+?)(?=\s+(?:per|a|in|nuovo|continuo|telefono|numero|$))/i);
       if (nameMatch) {
         document.getElementById('field-name').value = capitalizeWords(nameMatch[1].trim());
