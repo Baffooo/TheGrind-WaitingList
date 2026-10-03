@@ -5,9 +5,14 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>The Grind Waiting List</title>
   
+  <!-- Favicon & Icona Schermata Home iPhone (PWA) -->
+  <link rel="icon" type="image/jpeg" href="logo.jpg">
+  <link rel="apple-touch-icon" href="logo.jpg">
+  
   <!-- Web App PWA Setup -->
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="The Grind">
   <meta name="theme-color" content="#0a0a0a">
   
   <!-- Tailwind CSS CDN -->
@@ -58,13 +63,8 @@
   <!-- HEADER -->
   <header class="sticky top-0 z-30 bg-brand-black/90 backdrop-blur-md border-b border-brand-border px-4 py-3 flex justify-between items-center">
     <div class="flex items-center gap-3">
-      <!-- Logo The Grind SVG Grafico integrato -->
-      <div class="w-10 h-10 rounded-lg bg-black border border-neutral-700 p-1 flex items-center justify-center shrink-0 shadow-sm">
-        <svg viewBox="0 0 100 100" class="w-full h-full text-white fill-current">
-          <path d="M15,50 C15,30 30,15 50,15 C70,15 85,30 85,50 C85,70 70,85 50,85 C30,85 15,70 15,50 Z" fill="none" stroke="currentColor" stroke-width="6"/>
-          <text x="50%" y="58%" text-anchor="middle" font-family="'Brush Script MT', 'Arial Black', cursive, sans-serif" font-weight="bold" font-size="28" fill="white">TG</text>
-        </svg>
-      </div>
+      <!-- Logo The Grind caricato da GitHub -->
+      <img src="logo.jpg" alt="The Grind Logo" class="w-10 h-10 object-contain rounded-lg border border-brand-border shrink-0 bg-black">
       <div>
         <h1 class="text-base font-bold tracking-wider text-white uppercase leading-tight">The Grind Waiting List</h1>
         <p class="text-[11px] text-brand-muted font-medium leading-tight">Tattoo Client Priority System</p>
@@ -195,6 +195,7 @@
     // =========================================================================
     // 1. CONFIGURAZIONE FIREBASE (Sostituisci i dati con la tua console Firebase)
     // =========================================================================
+
 const firebaseConfig = {
   apiKey: "AIzaSyDccFCqeRlOxyR9SkHGYBKVkruL4XOA1SQ",
   authDomain: "thegrind-waitinglist.firebaseapp.com",
