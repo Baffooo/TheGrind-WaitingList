@@ -1,671 +1,535 @@
 <!DOCTYPE html>
 <html lang="it" class="dark">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Tattoo Waiting List Manager</title>
-    <!-- iOS PWA Meta Tags -->
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <meta name="apple-mobile-web-app-title" content="WaitingList">
-    <meta name="theme-color" content="#09090b">
-    
-    <!-- Fonts & Tailwind CSS -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <script>
-        tailwind.config = {
-            darkMode: 'class',
-            theme: {
-                extend: {
-                    colors: {
-                        dark: {
-                            950: '#09090b',
-                            900: '#121215',
-                            800: '#18181b',
-                            700: '#27272a',
-                            600: '#3f3f46'
-                        }
-                    },
-                    fontFamily: {
-                        sans: ['Inter', 'sans-serif'],
-                    }
-                }
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Tattoo Waiting List</title>
+  
+  <!-- Web App PWA Setup -->
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="theme-color" content="#0a0a0a">
+  
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            brand: {
+              black: '#0a0a0a',
+              card: '#121212',
+              border: '#262626',
+              accent: '#ffffff',
+              muted: '#737373'
             }
+          }
         }
-    </script>
-    <style>
-        body {
-            background-color: #09090b;
-            color: #f4f4f5;
-            font-family: 'Inter', sans-serif;
-            -webkit-tap-highlight-color: transparent;
-        }
-        .glass-panel {
-            background: rgba(24, 24, 27, 0.85);
-            backdrop-filter: blur(16px);
-            border: 1px solid rgba(255, 255, 255, 0.08);
-        }
-        .pulse-red {
-            animation: pulse-animation 1.5s infinite;
-        }
-        @keyframes pulse-animation {
-            0% { box-shadow: 0 0 0 0px rgba(239, 68, 68, 0.6); }
-            100% { box-shadow: 0 0 0 15px rgba(239, 68, 68, 0); }
-        }
-    </style>
+      }
+    }
+  </script>
+  
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+  
+  <style>
+    body {
+      background-color: #0a0a0a;
+      color: #f5f5f5;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .custom-scrollbar::-webkit-scrollbar {
+      width: 4px;
+    }
+    .custom-scrollbar::-webkit-scrollbar-track {
+      background: #0a0a0a;
+    }
+    .custom-scrollbar::-webkit-scrollbar-thumb {
+      background: #262626;
+      border-radius: 2px;
+    }
+  </style>
 </head>
-<body class="min-h-screen pb-24 text-zinc-100 flex flex-col selection:bg-zinc-700 selection:text-white">
+<body class="min-h-screen flex flex-col pb-10">
 
-    <header class="sticky top-0 z-30 glass-panel border-b border-zinc-800/80 px-4 py-3 sm:px-6">
-        <div class="max-w-4xl mx-auto flex items-center justify-between">
-            <div class="flex items-center space-x-3">
-                <div class="w-9 h-9 rounded-xl bg-zinc-100 text-black flex items-center justify-center font-bold tracking-tighter text-lg shadow-lg">
-                    INK
-                </div>
-                <div>
-                    <h1 class="text-xs font-bold tracking-widest text-white uppercase">Waiting List</h1>
-                    <p class="text-[10px] text-zinc-400">Tattoo Client Priority System</p>
-                </div>
-            </div>
-            <button id="btnVoiceModal" class="flex items-center space-x-2 bg-zinc-900 hover:bg-zinc-800 text-zinc-200 border border-zinc-700 px-3.5 py-2 rounded-xl text-xs font-medium transition-all active:scale-95 shadow-sm">
-                <svg class="w-4 h-4 text-red-500 animate-pulse" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z"></path></svg>
-                <span>Comando Vocale</span>
-            </button>
-        </div>
-    </header>
+  <!-- HEADER -->
+  <header class="sticky top-0 z-30 bg-brand-black/90 backdrop-blur-md border-b border-brand-border px-4 py-4 flex justify-between items-center">
+    <div>
+      <h1 class="text-xl font-bold tracking-wider text-white uppercase">Waiting List</h1>
+      <p class="text-xs text-brand-muted" id="status-indicator">Inizializzazione...</p>
+    </div>
+    <div class="flex items-center gap-2">
+      <button id="voice-btn" onclick="startVoiceRecognition()" class="p-2.5 rounded-full bg-brand-card border border-brand-border text-white hover:border-white transition-all active:scale-95 relative" title="Comando Vocale">
+        <i data-lucide="mic" class="w-5 h-5"></i>
+        <span id="voice-pulse" class="hidden absolute top-0 right-0 w-3 h-3 bg-red-500 rounded-full animate-ping"></span>
+      </button>
+      <button onclick="openModal()" class="px-3.5 py-2 rounded-full bg-white text-black font-semibold text-sm hover:bg-neutral-200 transition-all active:scale-95 flex items-center gap-1.5">
+        <i data-lucide="plus" class="w-4 h-4"></i> Nuovo
+      </button>
+    </div>
+  </header>
 
-    <main class="max-w-4xl mx-auto w-full px-4 pt-4 flex-1">
-        <!-- Location Navigation Tabs -->
-        <div class="flex space-x-2 overflow-x-auto pb-2 text-xs font-medium border-b border-zinc-800 mb-4 no-scrollbar">
-            <button onclick="filterLocation('ALL')" class="loc-tab active border-b-2 border-white text-white px-3 py-2 whitespace-nowrap transition-all">Tutti</button>
-            <button onclick="filterLocation('The Grind')" class="loc-tab border-b-2 border-transparent text-zinc-400 hover:text-zinc-200 px-3 py-2 whitespace-nowrap transition-all">The Grind</button>
-            <button onclick="filterLocation('Milano City Ink')" class="loc-tab border-b-2 border-transparent text-zinc-400 hover:text-zinc-200 px-3 py-2 whitespace-nowrap transition-all">Milano City Ink</button>
-            <button onclick="filterLocation('Convention')" class="loc-tab border-b-2 border-transparent text-zinc-400 hover:text-zinc-200 px-3 py-2 whitespace-nowrap transition-all">Convention</button>
-        </div>
+  <!-- CONTENUTO PRINCIPALE -->
+  <main class="flex-1 max-w-2xl w-full mx-auto p-4 space-y-4">
 
-        <!-- Search & Quick Stats -->
-        <div class="flex flex-col sm:flex-row items-center justify-between gap-3 mb-5">
-            <div class="relative w-full sm:w-72">
-                <input type="text" id="searchInput" oninput="renderList()" placeholder="Cerca per nome, telefono o note..." class="w-full bg-zinc-900/90 border border-zinc-800 rounded-xl px-9 py-2.5 text-xs text-white placeholder-zinc-500 focus:outline-none focus:border-zinc-500 transition-all">
-                <svg class="w-4 h-4 text-zinc-500 absolute left-3 top-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
-            </div>
-            <div class="text-xs text-zinc-400 flex items-center justify-between w-full sm:w-auto space-x-4 px-1">
-                <span>In attesa: <strong id="totalCount" class="text-white font-semibold">0</strong></span>
-                <span class="text-zinc-700">|</span>
-                <span class="text-xs text-emerald-400 flex items-center space-x-1">
-                    <span id="syncIndicator" class="w-2 h-2 rounded-full bg-emerald-500 inline-block animate-pulse"></span>
-                    <span id="syncText" class="text-[11px] font-medium">Locale / Cloud Ready</span>
-                </span>
-            </div>
-        </div>
+    <!-- FILTRI E RICERCA -->
+    <div class="flex gap-2">
+      <div class="relative flex-1">
+        <i data-lucide="search" class="w-4 h-4 absolute left-3 top-3 text-brand-muted"></i>
+        <input type="text" id="search-input" oninput="renderList()" placeholder="Cerca cliente o note..." class="w-full bg-brand-card border border-brand-border rounded-xl pl-9 pr-4 py-2 text-sm text-white focus:outline-none focus:border-white">
+      </div>
+      <select id="filter-location" onchange="renderList()" class="bg-brand-card border border-brand-border rounded-xl px-3 py-2 text-sm text-white focus:outline-none focus:border-white">
+        <option value="ALL">Tutti i Luoghi</option>
+        <option value="The Grind">The Grind</option>
+        <option value="Milano City Ink">Milano City Ink</option>
+        <option value="Convention">Convention</option>
+      </select>
+    </div>
 
-        <!-- Client List Output Container -->
-        <div id="clientList" class="space-y-3">
-            <!-- Dynamic Client Cards -->
-        </div>
-    </main>
+    <!-- LISTA CLIENTI -->
+    <div id="client-list" class="space-y-3">
+      <!-- Le schede verranno inserite qui dinamicamente -->
+    </div>
 
-    <!-- Floating Action Button -->
-    <div class="fixed bottom-5 left-0 right-0 z-20 flex justify-center px-4">
-        <button onclick="openModal()" class="glass-panel hover:bg-zinc-800 text-white border border-zinc-700 shadow-2xl px-6 py-3 rounded-full flex items-center space-x-2 text-xs font-semibold tracking-wide transition-all transform active:scale-95">
-            <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
-            <span>Nuovo Cliente</span>
+    <!-- STATO VUOTO -->
+    <div id="empty-state" class="hidden py-16 text-center space-y-3">
+      <i data-lucide="inbox" class="w-12 h-12 mx-auto text-brand-muted stroke-1"></i>
+      <p class="text-brand-muted text-sm">Nessun cliente presente in lista d'attesa.</p>
+    </div>
+
+  </main>
+
+  <!-- MODALE FORM (NUOVO / MODIFICA) -->
+  <div id="modal" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm hidden flex items-end sm:items-center justify-center p-0 sm:p-4">
+    <div class="bg-brand-card border border-brand-border w-full max-w-md rounded-t-2xl sm:rounded-2xl p-6 space-y-5 max-h-[90vh] overflow-y-auto custom-scrollbar">
+      
+      <div class="flex justify-between items-center border-b border-brand-border pb-3">
+        <h2 id="modal-title" class="text-lg font-bold text-white uppercase tracking-wider">Nuovo Cliente</h2>
+        <button onclick="closeModal()" class="text-brand-muted hover:text-white p-1">
+          <i data-lucide="x" class="w-5 h-5"></i>
         </button>
-    </div>
+      </div>
 
-    <!-- Add/Edit Client Modal -->
-    <div id="clientModal" class="fixed inset-0 z-50 hidden bg-black/80 backdrop-blur-md flex items-center justify-center p-4">
-        <div class="glass-panel bg-zinc-900 border border-zinc-800 rounded-3xl w-full max-w-lg p-6 max-h-[90vh] overflow-y-auto">
-            <div class="flex justify-between items-center pb-4 border-b border-zinc-800/80 mb-4">
-                <h3 id="modalTitle" class="text-sm font-semibold text-white tracking-wide uppercase">Nuovo Cliente</h3>
-                <button onclick="closeModal()" class="text-zinc-400 hover:text-white p-1">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
-                </button>
-            </div>
+      <form id="client-form" onsubmit="handleFormSubmit(event)" class="space-y-4">
+        <input type="hidden" id="field-id">
 
-            <form id="clientForm" onsubmit="saveClient(event)" class="space-y-4 text-xs">
-                <input type="hidden" id="clientId">
-
-                <!-- 1. Nome Cliente -->
-                <div>
-                    <label class="block text-zinc-400 font-medium mb-1">1. Nome Cliente *</label>
-                    <input type="text" id="fieldName" required placeholder="Es. Mario Rossi" class="w-full bg-zinc-800/80 border border-zinc-700 rounded-xl px-3 py-2.5 text-white focus:outline-none focus:border-white transition-all">
-                </div>
-
-                <!-- 2. Contatto -->
-                <div>
-                    <label class="block text-zinc-400 font-medium mb-1">2. Contatto (Telefono / WhatsApp) *</label>
-                    <input type="tel" id="fieldPhone" required placeholder="Es. 3391234567" class="w-full bg-zinc-800/80 border border-zinc-700 rounded-xl px-3 py-2.5 text-white focus:outline-none focus:border-white transition-all">
-                </div>
-
-                <!-- 3. Tipo Progetto -->
-                <div>
-                    <label class="block text-zinc-400 font-medium mb-1">3. Tipo Progetto *</label>
-                    <select id="fieldProjectType" required class="w-full bg-zinc-800/80 border border-zinc-700 rounded-xl px-3 py-2.5 text-white focus:outline-none focus:border-white transition-all">
-                        <option value="Continuo Progetto">Continuo Progetto</option>
-                        <option value="Nuovo Tatuaggio">Nuovo Tatuaggio</option>
-                    </select>
-                </div>
-
-                <!-- 4. Luogo -->
-                <div>
-                    <label class="block text-zinc-400 font-medium mb-1">4. Luogo *</label>
-                    <select id="fieldLocation" required class="w-full bg-zinc-800/80 border border-zinc-700 rounded-xl px-3 py-2.5 text-white focus:outline-none focus:border-white transition-all">
-                        <option value="The Grind">The Grind</option>
-                        <option value="Milano City Ink">Milano City Ink</option>
-                        <option value="Convention">Convention</option>
-                    </select>
-                </div>
-
-                <!-- 5. Priorità (Urgenza) -->
-                <div>
-                    <label class="block text-zinc-400 font-medium mb-1">5. Urgenza / Priorità *</label>
-                    <select id="fieldUrgency" required class="w-full bg-zinc-800/80 border border-zinc-700 rounded-xl px-3 py-2.5 text-white focus:outline-none focus:border-white transition-all">
-                        <option value="Prima possibile">Prima possibile</option>
-                        <option value="Senza fretta">Senza fretta</option>
-                    </select>
-                </div>
-
-                <!-- 6. Data Inserimento -->
-                <div>
-                    <label class="block text-zinc-400 font-medium mb-1">6. Data Inserimento *</label>
-                    <input type="date" id="fieldDate" required class="w-full bg-zinc-800/80 border border-zinc-700 rounded-xl px-3 py-2.5 text-white focus:outline-none focus:border-white transition-all">
-                </div>
-
-                <!-- 7. Note -->
-                <div>
-                    <label class="block text-zinc-400 font-medium mb-1">7. Note</label>
-                    <textarea id="fieldNotes" rows="2" placeholder="Dettagli tatuaggio, stile, posizionamento..." class="w-full bg-zinc-800/80 border border-zinc-700 rounded-xl px-3 py-2.5 text-white focus:outline-none focus:border-white transition-all"></textarea>
-                </div>
-
-                <div class="pt-3 flex justify-end space-x-3">
-                    <button type="button" onclick="closeModal()" class="px-4 py-2 rounded-xl text-zinc-400 hover:text-white transition-all">Annulla</button>
-                    <button type="submit" class="bg-white text-black font-semibold px-5 py-2.5 rounded-xl hover:bg-zinc-200 transition-all shadow-md">Salva Cliente</button>
-                </div>
-            </form>
+        <!-- Nome Cliente -->
+        <div>
+          <label class="block text-xs font-medium text-brand-muted mb-1">Nome Cliente *</label>
+          <input type="text" id="field-name" required placeholder="Es. Mario Rossi" class="w-full bg-brand-black border border-brand-border rounded-xl px-3 py-2 text-sm text-white focus:outline-none focus:border-white">
         </div>
-    </div>
 
-    <!-- Speech Assistant Modal -->
-    <div id="voiceModal" class="fixed inset-0 z-50 hidden bg-black/85 backdrop-blur-md flex items-center justify-center p-4">
-        <div class="glass-panel bg-zinc-900 border border-zinc-800 rounded-3xl w-full max-w-md p-6 text-center space-y-6">
-            <div class="flex justify-between items-center border-b border-zinc-800/80 pb-3">
-                <span class="text-xs font-semibold text-zinc-400 tracking-wider uppercase">Comando Vocale Smart</span>
-                <button onclick="closeVoiceModal()" class="text-zinc-400 hover:text-white p-1">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
-                </button>
-            </div>
-
-            <!-- Pulsing Mic Visualizer -->
-            <div class="py-2 flex justify-center">
-                <div id="micPulseBg" class="w-20 h-20 rounded-full bg-zinc-800 flex items-center justify-center transition-all duration-300">
-                    <svg id="micIcon" class="w-10 h-10 text-zinc-400 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z"></path></svg>
-                </div>
-            </div>
-
-            <div class="space-y-2">
-                <p id="voiceStatus" class="text-xs font-medium text-zinc-300">Premi il pulsante per iniziare l'ascolto...</p>
-                <div id="voiceTranscription" class="min-h-[60px] p-3 rounded-xl bg-zinc-950 border border-zinc-800/90 text-xs text-zinc-300 italic text-left">
-                    "Aggiungi Mario Rossi 3391234567 per un nuovo tatuaggio prima possibile a Milano City Ink nota schiena"
-                </div>
-            </div>
-
-            <div class="bg-zinc-950/60 p-3 rounded-xl text-left text-[11px] text-zinc-400 space-y-1 border border-zinc-800/50">
-                <p class="font-semibold text-zinc-300">💡 Esempi di comandi vocali:</p>
-                <p>• <em>"Aggiungi Luca Conti 3470000000 continuo progetto The Grind prima possibile"</em></p>
-                <p>• <em>"Aggiungi Sara Verdi 3381112233 nuovo tatuaggio Convention senza fretta"</em></p>
-            </div>
-
-            <div class="flex justify-center space-x-3 pt-1">
-                <button id="toggleListeningBtn" onclick="toggleListening()" class="bg-red-600 text-white font-medium px-6 py-2.5 rounded-full hover:bg-red-500 text-xs transition-all shadow-md">
-                    <span>Avvia Ascolto</span>
-                </button>
-            </div>
+        <!-- Contatto (Telefono) -->
+        <div>
+          <label class="block text-xs font-medium text-brand-muted mb-1">Contatto (Telefono) *</label>
+          <input type="tel" id="field-contact" required placeholder="Es. +39 333 1234567" class="w-full bg-brand-black border border-brand-border rounded-xl px-3 py-2 text-sm text-white focus:outline-none focus:border-white">
         </div>
+
+        <!-- Tipo Progetto & Priorità -->
+        <div>
+          <label class="block text-xs font-medium text-brand-muted mb-1">Tipo Progetto & Priorità *</label>
+          <select id="field-priority" required class="w-full bg-brand-black border border-brand-border rounded-xl px-3 py-2 text-sm text-white focus:outline-none focus:border-white">
+            <option value="1">Continuo Progetto – Prima possibile (Rank 1)</option>
+            <option value="2">Nuovo Tatuaggio – Prima possibile (Rank 2)</option>
+            <option value="3">Continuo Progetto – Senza fretta (Rank 3)</option>
+            <option value="4">Nuovo Tatuaggio – Senza fretta (Rank 4)</option>
+          </select>
+        </div>
+
+        <!-- Luogo -->
+        <div>
+          <label class="block text-xs font-medium text-brand-muted mb-1">Luogo *</label>
+          <select id="field-location" required class="w-full bg-brand-black border border-brand-border rounded-xl px-3 py-2 text-sm text-white focus:outline-none focus:border-white">
+            <option value="The Grind">The Grind</option>
+            <option value="Milano City Ink">Milano City Ink</option>
+            <option value="Convention">Convention</option>
+          </select>
+        </div>
+
+        <!-- Data Inserimento -->
+        <div>
+          <label class="block text-xs font-medium text-brand-muted mb-1">Data Inserimento *</label>
+          <input type="date" id="field-date" required class="w-full bg-brand-black border border-brand-border rounded-xl px-3 py-2 text-sm text-white focus:outline-none focus:border-white">
+        </div>
+
+        <!-- Note -->
+        <div>
+          <label class="block text-xs font-medium text-brand-muted mb-1">Note</label>
+          <textarea id="field-notes" rows="3" placeholder="Dettagli progetto, zona corpo, orari..." class="w-full bg-brand-black border border-brand-border rounded-xl px-3 py-2 text-sm text-white focus:outline-none focus:border-white"></textarea>
+        </div>
+
+        <!-- Pulsanti Azione -->
+        <div class="flex gap-2 pt-2">
+          <button type="button" onclick="closeModal()" class="flex-1 py-2.5 rounded-xl border border-brand-border text-brand-muted hover:text-white font-medium text-sm transition-all">Annulla</button>
+          <button type="submit" class="flex-1 py-2.5 rounded-xl bg-white text-black font-semibold text-sm hover:bg-neutral-200 transition-all">Salva Cliente</button>
+        </div>
+      </form>
+
     </div>
+  </div>
 
-    <script>
-        // State Management
-        let clients = [];
-        let currentLocationFilter = 'ALL';
-        let recognition = null;
-        let isListening = false;
+  <!-- FIREBASE SDKs -->
+  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
 
-        /*
-         * STRICT PRIORITY ORDERING RULE:
-         * Rank 1 = Continuo Progetto – Prima possibile (HIGHEST)
-         * Rank 2 = Nuovo Tatuaggio   – Prima possibile
-         * Rank 3 = Continuo Progetto – Senza fretta
-         * Rank 4 = Nuovo Tatuaggio   – Senza fretta (LOWEST)
-        */
-        function getPriorityRank(projectType, urgency) {
-            if (projectType === 'Continuo Progetto' && urgency === 'Prima possibile') return 1;
-            if (projectType === 'Nuovo Tatuaggio' && urgency === 'Prima possibile') return 2;
-            if (projectType === 'Continuo Progetto' && urgency === 'Senza fretta') return 3;
-            if (projectType === 'Nuovo Tatuaggio' && urgency === 'Senza fretta') return 4;
-            return 5;
+  <!-- LOGICA APPLICAZIONE -->
+  <script>
+    // =========================================================================
+    // 1. CONFIGURAZIONE FIREBASE (Sostituisci i dati con la tua console Firebase)
+    // =========================================================================
+    const firebaseConfig = {
+  apiKey: "AIzaSyDccFCqeRlOxyR9SkHGYBKVkruL4XOA1SQ",
+  authDomain: "thegrind-waitinglist.firebaseapp.com",
+  projectId: "thegrind-waitinglist",
+  storageBucket: "thegrind-waitinglist.firebasestorage.app",
+  messagingSenderId: "977596767778",
+  appId: "1:977596767778:web:24202c4d719a2f7e14f47b",
+  measurementId: "G-L2SMGSKYFV"
+};
+    let db = null;
+    let useLocalStorage = false;
+    let clientsData = [];
+
+    // Inizializzazione Firebase o fallback su LocalStorage
+    try {
+      if (firebaseConfig.apiKey !== "INSERISCI_LA_TUA_API_KEY") {
+        firebase.initializeApp(firebaseConfig);
+        db = firebase.firestore();
+        document.getElementById('status-indicator').innerText = "Cloud Sync (Firebase)";
+        initFirebaseListener();
+      } else {
+        throw new Error("Firebase non configurato, proseguo in locale.");
+      }
+    } catch (e) {
+      useLocalStorage = true;
+      document.getElementById('status-indicator').innerText = "Modalità Locale (LocalStorage)";
+      loadFromLocalStorage();
+    }
+
+    // =========================================================================
+    // 2. GESTIONE DATI (FIREBASE & LOCALSTORAGE)
+    // =========================================================================
+    function initFirebaseListener() {
+      db.collection("waiting_list").onSnapshot(snapshot => {
+        clientsData = snapshot.docs.map(doc => ({
+          id: doc.id,
+          ...doc.data()
+        }));
+        renderList();
+      }, error => {
+        console.error("Errore Firebase:", error);
+        document.getElementById('status-indicator').innerText = "Errore Connessione Cloud";
+      });
+    }
+
+    function loadFromLocalStorage() {
+      const data = localStorage.getItem('tattoo_waiting_list');
+      clientsData = data ? JSON.parse(data) : [];
+      renderList();
+    }
+
+    function saveLocal() {
+      if (useLocalStorage) {
+        localStorage.setItem('tattoo_waiting_list', JSON.stringify(clientsData));
+        renderList();
+      }
+    }
+
+    async function saveClient(client) {
+      if (!useLocalStorage && db) {
+        if (client.id) {
+          const id = client.id;
+          delete client.id;
+          await db.collection("waiting_list").doc(id).set(client);
+        } else {
+          delete client.id;
+          await db.collection("waiting_list").add(client);
         }
-
-        function getPriorityBadge(rank) {
-            switch(rank) {
-                case 1:
-                    return `<span class="bg-red-950/80 text-red-400 border border-red-800/60 px-2 py-0.5 rounded-md font-semibold text-[10px] uppercase tracking-wider">1° Max (Continuo - Urgente)</span>`;
-                case 2:
-                    return `<span class="bg-amber-950/80 text-amber-400 border border-amber-800/60 px-2 py-0.5 rounded-md font-semibold text-[10px] uppercase tracking-wider">2° Alta (Nuovo - Urgente)</span>`;
-                case 3:
-                    return `<span class="bg-blue-950/80 text-blue-400 border border-blue-800/60 px-2 py-0.5 rounded-md font-semibold text-[10px] uppercase tracking-wider">3° Media (Continuo - No Fretta)</span>`;
-                case 4:
-                    return `<span class="bg-zinc-800 text-zinc-400 border border-zinc-700 px-2 py-0.5 rounded-md font-medium text-[10px] uppercase tracking-wider">4° Bassa (Nuovo - No Fretta)</span>`;
-                default:
-                    return `<span class="bg-zinc-800 text-zinc-400 px-2 py-0.5 rounded-md text-[10px]">Standard</span>`;
-            }
+      } else {
+        if (client.id) {
+          const index = clientsData.findIndex(c => c.id === client.id);
+          if (index !== -1) clientsData[index] = client;
+        } else {
+          client.id = 'local_' + Date.now();
+          clientsData.push(client);
         }
+        saveLocal();
+      }
+    }
 
-        // Initialize application
-        window.onload = function() {
-            loadClientsFromStorage();
-            setupVoiceRecognition();
-            document.getElementById('fieldDate').value = new Date().toISOString().split('T')[0];
-        };
-
-        function loadClientsFromStorage() {
-            try {
-                const saved = localStorage.getItem('tattoo_clients_v3');
-                if (saved) {
-                    clients = JSON.parse(saved);
-                } else {
-                    // Seed initial demo data (Note: Earlier creation date ranks higher when priority matches)
-                    clients = [
-                        {
-                            id: '1',
-                            name: 'Marco Rossi',
-                            phone: '3331234567',
-                            projectType: 'Continuo Progetto',
-                            location: 'The Grind',
-                            urgency: 'Prima possibile',
-                            date: '2026-09-15',
-                            notes: 'Completamento manica destra'
-                        },
-                        {
-                            id: '2',
-                            name: 'Laura Bianchi',
-                            phone: '3409876543',
-                            projectType: 'Nuovo Tatuaggio',
-                            location: 'Milano City Ink',
-                            urgency: 'Prima possibile',
-                            date: '2026-09-20',
-                            notes: 'Microrealismo avambraccio'
-                        },
-                        {
-                            id: '3',
-                            name: 'Andrea Conti',
-                            phone: '3398877665',
-                            projectType: 'Nuovo Tatuaggio',
-                            location: 'Milano City Ink',
-                            urgency: 'Prima possibile',
-                            date: '2026-09-10', // Registered EARLIER than Laura -> Ranks above Laura!
-                            notes: 'Schiena stile giapponese'
-                        },
-                        {
-                            id: '4',
-                            name: 'Giuseppe Verdi',
-                            phone: '3381122334',
-                            projectType: 'Continuo Progetto',
-                            location: 'Convention',
-                            urgency: 'Senza fretta',
-                            date: '2026-09-01',
-                            notes: 'Seconda seduta schiena'
-                        }
-                    ];
-                    saveToStorage();
-                }
-            } catch (e) {
-                console.error("Errore storage locale:", e);
-                clients = [];
-            }
-            renderList();
+    async function deleteClient(id) {
+      if (confirm("Sei sicuro di voler rimuovere questo cliente dalla lista d'attesa?")) {
+        if (!useLocalStorage && db) {
+          await db.collection("waiting_list").doc(id).delete();
+        } else {
+          clientsData = clientsData.filter(c => c.id !== id);
+          saveLocal();
         }
+      }
+    }
 
-        function saveToStorage() {
-            localStorage.setItem('tattoo_clients_v3', JSON.stringify(clients));
-            renderList();
+    // =========================================================================
+    // 3. ORDINAMENTO & RENDERING LISTA
+    // =========================================================================
+    const PRIORITY_LABELS = {
+      1: { text: 'Continuo – ASAP', badge: 'bg-white text-black font-bold' },
+      2: { text: 'Nuovo – ASAP', badge: 'bg-neutral-300 text-black font-medium' },
+      3: { text: 'Continuo – Relax', badge: 'bg-neutral-800 text-neutral-300 border border-neutral-700' },
+      4: { text: 'Nuovo – Relax', badge: 'bg-neutral-900 text-neutral-500 border border-neutral-800' }
+    };
+
+    function renderList() {
+      const searchQuery = document.getElementById('search-input').value.toLowerCase();
+      const locationFilter = document.getElementById('filter-location').value;
+
+      // Filtraggio
+      let filtered = clientsData.filter(c => {
+        const matchesSearch = c.name.toLowerCase().includes(searchQuery) || 
+                              (c.notes && c.notes.toLowerCase().includes(searchQuery)) ||
+                              c.contact.includes(searchQuery);
+        const matchesLocation = locationFilter === 'ALL' || c.location === locationFilter;
+        return matchesSearch && matchesLocation;
+      });
+
+      // Ordinamento: Priorità crescente (1 -> 4), a pari priorità Data Inserimento antecedente prima
+      filtered.sort((a, b) => {
+        const pA = parseInt(a.priority);
+        const pB = parseInt(b.priority);
+
+        if (pA !== pB) {
+          return pA - pB;
         }
+        return new Date(a.date) - new Date(b.date);
+      });
 
-        function filterLocation(loc) {
-            currentLocationFilter = loc;
-            document.querySelectorAll('.loc-tab').forEach(tab => {
-                tab.classList.remove('active', 'border-white', 'text-white');
-                tab.classList.add('border-transparent', 'text-zinc-400');
-            });
-            event.target.classList.add('active', 'border-white', 'text-white');
-            event.target.classList.remove('border-transparent', 'text-zinc-400');
-            renderList();
-        }
+      const listContainer = document.getElementById('client-list');
+      const emptyState = document.getElementById('empty-state');
 
-        function renderList() {
-            const container = document.getElementById('clientList');
-            const searchVal = document.getElementById('searchInput').value.toLowerCase();
+      listContainer.innerHTML = '';
 
-            // Filter logic
-            let filtered = clients.filter(c => {
-                const matchesLoc = currentLocationFilter === 'ALL' || c.location === currentLocationFilter;
-                const matchesSearch = c.name.toLowerCase().includes(searchVal) || 
-                                      (c.notes && c.notes.toLowerCase().includes(searchVal)) ||
-                                      c.phone.includes(searchVal);
-                return matchesLoc && matchesSearch;
-            });
+      if (filtered.length === 0) {
+        emptyState.classList.remove('hidden');
+        return;
+      } else {
+        emptyState.classList.add('hidden');
+      }
 
-            /*
-             * SORTING ALGORITHM:
-             * 1. Primary: Priority Rank (1 -> 2 -> 3 -> 4)
-             * 2. Secondary (Tie-breaker): Earliest "Data Inserimento" comes FIRST (Older dates = Higher position)
-            */
-            filtered.sort((a, b) => {
-                const rankA = getPriorityRank(a.projectType, a.urgency);
-                const rankB = getPriorityRank(b.projectType, b.urgency);
-                
-                // If priority ranks differ, sort by rank
-                if (rankA !== rankB) {
-                    return rankA - rankB;
-                }
-                
-                // Tie-breaker: Same priority -> earlier Data Inserimento rises to top
-                const dateA = new Date(a.date || '2099-12-31');
-                const dateB = new Date(b.date || '2099-12-31');
-                return dateA - dateB;
-            });
+      filtered.forEach((client, index) => {
+        const pInfo = PRIORITY_LABELS[client.priority] || PRIORITY_LABELS[4];
+        const cleanPhone = client.contact.replace(/\D/g, '');
+        const waUrl = `https://wa.me/${cleanPhone}`;
 
-            document.getElementById('totalCount').innerText = filtered.length;
+        const card = document.createElement('div');
+        card.className = 'bg-brand-card border border-brand-border rounded-xl p-4 space-y-3 transition-all hover:border-neutral-700 relative group';
 
-            if (filtered.length === 0) {
-                container.innerHTML = `
-                    <div class="text-center py-12 glass-panel rounded-2xl border border-zinc-800">
-                        <svg class="w-10 h-10 text-zinc-600 mx-auto mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path></svg>
-                        <p class="text-zinc-400 text-xs font-medium">Nessun cliente presente</p>
-                        <p class="text-zinc-600 text-[11px] mt-1">Aggiungi un contatto con il tasto in basso o via voce</p>
-                    </div>
-                `;
-                return;
-            }
+        card.innerHTML = `
+          <div class="flex justify-between items-start gap-2">
+            <div class="flex items-center gap-2">
+              <span class="text-xs font-mono font-bold text-brand-muted bg-brand-black px-2 py-1 rounded-md border border-brand-border">#${index + 1}</span>
+              <h3 class="font-bold text-white text-base tracking-wide">${escapeHtml(client.name)}</h3>
+            </div>
+            <span class="text-[10px] px-2.5 py-1 rounded-full uppercase tracking-wider ${pInfo.badge}">
+              ${pInfo.text}
+            </span>
+          </div>
 
-            container.innerHTML = filtered.map((item, idx) => {
-                const rank = getPriorityRank(item.projectType, item.urgency);
-                const badge = getPriorityBadge(rank);
-                const cleanPhone = item.phone.replace(/\D/g, '');
-                const waLink = `https://wa.me/${cleanPhone.startsWith('39') ? cleanPhone : '39' + cleanPhone}`;
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs text-neutral-400">
+            <div class="flex items-center gap-1.5">
+              <i data-lucide="phone" class="w-3.5 h-3.5 text-brand-muted"></i>
+              <span>${escapeHtml(client.contact)}</span>
+              <a href="${waUrl}" target="_blank" class="ml-1 text-emerald-400 hover:text-emerald-300 font-semibold flex items-center gap-0.5">
+                [💬 WhatsApp]
+              </a>
+            </div>
 
-                return `
-                    <!-- CLIENT CARD ITEM -->
-                    <div class="glass-panel bg-zinc-900/90 border border-zinc-800/90 rounded-2xl p-4 transition-all hover:border-zinc-700 space-y-3">
-                        <div class="flex items-start justify-between">
-                            <div class="flex items-start space-x-3">
-                                <span class="text-xs font-bold text-zinc-500 bg-zinc-950 border border-zinc-800 px-2 py-1 rounded-lg">#${idx + 1}</span>
-                                <div>
-                                    <!-- 1. Nome Cliente -->
-                                    <h3 class="text-sm font-semibold text-white tracking-wide">${escapeHtml(item.name)}</h3>
-                                    <div class="mt-1.5 flex flex-wrap items-center gap-1.5">
-                                        ${badge}
-                                        <!-- 4. Luogo -->
-                                        <span class="text-[10px] text-zinc-300 bg-zinc-800 border border-zinc-700 px-2 py-0.5 rounded-md font-medium">${escapeHtml(item.location)}</span>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="flex items-center space-x-1">
-                                <!-- 2. Contatto (WhatsApp Link) -->
-                                <a href="${waLink}" target="_blank" rel="noopener" title="Apri WhatsApp" class="p-2 text-emerald-400 hover:text-emerald-300 hover:bg-emerald-950/40 rounded-xl transition-all">
-                                    <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946.003-6.556 5.338-11.891 11.893-11.891 3.181.001 6.167 1.24 8.413 3.488 2.245 2.248 3.481 5.236 3.48 8.414-.003 6.557-5.338 11.892-11.893 11.892-1.99-.001-3.951-.5-5.688-1.448l-6.305 1.654zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.434 9.889-9.885.002-5.462-4.415-9.89-9.881-9.892-5.452 0-9.887 4.434-9.889 9.884-.001 2.225.651 3.891 1.746 5.634l-.999 3.648 3.742-.981zm11.387-5.464c-.074-.124-.272-.198-.57-.347-.297-.149-1.758-.868-2.031-.967-.272-.099-.47-.149-.669.149-.198.297-.768.967-.941 1.165-.173.198-.347.223-.644.074-.297-.149-1.255-.462-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.297-.347.446-.521.151-.172.2-.296.3-.495.099-.198.05-.372-.025-.521-.075-.148-.669-1.611-.916-2.206-.242-.579-.487-.501-.669-.51l-.57-.01c-.198 0-.52.074-.792.372s-1.04 1.016-1.04 2.479 1.065 2.876 1.213 3.074c.149.198 2.095 3.2 5.076 4.487.709.306 1.263.489 1.694.626.712.226 1.36.194 1.872.118.571-.085 1.758-.719 2.006-1.413.248-.695.248-1.29.173-1.414z"/></svg>
-                                </a>
-                                <!-- Edit & Delete -->
-                                <button onclick="editClient('${item.id}')" title="Modifica" class="p-2 text-zinc-400 hover:text-white hover:bg-zinc-800 rounded-xl transition-all">
-                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path></svg>
-                                </button>
-                                <button onclick="deleteClient('${item.id}')" title="Elimina" class="p-2 text-zinc-500 hover:text-red-400 hover:bg-red-950/30 rounded-xl transition-all">
-                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
-                                </button>
-                            </div>
-                        </div>
+            <div class="flex items-center gap-1.5">
+              <i data-lucide="map-pin" class="w-3.5 h-3.5 text-brand-muted"></i>
+              <span>${escapeHtml(client.location)}</span>
+            </div>
 
-                        <!-- Data Fields Schema Grid -->
-                        <div class="grid grid-cols-2 gap-2 text-[11px] pt-1 border-t border-zinc-800/60 text-zinc-400">
-                            <!-- 2. Contatto -->
-                            <div>
-                                <span class="block text-[9px] text-zinc-500 uppercase tracking-wider">2. Contatto:</span>
-                                <span class="text-zinc-200 font-mono">${escapeHtml(item.phone)}</span>
-                            </div>
-                            <!-- 3. Tipo Progetto & Priorità -->
-                            <div>
-                                <span class="block text-[9px] text-zinc-500 uppercase tracking-wider">3. Progetto:</span>
-                                <span class="text-zinc-200">${escapeHtml(item.projectType)} (${escapeHtml(item.urgency)})</span>
-                            </div>
-                            <!-- 6. Data Inserimento -->
-                            <div class="col-span-2">
-                                <span class="block text-[9px] text-zinc-500 uppercase tracking-wider">6. Data Inserimento:</span>
-                                <span class="text-zinc-300 font-medium">${formatDate(item.date)}</span>
-                            </div>
-                        </div>
+            <div class="flex items-center gap-1.5 sm:col-span-2">
+              <i data-lucide="calendar" class="w-3.5 h-3.5 text-brand-muted"></i>
+              <span>Data Inserimento: ${formatDate(client.date)}</span>
+            </div>
+          </div>
 
-                        <!-- 7. Note -->
-                        ${item.notes ? `
-                            <div class="bg-zinc-950/60 p-2.5 rounded-xl text-xs text-zinc-300 border border-zinc-800/80">
-                                <span class="text-[9px] text-zinc-500 uppercase tracking-wider block font-semibold mb-0.5">7. Note:</span>
-                                ${escapeHtml(item.notes)}
-                            </div>
-                        ` : ''}
-                    </div>
-                `;
-            }).join('');
-        }
+          ${client.notes ? `
+            <div class="text-xs text-neutral-300 bg-brand-black/60 border border-brand-border/50 p-2.5 rounded-lg italic">
+              "${escapeHtml(client.notes)}"
+            </div>
+          ` : ''}
 
-        function openModal() {
-            document.getElementById('clientForm').reset();
-            document.getElementById('clientId').value = '';
-            document.getElementById('modalTitle').innerText = 'Nuovo Cliente';
-            document.getElementById('fieldDate').value = new Date().toISOString().split('T')[0];
-            document.getElementById('clientModal').classList.remove('hidden');
-        }
+          <div class="flex justify-end gap-3 pt-1 border-t border-brand-border/40 text-xs">
+            <button onclick="editClient('${client.id}')" class="text-neutral-400 hover:text-white flex items-center gap-1 py-1">
+              <i data-lucide="edit-3" class="w-3.5 h-3.5"></i> Modifica
+            </button>
+            <button onclick="deleteClient('${client.id}')" class="text-red-400/80 hover:text-red-400 flex items-center gap-1 py-1">
+              <i data-lucide="trash-2" class="w-3.5 h-3.5"></i> Elimina
+            </button>
+          </div>
+        `;
 
-        function closeModal() {
-            document.getElementById('clientModal').classList.add('hidden');
-        }
+        listContainer.appendChild(card);
+      });
 
-        function saveClient(e) {
-            e.preventDefault();
-            const id = document.getElementById('clientId').value;
-            const name = document.getElementById('fieldName').value.trim();
-            const phone = document.getElementById('fieldPhone').value.trim();
-            const projectType = document.getElementById('fieldProjectType').value;
-            const location = document.getElementById('fieldLocation').value;
-            const urgency = document.getElementById('fieldUrgency').value;
-            const date = document.getElementById('fieldDate').value;
-            const notes = document.getElementById('fieldNotes').value.trim();
+      lucide.createIcons();
+    }
 
-            if (id) {
-                const index = clients.findIndex(c => c.id === id);
-                if (index !== -1) {
-                    clients[index] = { id, name, phone, projectType, location, urgency, date, notes };
-                }
-            } else {
-                const newClient = {
-                    id: Date.now().toString(),
-                    name, phone, projectType, location, urgency, date, notes
-                };
-                clients.push(newClient);
-            }
+    // =========================================================================
+    // 4. MODALE & FORM
+    // =========================================================================
+    function openModal(isEdit = false) {
+      if (!isEdit) {
+        document.getElementById('client-form').reset();
+        document.getElementById('field-id').value = '';
+        document.getElementById('modal-title').innerText = 'Nuovo Cliente';
+        document.getElementById('field-date').valueAsDate = new Date();
+      }
+      document.getElementById('modal').classList.remove('hidden');
+    }
 
-            saveToStorage();
-            closeModal();
-        }
+    function closeModal() {
+      document.getElementById('modal').classList.add('hidden');
+    }
 
-        function editClient(id) {
-            const client = clients.find(c => c.id === id);
-            if (!client) return;
+    function editClient(id) {
+      const client = clientsData.find(c => c.id === id);
+      if (!client) return;
 
-            document.getElementById('clientId').value = client.id;
-            document.getElementById('fieldName').value = client.name;
-            document.getElementById('fieldPhone').value = client.phone;
-            document.getElementById('fieldProjectType').value = client.projectType;
-            document.getElementById('fieldLocation').value = client.location;
-            document.getElementById('fieldUrgency').value = client.urgency;
-            document.getElementById('fieldDate').value = client.date || new Date().toISOString().split('T')[0];
-            document.getElementById('fieldNotes').value = client.notes || '';
+      document.getElementById('field-id').value = client.id;
+      document.getElementById('field-name').value = client.name;
+      document.getElementById('field-contact').value = client.contact;
+      document.getElementById('field-priority').value = client.priority;
+      document.getElementById('field-location').value = client.location;
+      document.getElementById('field-date').value = client.date;
+      document.getElementById('field-notes').value = client.notes || '';
 
-            document.getElementById('modalTitle').innerText = 'Modifica Cliente';
-            document.getElementById('clientModal').classList.remove('hidden');
-        }
+      document.getElementById('modal-title').innerText = 'Modifica Cliente';
+      openModal(true);
+    }
 
-        function deleteClient(id) {
-            if (confirm('Sei sicuro di voler rimuovere questo cliente dalla lista?')) {
-                clients = clients.filter(c => c.id !== id);
-                saveToStorage();
-            }
-        }
+    async function handleFormSubmit(e) {
+      e.preventDefault();
 
-        document.getElementById('btnVoiceModal').onclick = function() {
-            document.getElementById('voiceModal').classList.remove('hidden');
-        };
+      const clientData = {
+        id: document.getElementById('field-id').value || null,
+        name: document.getElementById('field-name').value.trim(),
+        contact: document.getElementById('field-contact').value.trim(),
+        priority: document.getElementById('field-priority').value,
+        location: document.getElementById('field-location').value,
+        date: document.getElementById('field-date').value,
+        notes: document.getElementById('field-notes').value.trim()
+      };
 
-        function closeVoiceModal() {
-            if (isListening && recognition) {
-                recognition.stop();
-            }
-            document.getElementById('voiceModal').classList.add('hidden');
-        }
+      await saveClient(clientData);
+      closeModal();
+    }
 
-        function setupVoiceRecognition() {
-            const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-            if (!SpeechRecognition) {
-                document.getElementById('voiceStatus').innerText = "Riconoscimento vocale non supportato da questo browser.";
-                document.getElementById('toggleListeningBtn').disabled = true;
-                return;
-            }
+    // =========================================================================
+    // 5. RICONOSCIMENTO VOCALE (WEB SPEECH API)
+    // =========================================================================
+    function startVoiceRecognition() {
+      const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
 
-            recognition = new SpeechRecognition();
-            recognition.lang = 'it-IT';
-            recognition.continuous = false;
-            recognition.interimResults = true;
+      if (!SpeechRecognition) {
+        alert("Il tuo browser non supporta la dettatura vocale. Usa Safari su iOS o Chrome su Android.");
+        return;
+      }
 
-            recognition.onstart = function() {
-                isListening = true;
-                document.getElementById('micPulseBg').classList.add('bg-red-600', 'pulse-red');
-                document.getElementById('micIcon').classList.replace('text-zinc-400', 'text-white');
-                document.getElementById('voiceStatus').innerText = "In ascolto... Parla adesso";
-                document.getElementById('toggleListeningBtn').innerText = "Ferma";
-            };
+      const recognition = new SpeechRecognition();
+      recognition.lang = 'it-IT';
+      recognition.interimResults = false;
 
-            recognition.onresult = function(event) {
-                let transcript = '';
-                for (let i = event.resultIndex; i < event.results.length; i++) {
-                    transcript += event.results[i][0].transcript;
-                }
-                document.getElementById('voiceTranscription').innerText = `"${transcript}"`;
+      const pulse = document.getElementById('voice-pulse');
+      pulse.classList.remove('hidden');
 
-                if (event.results[0].isFinal) {
-                    parseVoiceCommand(transcript);
-                }
-            };
+      recognition.start();
 
-            recognition.onerror = function(e) {
-                console.error('Speech error:', e);
-                stopListeningState();
-                document.getElementById('voiceStatus').innerText = "Errore durante l'ascolto. Riprova.";
-            };
+      recognition.onresult = function(event) {
+        pulse.classList.add('hidden');
+        const transcript = event.results[0][0].transcript.toLowerCase();
+        parseVoiceCommand(transcript);
+      };
 
-            recognition.onend = function() {
-                stopListeningState();
-            };
-        }
+      recognition.onerror = function() {
+        pulse.classList.add('hidden');
+        alert("Errore o nessun comando rilevato. Riprova.");
+      };
 
-        function toggleListening() {
-            if (!recognition) return;
-            if (isListening) {
-                recognition.stop();
-            } else {
-                recognition.start();
-            }
-        }
+      recognition.onend = function() {
+        pulse.classList.add('hidden');
+      };
+    }
 
-        function stopListeningState() {
-            isListening = false;
-            document.getElementById('micPulseBg').classList.remove('bg-red-600', 'pulse-red');
-            document.getElementById('micIcon').classList.replace('text-white', 'text-zinc-400');
-            document.getElementById('toggleListeningBtn').innerText = "Avvia Ascolto";
-        }
+    function parseVoiceCommand(text) {
+      openModal();
 
-        function parseVoiceCommand(text) {
-            const lower = text.toLowerCase();
-            
-            // Location extraction
-            let location = 'The Grind';
-            if (lower.includes('milano')) location = 'Milano City Ink';
-            else if (lower.includes('convention')) location = 'Convention';
-            else if (lower.includes('grind')) location = 'The Grind';
+      // Estrazione Nome (cerca dopo "aggiungi" o prende le prime parole)
+      let nameMatch = text.match(/(?:aggiungi|cliente)\s+([a-zàèéìòù\s]+?)(?=\s+(?:per|a|in|nuovo|continuo|telefono|numero|$))/i);
+      if (nameMatch) {
+        document.getElementById('field-name').value = capitalizeWords(nameMatch[1].trim());
+      } else {
+        const words = text.split(' ');
+        if (words.length > 0) document.getElementById('field-name').value = capitalizeWords(words.slice(0, 2).join(' '));
+      }
 
-            // Urgency extraction
-            let urgency = lower.includes('senza fretta') ? 'Senza fretta' : 'Prima possibile';
+      // Estrazione Luogo
+      if (text.includes('milano')) {
+        document.getElementById('field-location').value = 'Milano City Ink';
+      } else if (text.includes('convention')) {
+        document.getElementById('field-location').value = 'Convention';
+      } else {
+        document.getElementById('field-location').value = 'The Grind';
+      }
 
-            // Project Type extraction
-            let projectType = (lower.includes('continuo') || lower.includes('continuare')) ? 
-                              'Continuo Progetto' : 'Nuovo Tatuaggio';
+      // Estrazione Priorità
+      const isContinuo = text.includes('continuo') || text.includes('proseguire') || text.includes('progetto');
+      const isAsap = text.includes('prima possibile') || text.includes('urgente') || text.includes('subito');
 
-            // Phone extraction
-            const phoneMatch = text.match(/\b\d{8,12}\b/);
-            const phone = phoneMatch ? phoneMatch[0] : '';
+      if (isContinuo && isAsap) {
+        document.getElementById('field-priority').value = '1';
+      } else if (!isContinuo && isAsap) {
+        document.getElementById('field-priority').value = '2';
+      } else if (isContinuo && !isAsap) {
+        document.getElementById('field-priority').value = '3';
+      } else {
+        document.getElementById('field-priority').value = '4';
+      }
 
-            // Note extraction
-            let notes = '';
-            if (lower.includes('nota')) {
-                notes = text.substring(lower.indexOf('nota') + 4).trim();
-            } else if (lower.includes('note')) {
-                notes = text.substring(lower.indexOf('note') + 4).trim();
-            }
+      // Estrazione Numero Telefono
+      const phoneMatch = text.match(/\d[\d\s]{7,}\d/);
+      if (phoneMatch) {
+        document.getElementById('field-contact').value = phoneMatch[0].replace(/\s+/g, '');
+      }
 
-            // Name cleaning
-            let nameClean = text
-                .replace(/aggiungi/gi, '')
-                .replace(/per/gi, '')
-                .replace(/continuo progetto/gi, '')
-                .replace(/continuare/gi, '')
-                .replace(/nuovo tatuaggio/gi, '')
-                .replace(/the grind/gi, '')
-                .replace(/milano city ink/gi, '')
-                .replace(/convention/gi, '')
-                .replace(/prima possibile/gi, '')
-                .replace(/senza fretta/gi, '')
-                .replace(/nota.*/gi, '')
-                .replace(/\b\d{8,12}\b/g, '')
-                .trim();
+      // Dettaglio note
+      document.getElementById('field-notes').value = "Inserito via voce: " + text;
+    }
 
-            if (!nameClean) nameClean = "Cliente Vocale";
+    // =========================================================================
+    // UTILITIES
+    // =========================================================================
+    function escapeHtml(str) {
+      if (!str) return '';
+      return str.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;");
+    }
 
-            // Open modal pre-filled
-            openModal();
-            document.getElementById('fieldName').value = capitalizeFirst(nameClean);
-            document.getElementById('fieldPhone').value = phone;
-            document.getElementById('fieldProjectType').value = projectType;
-            document.getElementById('fieldLocation').value = location;
-            document.getElementById('fieldUrgency').value = urgency;
-            document.getElementById('fieldNotes').value = notes;
-            document.getElementById('fieldDate').value = new Date().toISOString().split('T')[0];
+    function formatDate(dateStr) {
+      if (!dateStr) return '';
+      const parts = dateStr.split('-');
+      if (parts.length === 3) return `${parts[2]}/${parts[1]}/${parts[0]}`;
+      return dateStr;
+    }
 
-            closeVoiceModal();
-        }
+    function capitalizeWords(str) {
+      return str.replace(/\b\w/g, l => l.toUpperCase());
+    }
 
-        // Helper utilities
-        function capitalizeFirst(str) {
-            return str.replace(/\w\S*/g, (txt) => txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase());
-        }
-
-        function formatDate(dateStr) {
-            if (!dateStr) return '';
-            const [y, m, d] = dateStr.split('-');
-            return `${d}/${m}/${y}`;
-        }
-
-        function escapeHtml(str) {
-            if (!str) return '';
-            return str.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;");
-        }
-    </script>
+    // Init icons
+    lucide.createIcons();
+  </script>
 </body>
 </html>
