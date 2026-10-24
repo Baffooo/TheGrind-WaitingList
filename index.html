@@ -47,6 +47,10 @@
       background: #262626;
       border-radius: 2px;
     }
+    input[type="date"]::-webkit-calendar-picker-indicator {
+      filter: invert(1);
+      cursor: pointer;
+    }
   </style>
 </head>
 <body class="min-h-screen flex flex-col pb-10">
@@ -81,32 +85,50 @@
       <span>Priorità: ASAP > Relax</span>
     </div>
 
-    <div class="flex gap-2">
-      <div class="relative flex-1">
+    <!-- RICERCA E FILTRI -->
+    <div class="space-y-2">
+      <div class="relative w-full">
         <i data-lucide="search" class="w-4 h-4 absolute left-3 top-3 text-brand-muted"></i>
         <input type="text" id="search-input" oninput="renderList()" placeholder="Cerca cliente o note..." class="w-full bg-brand-card border border-brand-border rounded-xl pl-9 pr-4 py-2 text-sm text-white focus:outline-none focus:border-white">
       </div>
-      <select id="filter-location" onchange="renderList()" class="bg-brand-card border border-brand-border rounded-xl px-3 py-2 text-sm text-white focus:outline-none focus:border-white">
-        <option value="ALL">Tutti i Luoghi</option>
-        <option value="The Grind">The Grind</option>
-        <option value="Milano City Ink">Milano City Ink</option>
-        <option value="Roma">Roma</option>
-        <option value="Pordenone">Pordenone</option>
-        <option value="Convention">Convention</option>
-        <option value="Seminario Cla">Seminario Cla</option>
-        <option value="Seminario Pos">Seminario Pos</option>
-      </select>
+      
+      <div class="grid grid-cols-2 gap-2">
+        <!-- Filtro Luogo -->
+        <select id="filter-location" onchange="renderList()" class="bg-brand-card border border-brand-border rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-white w-full truncate">
+          <option value="ALL">Tutti i Luoghi</option>
+          <option value="The Grind">The Grind</option>
+          <option value="Milano City Ink">Milano City Ink</option>
+          <option value="Roma">Roma</option>
+          <option value="Pordenone">Pordenone</option>
+          <option value="Convention">Convention</option>
+          <option value="Seminario Cla">Seminario Cla</option>
+          <option value="Seminario Pos">Seminario Pos</option>
+        </select>
+
+        <!-- Filtro Tipologia & Priorità -->
+        <select id="filter-priority" onchange="renderList()" class="bg-brand-card border border-brand-border rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-white w-full truncate">
+          <option value="ALL">Tutte le Tipologie</option>
+          <option value="1">Continuo – ASAP</option>
+          <option value="2">Nuovo – ASAP</option>
+          <option value="3">Continuo – Relax</option>
+          <option value="4">Nuovo – Relax</option>
+          <option value="ALL_CONTINUO">Tutti i Continui</option>
+          <option value="ALL_NUOVO">Tutti i Nuovi</option>
+          <option value="EVENT">Iscrizioni Eventi</option>
+        </select>
+      </div>
     </div>
 
     <div id="client-list" class="space-y-3"></div>
 
     <div id="empty-state" class="hidden py-16 text-center space-y-3">
       <i data-lucide="inbox" class="w-12 h-12 mx-auto text-brand-muted stroke-1"></i>
-      <p class="text-brand-muted text-sm">Nessun cliente presente in lista d'attesa.</p>
+      <p class="text-brand-muted text-sm">Nessun cliente presente con i filtri selezionati.</p>
     </div>
 
   </main>
 
+  <!-- MODALE FORM -->
   <div id="modal" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm hidden flex items-end sm:items-center justify-center p-0 sm:p-4">
     <div class="bg-brand-card border border-brand-border w-full max-w-md rounded-t-2xl sm:rounded-2xl p-6 space-y-5 max-h-[90vh] overflow-y-auto custom-scrollbar">
       
@@ -131,18 +153,8 @@
         </div>
 
         <div>
-          <label class="block text-xs font-medium text-brand-muted mb-1">Tipo Progetto & Priorità *</label>
-          <select id="field-priority" required class="w-full bg-brand-black border border-brand-border rounded-xl px-3 py-2 text-sm text-white focus:outline-none focus:border-white">
-            <option value="1">Continuo Progetto – Prima possibile (Rank 1)</option>
-            <option value="2">Nuovo Tatuaggio – Prima possibile (Rank 2)</option>
-            <option value="3">Continuo Progetto – Senza fretta (Rank 3)</option>
-            <option value="4">Nuovo Tatuaggio – Senza fretta (Rank 4)</option>
-          </select>
-        </div>
-
-        <div>
           <label class="block text-xs font-medium text-brand-muted mb-1">Luogo *</label>
-          <select id="field-location" required class="w-full bg-brand-black border border-brand-border rounded-xl px-3 py-2 text-sm text-white focus:outline-none focus:border-white">
+          <select id="field-location" required onchange="handleLocationChange()" class="w-full bg-brand-black border border-brand-border rounded-xl px-3 py-2 text-sm text-white focus:outline-none focus:border-white">
             <option value="The Grind">The Grind</option>
             <option value="Milano City Ink">Milano City Ink</option>
             <option value="Roma">Roma</option>
@@ -150,6 +162,16 @@
             <option value="Convention">Convention</option>
             <option value="Seminario Cla">Seminario Cla</option>
             <option value="Seminario Pos">Seminario Pos</option>
+          </select>
+        </div>
+
+        <div id="priority-container">
+          <label class="block text-xs font-medium text-brand-muted mb-1">Tipo Progetto & Priorità *</label>
+          <select id="field-priority" required class="w-full bg-brand-black border border-brand-border rounded-xl px-3 py-2 text-sm text-white focus:outline-none focus:border-white">
+            <option value="1">Continuo Progetto – Prima possibile (Rank 1)</option>
+            <option value="2">Nuovo Tatuaggio – Prima possibile (Rank 2)</option>
+            <option value="3">Continuo Progetto – Senza fretta (Rank 3)</option>
+            <option value="4">Nuovo Tatuaggio – Senza fretta (Rank 4)</option>
           </select>
         </div>
 
@@ -189,6 +211,8 @@ const firebaseConfig = {
     let db = null;
     let useLocalStorage = false;
     let clientsData = [];
+
+    const EVENT_LOCATIONS = ['Convention', 'Seminario Cla', 'Seminario Pos'];
 
     try {
       if (firebaseConfig.apiKey !== "INSERISCI_LA_TUA_API_KEY") {
@@ -268,19 +292,35 @@ const firebaseConfig = {
       1: { text: 'Continuo – ASAP', badge: 'bg-white text-black font-bold' },
       2: { text: 'Nuovo – ASAP', badge: 'bg-neutral-300 text-black font-medium' },
       3: { text: 'Continuo – Relax', badge: 'bg-neutral-800 text-neutral-300 border border-neutral-700' },
-      4: { text: 'Nuovo – Relax', badge: 'bg-neutral-900 text-neutral-500 border border-neutral-800' }
+      4: { text: 'Nuovo – Relax', badge: 'bg-neutral-900 text-neutral-500 border border-neutral-800' },
+      0: { text: 'Iscrizione Evento', badge: 'bg-emerald-950 text-emerald-300 border border-emerald-800' }
     };
 
     function renderList() {
       const searchQuery = document.getElementById('search-input').value.toLowerCase();
       const locationFilter = document.getElementById('filter-location').value;
+      const priorityFilter = document.getElementById('filter-priority').value;
 
       let filtered = clientsData.filter(c => {
         const matchesSearch = c.name.toLowerCase().includes(searchQuery) || 
                               (c.notes && c.notes.toLowerCase().includes(searchQuery)) ||
                               c.contact.includes(searchQuery);
         const matchesLocation = locationFilter === 'ALL' || c.location === locationFilter;
-        return matchesSearch && matchesLocation;
+
+        let matchesPriority = true;
+        const p = String(c.priority);
+
+        if (priorityFilter === 'ALL_CONTINUO') {
+          matchesPriority = (p === '1' || p === '3');
+        } else if (priorityFilter === 'ALL_NUOVO') {
+          matchesPriority = (p === '2' || p === '4');
+        } else if (priorityFilter === 'EVENT') {
+          matchesPriority = (p === '0');
+        } else if (priorityFilter !== 'ALL') {
+          matchesPriority = (p === priorityFilter);
+        }
+
+        return matchesSearch && matchesLocation && matchesPriority;
       });
 
       filtered.sort((a, b) => {
@@ -366,6 +406,17 @@ const firebaseConfig = {
       if (window.lucide) lucide.createIcons();
     }
 
+    function handleLocationChange() {
+      const selectedLoc = document.getElementById('field-location').value;
+      const priorityContainer = document.getElementById('priority-container');
+
+      if (EVENT_LOCATIONS.includes(selectedLoc)) {
+        priorityContainer.classList.add('hidden');
+      } else {
+        priorityContainer.classList.remove('hidden');
+      }
+    }
+
     function openModal(isEdit = false) {
       if (!isEdit) {
         document.getElementById('client-form').reset();
@@ -373,6 +424,7 @@ const firebaseConfig = {
         document.getElementById('modal-title').innerText = 'Nuovo Cliente';
         document.getElementById('field-date').valueAsDate = new Date();
       }
+      handleLocationChange();
       document.getElementById('modal').classList.remove('hidden');
     }
 
@@ -387,8 +439,8 @@ const firebaseConfig = {
       document.getElementById('field-id').value = client.id;
       document.getElementById('field-name').value = client.name;
       document.getElementById('field-contact').value = client.contact;
-      document.getElementById('field-priority').value = client.priority;
       document.getElementById('field-location').value = client.location;
+      document.getElementById('field-priority').value = client.priority || '4';
       document.getElementById('field-date').value = client.date;
       document.getElementById('field-notes').value = client.notes || '';
 
@@ -399,12 +451,15 @@ const firebaseConfig = {
     async function handleFormSubmit(e) {
       e.preventDefault();
 
+      const selectedLoc = document.getElementById('field-location').value;
+      const isEvent = EVENT_LOCATIONS.includes(selectedLoc);
+
       const clientData = {
         id: document.getElementById('field-id').value || null,
         name: document.getElementById('field-name').value.trim(),
         contact: document.getElementById('field-contact').value.trim(),
-        priority: document.getElementById('field-priority').value,
-        location: document.getElementById('field-location').value,
+        priority: isEvent ? '0' : document.getElementById('field-priority').value,
+        location: selectedLoc,
         date: document.getElementById('field-date').value,
         notes: document.getElementById('field-notes').value.trim()
       };
@@ -474,6 +529,8 @@ const firebaseConfig = {
         document.getElementById('field-location').value = 'The Grind';
       }
 
+      handleLocationChange();
+
       const isContinuo = text.includes('continuo') || text.includes('proseguire') || text.includes('progetto');
       const isAsap = text.includes('prima possibile') || text.includes('urgente') || text.includes('subito');
 
@@ -517,5 +574,3 @@ const firebaseConfig = {
   </script>
 </body>
 </html>
-
-```
