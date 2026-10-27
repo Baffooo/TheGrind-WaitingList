@@ -12,9 +12,10 @@
   <meta name="theme-color" content="#0a0a0a">
   <script src="https://cdn.tailwindcss.com"></script>
 
+  <!-- Google Fonts: Audiowide per gli artisti e Space Grotesk per i titoli -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=Space+Grotesk:wght@600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Audiowide&family=Space+Grotesk:wght@600;700;800&display=swap" rel="stylesheet">
 
   <script>
     tailwind.config = {
@@ -22,7 +23,7 @@
       theme: {
         extend: {
           fontFamily: {
-            artistHome: ['Syne', 'sans-serif'],
+            artistHome: ['Audiowide', 'sans-serif'],
             heading: ['Space Grotesk', 'sans-serif']
           },
           colors: {
@@ -97,33 +98,35 @@
     
     <!-- CONTENUTO SELEZIONE ARTISTI -->
     <div id="home-artists-view" class="w-full max-w-sm flex flex-col items-center space-y-4">
-      <div class="text-center space-y-1.5">
+      <div class="text-center space-y-2">
         <div class="logo-hover-effect w-32 h-32 sm:w-40 sm:h-40 mx-auto flex items-center justify-center overflow-visible cursor-pointer transition-all duration-300">
           <img src="logo.jpg" alt="Logo The Grind" class="max-w-full max-h-full object-contain transition-all duration-300">
         </div>
 
         <div>
-          <h1 class="font-heading text-lg sm:text-xl font-black tracking-wider text-white uppercase">THE GRIND TATTOO FINEST</h1>
-          <p class="text-[10px] text-brand-muted tracking-[0.25em] uppercase font-bold mt-0.5">PICK YOUR ARTIST</p>
+          <!-- Titolo e Sottotitolo ingranditi e differenziati -->
+          <h1 class="font-heading text-xl sm:text-2xl font-black tracking-wide text-white uppercase">THE GRIND TATTOO FINEST</h1>
+          <p class="text-xs sm:text-sm text-brand-muted tracking-[0.3em] uppercase font-bold mt-1.5">PICK YOUR ARTIST</p>
         </div>
       </div>
 
+      <!-- Pulsanti scelta artista rimpiccioliti leggermente e perfettamente centrati -->
       <div class="w-full space-y-2.5">
-        <button onclick="selectArtist('claudia')" class="w-full py-3.5 px-4 rounded-2xl bg-brand-card border border-pink-500/30 hover:border-pink-500 hover:bg-pink-500/10 hover:scale-[1.02] hover:shadow-[0_0_20px_rgba(236,72,153,0.2)] grid grid-cols-[24px_1fr_24px] items-center transition-all duration-300 active:scale-95 group cursor-pointer">
-          <div class="w-3 h-3 rounded-full bg-pink-500 shadow-[0_0_10px_#ec4899] justify-self-start"></div>
-          <span class="font-artistHome font-extrabold text-white text-base sm:text-lg tracking-wide text-center group-hover:text-pink-400 transition-colors">Claudia Bindi</span>
+        <button onclick="selectArtist('claudia')" class="w-full py-3 px-4 rounded-xl bg-brand-card border border-pink-500/30 hover:border-pink-500 hover:bg-pink-500/10 hover:scale-[1.02] hover:shadow-[0_0_20px_rgba(236,72,153,0.2)] grid grid-cols-[20px_1fr_20px] items-center transition-all duration-300 active:scale-95 group cursor-pointer">
+          <div class="w-2.5 h-2.5 rounded-full bg-pink-500 shadow-[0_0_10px_#ec4899] justify-self-start"></div>
+          <span class="font-artistHome text-xs sm:text-sm text-white tracking-wider text-center group-hover:text-pink-400 transition-colors">Claudia Bindi</span>
           <i data-lucide="chevron-right" class="w-4 h-4 text-pink-500 justify-self-end transform group-hover:translate-x-1 transition-transform"></i>
         </button>
 
-        <button onclick="selectArtist('posco')" class="w-full py-3.5 px-4 rounded-2xl bg-brand-card border border-blue-500/30 hover:border-blue-500 hover:bg-blue-500/10 hover:scale-[1.02] hover:shadow-[0_0_20px_rgba(59,130,246,0.2)] grid grid-cols-[24px_1fr_24px] items-center transition-all duration-300 active:scale-95 group cursor-pointer">
-          <div class="w-3 h-3 rounded-full bg-blue-500 shadow-[0_0_10px_#3b82f6] justify-self-start"></div>
-          <span class="font-artistHome font-extrabold text-white text-base sm:text-lg tracking-wide text-center group-hover:text-blue-400 transition-colors">Posco Losco</span>
+        <button onclick="selectArtist('posco')" class="w-full py-3 px-4 rounded-xl bg-brand-card border border-blue-500/30 hover:border-blue-500 hover:bg-blue-500/10 hover:scale-[1.02] hover:shadow-[0_0_20px_rgba(59,130,246,0.2)] grid grid-cols-[20px_1fr_20px] items-center transition-all duration-300 active:scale-95 group cursor-pointer">
+          <div class="w-2.5 h-2.5 rounded-full bg-blue-500 shadow-[0_0_10px_#3b82f6] justify-self-start"></div>
+          <span class="font-artistHome text-xs sm:text-sm text-white tracking-wider text-center group-hover:text-blue-400 transition-colors">Posco Losco</span>
           <i data-lucide="chevron-right" class="w-4 h-4 text-blue-500 justify-self-end transform group-hover:translate-x-1 transition-transform"></i>
         </button>
 
-        <button onclick="selectArtist('davide')" class="w-full py-3.5 px-4 rounded-2xl bg-brand-card border border-orange-500/30 hover:border-orange-500 hover:bg-orange-500/10 hover:scale-[1.02] hover:shadow-[0_0_20px_rgba(249,115,22,0.2)] grid grid-cols-[24px_1fr_24px] items-center transition-all duration-300 active:scale-95 group cursor-pointer">
-          <div class="w-3 h-3 rounded-full bg-orange-500 shadow-[0_0_10px_#f97316] justify-self-start"></div>
-          <span class="font-artistHome font-extrabold text-white text-base sm:text-lg tracking-wide text-center group-hover:text-orange-400 transition-colors">Davide Saba</span>
+        <button onclick="selectArtist('davide')" class="w-full py-3 px-4 rounded-xl bg-brand-card border border-orange-500/30 hover:border-orange-500 hover:bg-orange-500/10 hover:scale-[1.02] hover:shadow-[0_0_20px_rgba(249,115,22,0.2)] grid grid-cols-[20px_1fr_20px] items-center transition-all duration-300 active:scale-95 group cursor-pointer">
+          <div class="w-2.5 h-2.5 rounded-full bg-orange-500 shadow-[0_0_10px_#f97316] justify-self-start"></div>
+          <span class="font-artistHome text-xs sm:text-sm text-white tracking-wider text-center group-hover:text-orange-400 transition-colors">Davide Saba</span>
           <i data-lucide="chevron-right" class="w-4 h-4 text-orange-500 justify-self-end transform group-hover:translate-x-1 transition-transform"></i>
         </button>
       </div>
@@ -131,8 +134,6 @@
 
     <!-- VISTA LISTA SPESA (CON LOGO E ICONA HOME) -->
     <div id="home-shopping-view" class="w-full max-w-md space-y-3 hidden">
-      
-      <!-- HEADER LISTA SPESA CON LOGO E PULSANTE CASA -->
       <div class="flex justify-between items-center bg-brand-card border border-brand-border p-3.5 rounded-2xl">
         <div class="flex items-center gap-3">
           <div class="logo-hover-effect w-10 h-10 flex items-center justify-center overflow-visible cursor-pointer">
@@ -153,17 +154,9 @@
         </div>
       </div>
 
-      <!-- FORM SPESA MOBILE-FRIENDLY CON GRIGLIA FLUIDA -->
-      <div class="grid grid-cols-[1fr_50px_auto_auto] gap-1.5 items-center bg-brand-card border border-brand-border p-2 rounded-xl">
+      <div class="grid grid-cols-[1fr_50px_auto] gap-1.5 items-center bg-brand-card border border-brand-border p-2 rounded-xl">
         <input type="text" id="shopping-item-name" placeholder="Articolo..." class="w-full bg-brand-black border border-brand-border rounded-lg px-2.5 py-2 text-xs text-white focus:outline-none focus:border-white truncate">
         <input type="number" id="shopping-item-qty" value="1" min="1" class="w-full bg-brand-black border border-brand-border rounded-lg px-1 py-2 text-xs text-white text-center focus:outline-none focus:border-white">
-        
-        <!-- MICROFONO SPESA (TOGGLE ON/OFF) -->
-        <button type="button" id="shopping-mic-btn" onclick="toggleShoppingVoice()" class="p-2 rounded-lg bg-emerald-600/20 border border-emerald-500/40 text-emerald-400 hover:bg-emerald-600/30 transition-all active:scale-95 relative cursor-pointer" title="Parla per aggiungere/modificare">
-          <i data-lucide="mic" class="w-4 h-4 pointer-events-none"></i>
-          <span id="shopping-voice-pulse" class="hidden absolute top-0 right-0 w-2 h-2 bg-emerald-400 rounded-full animate-ping pointer-events-none"></span>
-        </button>
-
         <button onclick="addShoppingItemManual()" class="px-3 py-2 rounded-lg bg-emerald-600 text-white font-semibold text-xs hover:bg-emerald-500 transition-all whitespace-nowrap">Aggiungi</button>
       </div>
 
@@ -192,7 +185,7 @@
       </div>
       <div class="truncate">
         <div onclick="openArtistSelectionScreen()" class="flex items-center gap-1.5 cursor-pointer group" title="Clicca per cambiare artista">
-          <h1 id="artist-title" class="font-artistHome font-bold text-sm tracking-wider text-white uppercase leading-none truncate group-hover:underline">CLAUDIA BINDI</h1>
+          <h1 id="artist-title" class="font-heading font-bold text-sm tracking-wider text-white uppercase leading-none truncate group-hover:underline">CLAUDIA BINDI</h1>
           <i data-lucide="repeat" class="w-3 h-3 text-brand-muted group-hover:text-white shrink-0"></i>
         </div>
         <h2 class="text-[10px] font-bold tracking-widest text-neutral-300 uppercase leading-tight mt-0.5 truncate">WAITING LIST</h2>
@@ -200,7 +193,7 @@
     </div>
 
     <div class="flex items-center gap-2 shrink-0 z-10">
-      <button type="button" id="voice-btn" onclick="toggleClientVoice()" class="p-2.5 rounded-full bg-brand-card border border-brand-border text-white hover:border-white transition-all active:scale-95 relative cursor-pointer" title="Comando Vocale Cliente (Premi per avviare/fermare)">
+      <button type="button" id="voice-btn" onclick="startVoiceRecognition(event)" class="p-2.5 rounded-full bg-brand-card border border-brand-border text-white hover:border-white transition-all active:scale-95 relative cursor-pointer" title="Comando Vocale">
         <i data-lucide="mic" class="w-5 h-5 pointer-events-none"></i>
         <span id="voice-pulse" class="hidden absolute top-0 right-0 w-3 h-3 bg-red-500 rounded-full animate-ping pointer-events-none"></span>
       </button>
@@ -669,7 +662,6 @@ const firebaseConfig = {
         fabBtn.classList.add('bg-white', 'text-black');
         renderShoppingList();
       } else {
-        stopShoppingVoice();
         shoppingView.classList.add('hidden');
         artistView.classList.remove('hidden');
         fabBtn.classList.remove('bg-white', 'text-black');
@@ -755,128 +747,22 @@ const firebaseConfig = {
     }
 
     // =========================================================================
-    // SISTEMA DI DETTATURA VOCALE MIGLIORATO (START/STOP MANUALE O INTELLIGENTE)
+    // DETTATURA VOCALE PER CLIENTI
     // =========================================================================
     let activeRecognition = null;
-    let isShoppingListening = false;
     let isClientListening = false;
 
-    function toggleShoppingVoice() {
-      if (isShoppingListening) {
-        stopShoppingVoice();
-      } else {
-        startShoppingVoice();
-      }
-    }
-
-    function startShoppingVoice() {
+    function startVoiceRecognition(e) {
+      if (e) e.preventDefault();
       const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+
       if (!SpeechRecognition) {
         alert("Il tuo browser non supporta la dettatura vocale.");
         return;
       }
 
-      activeRecognition = new SpeechRecognition();
-      activeRecognition.lang = 'it-IT';
-      activeRecognition.interimResults = false;
-      activeRecognition.continuous = false;
-
-      const pulse = document.getElementById('shopping-voice-pulse');
-      const micBtn = document.getElementById('shopping-mic-btn');
-
-      activeRecognition.onstart = function() {
-        isShoppingListening = true;
-        if (pulse) pulse.classList.remove('hidden');
-        if (micBtn) micBtn.classList.add('bg-emerald-600', 'text-white');
-      };
-
-      activeRecognition.onresult = function(event) {
-        const transcript = event.results[0][0].transcript.toLowerCase().trim();
-        parseShoppingVoiceCommand(transcript);
-      };
-
-      activeRecognition.onerror = function() {
-        stopShoppingVoice();
-      };
-
-      activeRecognition.onend = function() {
-        stopShoppingVoice();
-      };
-
-      activeRecognition.start();
-    }
-
-    function stopShoppingVoice() {
-      isShoppingListening = false;
-      const pulse = document.getElementById('shopping-voice-pulse');
-      const micBtn = document.getElementById('shopping-mic-btn');
-      if (pulse) pulse.classList.add('hidden');
-      if (micBtn) micBtn.classList.remove('bg-emerald-600', 'text-white');
-      if (activeRecognition) {
-        try { activeRecognition.stop(); } catch(e){}
-        activeRecognition = null;
-      }
-    }
-
-    function parseShoppingVoiceCommand(text) {
-      if (text.includes('elimina tutto') || text.includes('svuota lista') || text.includes('cancella tutto')) {
-        confirmClearShoppingList();
-        return;
-      }
-
-      let modMatch = text.match(/(?:modifica|cambia)\s+(?:la\s+)?quantità\s+(?:di\s+)?([a-zàèéìòù\s\d]+?)\s+(?:in|a)\s+(\d+)/i);
-      if (modMatch) {
-        const itemName = modMatch[1].trim();
-        const newQty = parseInt(modMatch[2]);
-        const item = shoppingList.find(i => i.name.toLowerCase().includes(itemName));
-        if (item) {
-          item.qty = newQty;
-          localStorage.setItem('shopping_list_data', JSON.stringify(shoppingList));
-          renderShoppingList();
-          return;
-        }
-      }
-
-      let itemName = '';
-      let qty = 1;
-
-      let qtyMatch = text.match(/(?:quantità|in quantità)\s+(\d+)/i);
-      if (qtyMatch) {
-        qty = parseInt(qtyMatch[1]);
-        itemName = text.replace(/(?:aggiungi|alla lista|in quantità|\d+)/gi, '').trim();
-      } else {
-        itemName = text.replace(/aggiungi/gi, '').replace(/alla lista/gi, '').trim();
-      }
-
-      if (itemName) {
-        itemName = capitalizeWords(itemName);
-        const existing = shoppingList.find(i => i.name.toLowerCase() === itemName.toLowerCase());
-        if (existing) {
-          existing.qty += qty;
-        } else {
-          shoppingList.push({ name: itemName, qty });
-        }
-        localStorage.setItem('shopping_list_data', JSON.stringify(shoppingList));
-        renderShoppingList();
-        return;
-      }
-
-      alert("Comando vocale spesa ricevuto ma non interpretato: '" + text + "'");
-    }
-
-    // Dettatura vocale clienti
-    function toggleClientVoice() {
       if (isClientListening) {
         stopClientVoice();
-      } else {
-        startClientVoice();
-      }
-    }
-
-    function startClientVoice() {
-      const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-      if (!SpeechRecognition) {
-        alert("Il tuo browser non supporta la dettatura vocale.");
         return;
       }
 
