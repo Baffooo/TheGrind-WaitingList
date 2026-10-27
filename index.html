@@ -12,10 +12,10 @@
   <meta name="theme-color" content="#0a0a0a">
   <script src="https://cdn.tailwindcss.com"></script>
 
-  <!-- Google Fonts per un look tipografico d'impatto -->
+  <!-- Google Fonts Pulito e Moderno per gli Artisti -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@600;700&family=Syne:wght@700;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@600;700;800&family=Space+Grotesk:wght@600;700&display=swap" rel="stylesheet">
 
   <script>
     tailwind.config = {
@@ -23,7 +23,7 @@
       theme: {
         extend: {
           fontFamily: {
-            artist: ['Syne', 'sans-serif'],
+            artist: ['Montserrat', 'sans-serif'],
             heading: ['Space Grotesk', 'sans-serif']
           },
           colors: {
@@ -66,27 +66,27 @@
       cursor: pointer;
     }
 
-    /* Animazione Scintilla e Saltello per il Logo */
+    /* Animazione Scintilla e Saltello per il Logo Libero */
     @keyframes logoSparkleBounce {
       0% {
         transform: translateY(0) scale(1) rotate(0deg);
-        filter: drop-shadow(0 0 10px rgba(255, 255, 255, 0.2)) brightness(1);
+        filter: drop-shadow(0 0 15px rgba(255, 255, 255, 0.25)) brightness(1);
       }
       30% {
-        transform: translateY(-12px) scale(1.08) rotate(-3deg);
-        filter: drop-shadow(0 0 25px rgba(255, 255, 255, 0.8)) brightness(1.3);
+        transform: translateY(-14px) scale(1.1) rotate(-3deg);
+        filter: drop-shadow(0 0 30px rgba(255, 255, 255, 0.8)) brightness(1.35);
       }
       60% {
-        transform: translateY(-4px) scale(1.03) rotate(2deg);
-        filter: drop-shadow(0 0 35px rgba(255, 255, 255, 1)) brightness(1.5);
+        transform: translateY(-5px) scale(1.04) rotate(2deg);
+        filter: drop-shadow(0 0 40px rgba(255, 255, 255, 1)) brightness(1.6);
       }
       80% {
-        transform: translateY(-7px) scale(1.05) rotate(-1deg);
-        filter: drop-shadow(0 0 20px rgba(255, 255, 255, 0.6)) brightness(1.2);
+        transform: translateY(-8px) scale(1.07) rotate(-1deg);
+        filter: drop-shadow(0 0 25px rgba(255, 255, 255, 0.6)) brightness(1.25);
       }
       100% {
         transform: translateY(0) scale(1) rotate(0deg);
-        filter: drop-shadow(0 0 10px rgba(255, 255, 255, 0.2)) brightness(1);
+        filter: drop-shadow(0 0 15px rgba(255, 255, 255, 0.25)) brightness(1);
       }
     }
 
@@ -99,37 +99,43 @@
 <body class="min-h-screen flex flex-col pb-10">
 
   <!-- SCHERMATA SELEZIONE ARTISTA ALL'AVVIO -->
-  <div id="artist-selector-screen" class="fixed inset-0 z-50 bg-brand-black flex flex-col items-center justify-center p-6 space-y-8">
-    <div class="text-center space-y-4 max-w-sm">
+  <div id="artist-selector-screen" class="fixed inset-0 z-50 bg-brand-black flex flex-col items-center justify-center p-6 space-y-6">
+    <div class="text-center space-y-3 max-w-sm">
       
-      <!-- LOGO PIÙ GRANDE CON EFFETTO SALTELLO & SCINTILLA -->
-      <div class="logo-hover-effect w-28 h-28 sm:w-32 sm:h-32 mx-auto rounded-3xl bg-black border border-brand-border/80 p-3 flex items-center justify-center overflow-hidden shadow-2xl transition-all duration-300 cursor-pointer">
+      <!-- LOGO PIÙ GRANDE E LIBERO DA CONFINI -->
+      <div class="logo-hover-effect w-40 h-40 sm:w-48 sm:h-48 mx-auto flex items-center justify-center overflow-visible cursor-pointer transition-all duration-300">
         <img src="logo.jpg" alt="Logo The Grind" class="max-w-full max-h-full object-contain transition-all duration-300">
       </div>
 
       <div>
-        <h1 class="font-heading text-xl sm:text-2xl font-black tracking-wider text-white uppercase">THE GRIND TATTOO FINEST</h1>
-        <p class="text-[11px] text-brand-muted tracking-[0.25em] uppercase font-bold mt-1">PICK YOUR ARTIST</p>
+        <h1 class="font-heading text-lg sm:text-xl font-black tracking-wider text-white uppercase">THE GRIND TATTOO FINEST</h1>
+        <p class="text-[10px] text-brand-muted tracking-[0.25em] uppercase font-bold mt-1">PICK YOUR ARTIST</p>
       </div>
     </div>
 
-    <!-- PULSANTI ARTISTI COMPATTI E CENTRATI CON FONT DEDICATO -->
+    <!-- PULSANTI ARTISTI COMPATTI E CENTRATI -->
     <div class="w-full max-w-xs space-y-3">
-      <button onclick="selectArtist('claudia')" class="w-full py-3.5 px-5 rounded-2xl bg-brand-card border border-pink-500/30 hover:border-pink-500 hover:bg-pink-500/10 hover:scale-[1.03] hover:shadow-[0_0_25px_rgba(236,72,153,0.25)] flex items-center justify-center gap-3 transition-all duration-300 active:scale-95 group cursor-pointer">
-        <div class="w-3 h-3 rounded-full bg-pink-500 shadow-[0_0_10px_#ec4899] shrink-0"></div>
-        <span class="font-artist font-extrabold text-white text-base tracking-wider group-hover:text-pink-400 transition-colors">Claudia Bindi</span>
+      <button onclick="selectArtist('claudia')" class="w-full py-3.5 px-5 rounded-2xl bg-brand-card border border-pink-500/30 hover:border-pink-500 hover:bg-pink-500/10 hover:scale-[1.03] hover:shadow-[0_0_25px_rgba(236,72,153,0.25)] flex items-center justify-between transition-all duration-300 active:scale-95 group cursor-pointer">
+        <div class="flex items-center gap-3">
+          <div class="w-3 h-3 rounded-full bg-pink-500 shadow-[0_0_10px_#ec4899] shrink-0"></div>
+          <span class="font-artist font-bold text-white text-sm tracking-wide group-hover:text-pink-400 transition-colors">Claudia Bindi</span>
+        </div>
         <i data-lucide="chevron-right" class="w-4 h-4 text-pink-500 transform group-hover:translate-x-1 transition-transform shrink-0"></i>
       </button>
 
-      <button onclick="selectArtist('posco')" class="w-full py-3.5 px-5 rounded-2xl bg-brand-card border border-blue-500/30 hover:border-blue-500 hover:bg-blue-500/10 hover:scale-[1.03] hover:shadow-[0_0_25px_rgba(59,130,246,0.25)] flex items-center justify-center gap-3 transition-all duration-300 active:scale-95 group cursor-pointer">
-        <div class="w-3 h-3 rounded-full bg-blue-500 shadow-[0_0_10px_#3b82f6] shrink-0"></div>
-        <span class="font-artist font-extrabold text-white text-base tracking-wider group-hover:text-blue-400 transition-colors">Posco Losco</span>
+      <button onclick="selectArtist('posco')" class="w-full py-3.5 px-5 rounded-2xl bg-brand-card border border-blue-500/30 hover:border-blue-500 hover:bg-blue-500/10 hover:scale-[1.03] hover:shadow-[0_0_25px_rgba(59,130,246,0.25)] flex items-center justify-between transition-all duration-300 active:scale-95 group cursor-pointer">
+        <div class="flex items-center gap-3">
+          <div class="w-3 h-3 rounded-full bg-blue-500 shadow-[0_0_10px_#3b82f6] shrink-0"></div>
+          <span class="font-artist font-bold text-white text-sm tracking-wide group-hover:text-blue-400 transition-colors">Posco Losco</span>
+        </div>
         <i data-lucide="chevron-right" class="w-4 h-4 text-blue-500 transform group-hover:translate-x-1 transition-transform shrink-0"></i>
       </button>
 
-      <button onclick="selectArtist('davide')" class="w-full py-3.5 px-5 rounded-2xl bg-brand-card border border-orange-500/30 hover:border-orange-500 hover:bg-orange-500/10 hover:scale-[1.03] hover:shadow-[0_0_25px_rgba(249,115,22,0.25)] flex items-center justify-center gap-3 transition-all duration-300 active:scale-95 group cursor-pointer">
-        <div class="w-3 h-3 rounded-full bg-orange-500 shadow-[0_0_10px_#f97316] shrink-0"></div>
-        <span class="font-artist font-extrabold text-white text-base tracking-wider group-hover:text-orange-400 transition-colors">Davide Saba</span>
+      <button onclick="selectArtist('davide')" class="w-full py-3.5 px-5 rounded-2xl bg-brand-card border border-orange-500/30 hover:border-orange-500 hover:bg-orange-500/10 hover:scale-[1.03] hover:shadow-[0_0_25px_rgba(249,115,22,0.25)] flex items-center justify-between transition-all duration-300 active:scale-95 group cursor-pointer">
+        <div class="flex items-center gap-3">
+          <div class="w-3 h-3 rounded-full bg-orange-500 shadow-[0_0_10px_#f97316] shrink-0"></div>
+          <span class="font-artist font-bold text-white text-sm tracking-wide group-hover:text-orange-400 transition-colors">Davide Saba</span>
+        </div>
         <i data-lucide="chevron-right" class="w-4 h-4 text-orange-500 transform group-hover:translate-x-1 transition-transform shrink-0"></i>
       </button>
     </div>
@@ -142,9 +148,8 @@
         <img src="logo.jpg" alt="Logo" class="max-w-full max-h-full object-contain">
       </div>
       <div class="truncate">
-        <!-- Cliccando direttamente sul nome si apre la schermata di cambio artista -->
         <div onclick="openArtistSelectionScreen()" class="flex items-center gap-1.5 cursor-pointer group" title="Clicca per cambiare artista">
-          <h1 id="artist-title" class="font-artist font-extrabold text-sm tracking-wider text-white uppercase leading-none truncate group-hover:underline">CLAUDIA BINDI</h1>
+          <h1 id="artist-title" class="font-artist font-bold text-sm tracking-wider text-white uppercase leading-none truncate group-hover:underline">CLAUDIA BINDI</h1>
           <i data-lucide="repeat" class="w-3 h-3 text-brand-muted group-hover:text-white shrink-0"></i>
         </div>
         <h2 class="text-xs font-bold tracking-widest text-neutral-300 uppercase leading-tight mt-0.5 truncate">WAITING LIST</h2>
