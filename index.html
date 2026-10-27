@@ -14,7 +14,7 @@
 
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@600;700;800&family=Space+Grotesk:wght@600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=Space+Grotesk:wght@600;700&display=swap" rel="stylesheet">
 
   <script>
     tailwind.config = {
@@ -22,7 +22,7 @@
       theme: {
         extend: {
           fontFamily: {
-            artist: ['Montserrat', 'sans-serif'],
+            artistHome: ['Syne', 'sans-serif'],
             heading: ['Space Grotesk', 'sans-serif']
           },
           colors: {
@@ -93,75 +93,85 @@
 <body class="min-h-screen flex flex-col pb-10">
 
   <!-- SCHERMATA SELEZIONE ARTISTA E LISTA SPESA (PAGINA PRINCIPALE) -->
-  <div id="artist-selector-screen" class="fixed inset-0 z-50 bg-brand-black flex flex-col items-center justify-center p-4 sm:p-6 space-y-6">
+  <div id="artist-selector-screen" class="fixed inset-0 z-50 bg-brand-black flex flex-col items-center justify-center p-4 sm:p-6 space-y-5">
     
     <!-- CONTENUTO SELEZIONE ARTISTI -->
-    <div id="home-artists-view" class="w-full max-w-sm flex flex-col items-center space-y-5">
-      <div class="text-center space-y-2">
-        <div class="logo-hover-effect w-36 h-36 sm:w-44 sm:h-44 mx-auto flex items-center justify-center overflow-visible cursor-pointer transition-all duration-300">
+    <div id="home-artists-view" class="w-full max-w-sm flex flex-col items-center space-y-4">
+      <div class="text-center space-y-1.5">
+        <div class="logo-hover-effect w-32 h-32 sm:w-40 sm:h-40 mx-auto flex items-center justify-center overflow-visible cursor-pointer transition-all duration-300">
           <img src="logo.jpg" alt="Logo The Grind" class="max-w-full max-h-full object-contain transition-all duration-300">
         </div>
 
         <div>
-          <h1 class="font-heading text-xl sm:text-2xl font-black tracking-wider text-white uppercase">THE GRIND TATTOO FINEST</h1>
-          <p class="text-xs text-brand-muted tracking-[0.25em] uppercase font-bold mt-1">PICK YOUR ARTIST</p>
+          <h1 class="font-heading text-lg sm:text-xl font-black tracking-wider text-white uppercase">THE GRIND TATTOO FINEST</h1>
+          <p class="text-[10px] text-brand-muted tracking-[0.25em] uppercase font-bold mt-0.5">PICK YOUR ARTIST</p>
         </div>
       </div>
 
-      <div class="w-full space-y-3">
-        <button onclick="selectArtist('claudia')" class="w-full py-4 px-5 rounded-2xl bg-brand-card border border-pink-500/30 hover:border-pink-500 hover:bg-pink-500/10 hover:scale-[1.02] hover:shadow-[0_0_20px_rgba(236,72,153,0.2)] grid grid-cols-[24px_1fr_24px] items-center transition-all duration-300 active:scale-95 group cursor-pointer">
-          <div class="w-3.5 h-3.5 rounded-full bg-pink-500 shadow-[0_0_10px_#ec4899] justify-self-start"></div>
-          <span class="font-artist font-bold text-white text-base sm:text-lg tracking-wide text-center group-hover:text-pink-400 transition-colors">Claudia Bindi</span>
-          <i data-lucide="chevron-right" class="w-5 h-5 text-pink-500 justify-self-end transform group-hover:translate-x-1 transition-transform"></i>
+      <div class="w-full space-y-2.5">
+        <button onclick="selectArtist('claudia')" class="w-full py-3.5 px-4 rounded-2xl bg-brand-card border border-pink-500/30 hover:border-pink-500 hover:bg-pink-500/10 hover:scale-[1.02] hover:shadow-[0_0_20px_rgba(236,72,153,0.2)] grid grid-cols-[24px_1fr_24px] items-center transition-all duration-300 active:scale-95 group cursor-pointer">
+          <div class="w-3 h-3 rounded-full bg-pink-500 shadow-[0_0_10px_#ec4899] justify-self-start"></div>
+          <span class="font-artistHome font-extrabold text-white text-base sm:text-lg tracking-wide text-center group-hover:text-pink-400 transition-colors">Claudia Bindi</span>
+          <i data-lucide="chevron-right" class="w-4 h-4 text-pink-500 justify-self-end transform group-hover:translate-x-1 transition-transform"></i>
         </button>
 
-        <button onclick="selectArtist('posco')" class="w-full py-4 px-5 rounded-2xl bg-brand-card border border-blue-500/30 hover:border-blue-500 hover:bg-blue-500/10 hover:scale-[1.02] hover:shadow-[0_0_20px_rgba(59,130,246,0.2)] grid grid-cols-[24px_1fr_24px] items-center transition-all duration-300 active:scale-95 group cursor-pointer">
-          <div class="w-3.5 h-3.5 rounded-full bg-blue-500 shadow-[0_0_10px_#3b82f6] justify-self-start"></div>
-          <span class="font-artist font-bold text-white text-base sm:text-lg tracking-wide text-center group-hover:text-blue-400 transition-colors">Posco Losco</span>
-          <i data-lucide="chevron-right" class="w-5 h-5 text-blue-500 justify-self-end transform group-hover:translate-x-1 transition-transform"></i>
+        <button onclick="selectArtist('posco')" class="w-full py-3.5 px-4 rounded-2xl bg-brand-card border border-blue-500/30 hover:border-blue-500 hover:bg-blue-500/10 hover:scale-[1.02] hover:shadow-[0_0_20px_rgba(59,130,246,0.2)] grid grid-cols-[24px_1fr_24px] items-center transition-all duration-300 active:scale-95 group cursor-pointer">
+          <div class="w-3 h-3 rounded-full bg-blue-500 shadow-[0_0_10px_#3b82f6] justify-self-start"></div>
+          <span class="font-artistHome font-extrabold text-white text-base sm:text-lg tracking-wide text-center group-hover:text-blue-400 transition-colors">Posco Losco</span>
+          <i data-lucide="chevron-right" class="w-4 h-4 text-blue-500 justify-self-end transform group-hover:translate-x-1 transition-transform"></i>
         </button>
 
-        <button onclick="selectArtist('davide')" class="w-full py-4 px-5 rounded-2xl bg-brand-card border border-orange-500/30 hover:border-orange-500 hover:bg-orange-500/10 hover:scale-[1.02] hover:shadow-[0_0_20px_rgba(249,115,22,0.2)] grid grid-cols-[24px_1fr_24px] items-center transition-all duration-300 active:scale-95 group cursor-pointer">
-          <div class="w-3.5 h-3.5 rounded-full bg-orange-500 shadow-[0_0_10px_#f97316] justify-self-start"></div>
-          <span class="font-artist font-bold text-white text-base sm:text-lg tracking-wide text-center group-hover:text-orange-400 transition-colors">Davide Saba</span>
-          <i data-lucide="chevron-right" class="w-5 h-5 text-orange-500 justify-self-end transform group-hover:translate-x-1 transition-transform"></i>
+        <button onclick="selectArtist('davide')" class="w-full py-3.5 px-4 rounded-2xl bg-brand-card border border-orange-500/30 hover:border-orange-500 hover:bg-orange-500/10 hover:scale-[1.02] hover:shadow-[0_0_20px_rgba(249,115,22,0.2)] grid grid-cols-[24px_1fr_24px] items-center transition-all duration-300 active:scale-95 group cursor-pointer">
+          <div class="w-3 h-3 rounded-full bg-orange-500 shadow-[0_0_10px_#f97316] justify-self-start"></div>
+          <span class="font-artistHome font-extrabold text-white text-base sm:text-lg tracking-wide text-center group-hover:text-orange-400 transition-colors">Davide Saba</span>
+          <i data-lucide="chevron-right" class="w-4 h-4 text-orange-500 justify-self-end transform group-hover:translate-x-1 transition-transform"></i>
         </button>
       </div>
     </div>
 
-    <!-- VISTA LISTA SPESA -->
-    <div id="home-shopping-view" class="w-full max-w-md space-y-4 hidden">
-      <div class="flex justify-between items-center bg-brand-card border border-brand-border p-4 rounded-2xl">
-        <div>
-          <h2 class="text-base font-bold text-white uppercase tracking-wider">Lista della Spesa</h2>
-          <p class="text-xs text-brand-muted mt-0.5">Ditta e gestione scorte</p>
+    <!-- VISTA LISTA SPESA (CON LOGO E ICONA HOME) -->
+    <div id="home-shopping-view" class="w-full max-w-md space-y-3 hidden">
+      
+      <!-- HEADER LISTA SPESA CON LOGO E PULSANTE CASA -->
+      <div class="flex justify-between items-center bg-brand-card border border-brand-border p-3.5 rounded-2xl">
+        <div class="flex items-center gap-3">
+          <div class="logo-hover-effect w-10 h-10 flex items-center justify-center overflow-visible cursor-pointer">
+            <img src="logo.jpg" alt="Logo" class="max-w-full max-h-full object-contain">
+          </div>
+          <div>
+            <h2 class="text-sm font-bold text-white uppercase tracking-wider">Lista della Spesa</h2>
+            <p class="text-[10px] text-brand-muted">Gestione scorte & materiali</p>
+          </div>
         </div>
         <div class="flex gap-2">
-          <button onclick="confirmClearShoppingList()" class="px-3 py-1.5 rounded-xl bg-red-500/20 text-red-400 border border-red-500/30 text-xs font-semibold hover:bg-red-500/30 transition-all">
-            Elimina Tutto
+          <button onclick="confirmClearShoppingList()" class="p-2 rounded-xl bg-red-500/20 text-red-400 border border-red-500/30 text-xs font-semibold hover:bg-red-500/30 transition-all" title="Elimina Tutto">
+            <i data-lucide="trash-2" class="w-4 h-4"></i>
           </button>
-          <button onclick="toggleShoppingViewHome()" class="px-3 py-1.5 rounded-xl bg-brand-black border border-brand-border text-white text-xs font-semibold hover:bg-neutral-800 transition-all">
-            Torna
+          <button onclick="toggleShoppingViewHome()" class="p-2 rounded-xl bg-brand-black border border-brand-border text-white text-xs font-semibold hover:bg-neutral-800 transition-all" title="Torna alla Home">
+            <i data-lucide="home" class="w-4 h-4"></i>
           </button>
         </div>
       </div>
 
-      <!-- FORM CON MICROFONO DEDICATO PER LA SPESA -->
-      <div class="flex gap-2">
-        <input type="text" id="shopping-item-name" placeholder="Articolo (es. Sacchi spazzatura)..." class="flex-1 bg-brand-card border border-brand-border rounded-xl px-3 py-2 text-sm text-white focus:outline-none focus:border-white">
-        <input type="number" id="shopping-item-qty" value="1" min="1" class="w-16 bg-brand-card border border-brand-border rounded-xl px-2 py-2 text-sm text-white text-center focus:outline-none focus:border-white">
-        <button type="button" onclick="startShoppingVoiceRecognition()" class="p-2.5 rounded-xl bg-emerald-600/20 border border-emerald-500/40 text-emerald-400 hover:bg-emerald-600/30 transition-all active:scale-95 relative cursor-pointer shrink-0" title="Dettatura Vocale Spesa">
-          <i data-lucide="mic" class="w-5 h-5 pointer-events-none"></i>
-          <span id="shopping-voice-pulse" class="hidden absolute top-0 right-0 w-2.5 h-2.5 bg-emerald-400 rounded-full animate-ping pointer-events-none"></span>
+      <!-- FORM SPESA MOBILE-FRIENDLY CON GRIGLIA FLUIDA -->
+      <div class="grid grid-cols-[1fr_50px_auto_auto] gap-1.5 items-center bg-brand-card border border-brand-border p-2 rounded-xl">
+        <input type="text" id="shopping-item-name" placeholder="Articolo..." class="w-full bg-brand-black border border-brand-border rounded-lg px-2.5 py-2 text-xs text-white focus:outline-none focus:border-white truncate">
+        <input type="number" id="shopping-item-qty" value="1" min="1" class="w-full bg-brand-black border border-brand-border rounded-lg px-1 py-2 text-xs text-white text-center focus:outline-none focus:border-white">
+        
+        <!-- MICROFONO SPESA (TOGGLE ON/OFF) -->
+        <button type="button" id="shopping-mic-btn" onclick="toggleShoppingVoice()" class="p-2 rounded-lg bg-emerald-600/20 border border-emerald-500/40 text-emerald-400 hover:bg-emerald-600/30 transition-all active:scale-95 relative cursor-pointer" title="Parla per aggiungere/modificare">
+          <i data-lucide="mic" class="w-4 h-4 pointer-events-none"></i>
+          <span id="shopping-voice-pulse" class="hidden absolute top-0 right-0 w-2 h-2 bg-emerald-400 rounded-full animate-ping pointer-events-none"></span>
         </button>
-        <button onclick="addShoppingItemManual()" class="px-3.5 py-2 rounded-xl bg-emerald-600 text-white font-semibold text-sm hover:bg-emerald-500 transition-all shrink-0">Aggiungi</button>
+
+        <button onclick="addShoppingItemManual()" class="px-3 py-2 rounded-lg bg-emerald-600 text-white font-semibold text-xs hover:bg-emerald-500 transition-all whitespace-nowrap">Aggiungi</button>
       </div>
 
-      <div id="shopping-list-container" class="space-y-2.5 max-h-[50vh] overflow-y-auto custom-scrollbar"></div>
+      <div id="shopping-list-container" class="space-y-2 max-h-[45vh] overflow-y-auto custom-scrollbar"></div>
 
-      <div id="shopping-empty-state" class="hidden py-12 text-center space-y-3">
-        <i data-lucide="shopping-cart" class="w-12 h-12 mx-auto text-brand-muted stroke-1"></i>
-        <p class="text-brand-muted text-sm">La lista della spesa è vuota.</p>
+      <div id="shopping-empty-state" class="hidden py-8 text-center space-y-2">
+        <i data-lucide="shopping-cart" class="w-10 h-10 mx-auto text-brand-muted stroke-1"></i>
+        <p class="text-brand-muted text-xs">La lista della spesa è vuota.</p>
       </div>
     </div>
 
@@ -182,7 +192,7 @@
       </div>
       <div class="truncate">
         <div onclick="openArtistSelectionScreen()" class="flex items-center gap-1.5 cursor-pointer group" title="Clicca per cambiare artista">
-          <h1 id="artist-title" class="font-artist font-bold text-sm tracking-wider text-white uppercase leading-none truncate group-hover:underline">CLAUDIA BINDI</h1>
+          <h1 id="artist-title" class="font-artistHome font-bold text-sm tracking-wider text-white uppercase leading-none truncate group-hover:underline">CLAUDIA BINDI</h1>
           <i data-lucide="repeat" class="w-3 h-3 text-brand-muted group-hover:text-white shrink-0"></i>
         </div>
         <h2 class="text-[10px] font-bold tracking-widest text-neutral-300 uppercase leading-tight mt-0.5 truncate">WAITING LIST</h2>
@@ -190,7 +200,7 @@
     </div>
 
     <div class="flex items-center gap-2 shrink-0 z-10">
-      <button type="button" id="voice-btn" onclick="startVoiceRecognition(event)" class="p-2.5 rounded-full bg-brand-card border border-brand-border text-white hover:border-white transition-all active:scale-95 relative cursor-pointer" title="Comando Vocale Cliente">
+      <button type="button" id="voice-btn" onclick="toggleClientVoice()" class="p-2.5 rounded-full bg-brand-card border border-brand-border text-white hover:border-white transition-all active:scale-95 relative cursor-pointer" title="Comando Vocale Cliente (Premi per avviare/fermare)">
         <i data-lucide="mic" class="w-5 h-5 pointer-events-none"></i>
         <span id="voice-pulse" class="hidden absolute top-0 right-0 w-3 h-3 bg-red-500 rounded-full animate-ping pointer-events-none"></span>
       </button>
@@ -365,7 +375,9 @@
       }
     };
 
-    let currentArtistId = localStorage.getItem('selected_artist_id') || null;
+    // AL REFRESH TORNA SEMPRE ALLA PAGINA PRINCIPALE
+    localStorage.removeItem('selected_artist_id');
+    let currentArtistId = null;
     let isHomeShoppingActive = false;
     let shoppingList = JSON.parse(localStorage.getItem('shopping_list_data')) || [];
 
@@ -378,7 +390,6 @@ const firebaseConfig = {
   appId: "1:977596767778:web:24202c4d719a2f7e14f47b",
   measurementId: "G-L2SMGSKYFV"
 };
-
 
     let db = null;
     let useLocalStorage = false;
@@ -400,12 +411,7 @@ const firebaseConfig = {
       loadFromLocalStorage();
     }
 
-    if (!currentArtistId) {
-      openArtistSelectionScreen();
-    } else {
-      document.getElementById('artist-selector-screen').classList.add('hidden');
-      applyArtistTheme(currentArtistId);
-    }
+    openArtistSelectionScreen();
 
     function selectArtist(artistId) {
       currentArtistId = artistId;
@@ -416,6 +422,8 @@ const firebaseConfig = {
     }
 
     function openArtistSelectionScreen() {
+      currentArtistId = null;
+      localStorage.removeItem('selected_artist_id');
       document.getElementById('artist-selector-screen').classList.remove('hidden');
       if (isHomeShoppingActive) toggleShoppingViewHome();
     }
@@ -646,7 +654,7 @@ const firebaseConfig = {
     }
 
     // =========================================================================
-    // GESTIONE LISTA SPESA SOLO NELLA HOME
+    // GESTIONE LISTA SPESA
     // =========================================================================
     function toggleShoppingViewHome() {
       isHomeShoppingActive = !isHomeShoppingActive;
@@ -661,6 +669,7 @@ const firebaseConfig = {
         fabBtn.classList.add('bg-white', 'text-black');
         renderShoppingList();
       } else {
+        stopShoppingVoice();
         shoppingView.classList.add('hidden');
         artistView.classList.remove('hidden');
         fabBtn.classList.remove('bg-white', 'text-black');
@@ -746,39 +755,67 @@ const firebaseConfig = {
     }
 
     // =========================================================================
-    // DETTATURA VOCALE PER LA LISTA DELLA SPESA
+    // SISTEMA DI DETTATURA VOCALE MIGLIORATO (START/STOP MANUALE O INTELLIGENTE)
     // =========================================================================
-    function startShoppingVoiceRecognition() {
-      const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    let activeRecognition = null;
+    let isShoppingListening = false;
+    let isClientListening = false;
 
+    function toggleShoppingVoice() {
+      if (isShoppingListening) {
+        stopShoppingVoice();
+      } else {
+        startShoppingVoice();
+      }
+    }
+
+    function startShoppingVoice() {
+      const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
       if (!SpeechRecognition) {
         alert("Il tuo browser non supporta la dettatura vocale.");
         return;
       }
 
-      const recognition = new SpeechRecognition();
-      recognition.lang = 'it-IT';
-      recognition.interimResults = false;
+      activeRecognition = new SpeechRecognition();
+      activeRecognition.lang = 'it-IT';
+      activeRecognition.interimResults = false;
+      activeRecognition.continuous = false;
 
       const pulse = document.getElementById('shopping-voice-pulse');
-      if (pulse) pulse.classList.remove('hidden');
+      const micBtn = document.getElementById('shopping-mic-btn');
 
-      recognition.start();
+      activeRecognition.onstart = function() {
+        isShoppingListening = true;
+        if (pulse) pulse.classList.remove('hidden');
+        if (micBtn) micBtn.classList.add('bg-emerald-600', 'text-white');
+      };
 
-      recognition.onresult = function(event) {
-        if (pulse) pulse.classList.add('hidden');
+      activeRecognition.onresult = function(event) {
         const transcript = event.results[0][0].transcript.toLowerCase().trim();
         parseShoppingVoiceCommand(transcript);
       };
 
-      recognition.onerror = function() {
-        if (pulse) pulse.classList.add('hidden');
-        alert("Errore o nessun comando vocale spesa rilevato.");
+      activeRecognition.onerror = function() {
+        stopShoppingVoice();
       };
 
-      recognition.onend = function() {
-        if (pulse) pulse.classList.add('hidden');
+      activeRecognition.onend = function() {
+        stopShoppingVoice();
       };
+
+      activeRecognition.start();
+    }
+
+    function stopShoppingVoice() {
+      isShoppingListening = false;
+      const pulse = document.getElementById('shopping-voice-pulse');
+      const micBtn = document.getElementById('shopping-mic-btn');
+      if (pulse) pulse.classList.add('hidden');
+      if (micBtn) micBtn.classList.remove('bg-emerald-600', 'text-white');
+      if (activeRecognition) {
+        try { activeRecognition.stop(); } catch(e){}
+        activeRecognition = null;
+      }
     }
 
     function parseShoppingVoiceCommand(text) {
@@ -824,7 +861,110 @@ const firebaseConfig = {
         return;
       }
 
-      alert("Comando vocale spesa non riconosciuto. Esempio: 'aggiungi sacchi spazzatura in quantità 1'");
+      alert("Comando vocale spesa ricevuto ma non interpretato: '" + text + "'");
+    }
+
+    // Dettatura vocale clienti
+    function toggleClientVoice() {
+      if (isClientListening) {
+        stopClientVoice();
+      } else {
+        startClientVoice();
+      }
+    }
+
+    function startClientVoice() {
+      const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+      if (!SpeechRecognition) {
+        alert("Il tuo browser non supporta la dettatura vocale.");
+        return;
+      }
+
+      activeRecognition = new SpeechRecognition();
+      activeRecognition.lang = 'it-IT';
+      activeRecognition.interimResults = false;
+      activeRecognition.continuous = false;
+
+      const pulse = document.getElementById('voice-pulse');
+      const micBtn = document.getElementById('voice-btn');
+
+      activeRecognition.onstart = function() {
+        isClientListening = true;
+        if (pulse) pulse.classList.remove('hidden');
+        if (micBtn) micBtn.classList.add('bg-red-600', 'text-white');
+      };
+
+      activeRecognition.onresult = function(event) {
+        const transcript = event.results[0][0].transcript.toLowerCase().trim();
+        parseVoiceCommand(transcript);
+      };
+
+      activeRecognition.onerror = function() {
+        stopClientVoice();
+      };
+
+      activeRecognition.onend = function() {
+        stopClientVoice();
+      };
+
+      activeRecognition.start();
+    }
+
+    function stopClientVoice() {
+      isClientListening = false;
+      const pulse = document.getElementById('voice-pulse');
+      const micBtn = document.getElementById('voice-btn');
+      if (pulse) pulse.classList.add('hidden');
+      if (micBtn) micBtn.classList.remove('bg-red-600', 'text-white');
+      if (activeRecognition) {
+        try { activeRecognition.stop(); } catch(e){}
+        activeRecognition = null;
+      }
+    }
+
+    function parseVoiceCommand(text) {
+      openModal(false);
+
+      let nameMatch = text.match(/(?:aggiungi|cliente)\s+([a-zàèéìòù\s]+?)(?=\s+(?:per|a|in|nuovo|continuo|telefono|numero|$))/i);
+      if (nameMatch) {
+        document.getElementById('field-name').value = capitalizeWords(nameMatch[1].trim());
+      } else {
+        const words = text.split(' ');
+        if (words.length > 0) document.getElementById('field-name').value = capitalizeWords(words.slice(0, 2).join(' '));
+      }
+
+      const locations = getArtistLocations();
+      let matchedLoc = locations[0]?.name || 'The Grind';
+
+      for (let loc of locations) {
+        if (text.includes(loc.name.toLowerCase())) {
+          matchedLoc = loc.name;
+          break;
+        }
+      }
+
+      document.getElementById('field-location').value = matchedLoc;
+      handleLocationChange();
+
+      const isContinuo = text.includes('continuo') || text.includes('proseguire') || text.includes('progetto');
+      const isAsap = text.includes('prima possibile') || text.includes('urgente') || text.includes('subito');
+
+      if (isContinuo && isAsap) {
+        document.getElementById('field-priority').value = '1';
+      } else if (!isContinuo && isAsap) {
+        document.getElementById('field-priority').value = '2';
+      } else if (isContinuo && !isAsap) {
+        document.getElementById('field-priority').value = '3';
+      } else {
+        document.getElementById('field-priority').value = '4';
+      }
+
+      const phoneMatch = text.match(/\d[\d\s]{7,}\d/);
+      if (phoneMatch) {
+        document.getElementById('field-contact').value = phoneMatch[0].replace(/\s+/g, '');
+      }
+
+      document.getElementById('field-notes').value = "Inserito via voce: " + text;
     }
 
     // =========================================================================
@@ -963,88 +1103,6 @@ const firebaseConfig = {
 
       await saveClient(clientData);
       closeModal();
-    }
-
-    // =========================================================================
-    // RICONOSCIMENTO VOCALE PER CLIENTI
-    // =========================================================================
-    function startVoiceRecognition(e) {
-      if (e) e.preventDefault();
-      const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-
-      if (!SpeechRecognition) {
-        alert("Il tuo browser non supporta la dettatura vocale.");
-        return;
-      }
-
-      const recognition = new SpeechRecognition();
-      recognition.lang = 'it-IT';
-      recognition.interimResults = false;
-
-      const pulse = document.getElementById('voice-pulse');
-      pulse.classList.remove('hidden');
-
-      recognition.start();
-
-      recognition.onresult = function(event) {
-        pulse.classList.add('hidden');
-        const transcript = event.results[0][0].transcript.toLowerCase().trim();
-        parseVoiceCommand(transcript);
-      };
-
-      recognition.onerror = function() {
-        pulse.classList.add('hidden');
-        alert("Errore o nessun comando rilevato. Riprova.");
-      };
-
-      recognition.onend = function() {
-        pulse.classList.add('hidden');
-      };
-    }
-
-    function parseVoiceCommand(text) {
-      openModal(false);
-
-      let nameMatch = text.match(/(?:aggiungi|cliente)\s+([a-zàèéìòù\s]+?)(?=\s+(?:per|a|in|nuovo|continuo|telefono|numero|$))/i);
-      if (nameMatch) {
-        document.getElementById('field-name').value = capitalizeWords(nameMatch[1].trim());
-      } else {
-        const words = text.split(' ');
-        if (words.length > 0) document.getElementById('field-name').value = capitalizeWords(words.slice(0, 2).join(' '));
-      }
-
-      const locations = getArtistLocations();
-      let matchedLoc = locations[0]?.name || 'The Grind';
-
-      for (let loc of locations) {
-        if (text.includes(loc.name.toLowerCase())) {
-          matchedLoc = loc.name;
-          break;
-        }
-      }
-
-      document.getElementById('field-location').value = matchedLoc;
-      handleLocationChange();
-
-      const isContinuo = text.includes('continuo') || text.includes('proseguire') || text.includes('progetto');
-      const isAsap = text.includes('prima possibile') || text.includes('urgente') || text.includes('subito');
-
-      if (isContinuo && isAsap) {
-        document.getElementById('field-priority').value = '1';
-      } else if (!isContinuo && isAsap) {
-        document.getElementById('field-priority').value = '2';
-      } else if (isContinuo && !isAsap) {
-        document.getElementById('field-priority').value = '3';
-      } else {
-        document.getElementById('field-priority').value = '4';
-      }
-
-      const phoneMatch = text.match(/\d[\d\s]{7,}\d/);
-      if (phoneMatch) {
-        document.getElementById('field-contact').value = phoneMatch[0].replace(/\s+/g, '');
-      }
-
-      document.getElementById('field-notes').value = "Inserito via voce: " + text;
     }
 
     function escapeHtml(str) {
