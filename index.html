@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>The Grind Waiting List</title>
+  <title>The Grind Waiting List Multi-Artist</title>
   <link rel="icon" type="image/jpeg" href="logo.jpg">
   <link rel="apple-touch-icon" href="logo.jpg">
   <meta name="apple-mobile-web-app-capable" content="yes">
@@ -21,8 +21,12 @@
               black: '#0a0a0a',
               card: '#121212',
               border: '#262626',
-              accent: '#ffffff',
               muted: '#737373'
+            },
+            artist: {
+              claudia: '#ec4899', // Rosa
+              posco: '#3b82f6',   // Blu
+              davide: '#f97316'   // Arancio
             }
           }
         }
@@ -51,19 +55,62 @@
       filter: invert(1);
       cursor: pointer;
     }
+    .artist-accent-border { border-color: var(--artist-color) !important; }
+    .artist-accent-bg { background-color: var(--artist-color) !important; }
+    .artist-accent-text { color: var(--artist-color) !important; }
   </style>
 </head>
 <body class="min-h-screen flex flex-col pb-10">
 
+  <!-- SCHERMATA SELEZIONE ARTISTA ALL'AVVIO -->
+  <div id="artist-selector-screen" class="fixed inset-0 z-50 bg-brand-black flex flex-col items-center justify-center p-6 space-y-8">
+    <div class="text-center space-y-3 max-w-sm">
+      <div class="w-16 h-16 mx-auto rounded-2xl bg-black border border-brand-border p-2 flex items-center justify-center overflow-hidden shadow-2xl">
+        <img src="logo.jpg" alt="Logo" class="max-w-full max-h-full object-contain">
+      </div>
+      <h1 class="text-xl font-black tracking-wider text-white uppercase">THE GRIND SYSTEM</h1>
+      <p class="text-xs text-brand-muted">Seleziona il Tattoo Artist per accedere alla relativa lista d'attesa</p>
+    </div>
+
+    <div class="w-full max-w-sm space-y-3">
+      <button onclick="selectArtist('claudia')" class="w-full p-4 rounded-2xl bg-brand-card border border-pink-500/30 hover:border-pink-500 flex items-center justify-between transition-all active:scale-95 group">
+        <div class="flex items-center gap-3">
+          <div class="w-3 h-3 rounded-full bg-pink-500"></div>
+          <span class="font-bold text-white text-sm tracking-wide">Claudia Bindi</span>
+        </div>
+        <i data-lucide="chevron-right" class="w-4 h-4 text-pink-500"></i>
+      </button>
+
+      <button onclick="selectArtist('posco')" class="w-full p-4 rounded-2xl bg-brand-card border border-blue-500/30 hover:border-blue-500 flex items-center justify-between transition-all active:scale-95 group">
+        <div class="flex items-center gap-3">
+          <div class="w-3 h-3 rounded-full bg-blue-500"></div>
+          <span class="font-bold text-white text-sm tracking-wide">Posco Losco</span>
+        </div>
+        <i data-lucide="chevron-right" class="w-4 h-4 text-blue-500"></i>
+      </button>
+
+      <button onclick="selectArtist('davide')" class="w-full p-4 rounded-2xl bg-brand-card border border-orange-500/30 hover:border-orange-500 flex items-center justify-between transition-all active:scale-95 group">
+        <div class="flex items-center gap-3">
+          <div class="w-3 h-3 rounded-full bg-orange-500"></div>
+          <span class="font-bold text-white text-sm tracking-wide">Davide Saba</span>
+        </div>
+        <i data-lucide="chevron-right" class="w-4 h-4 text-orange-500"></i>
+      </button>
+    </div>
+  </div>
+
+  <!-- HEADER -->
   <header class="sticky top-0 z-30 bg-brand-black/95 backdrop-blur-md border-b border-brand-border px-4 py-3 flex justify-between items-center gap-2">
     <div class="flex items-center gap-3 min-w-0 flex-1">
       <div class="w-10 h-10 rounded-lg bg-black border border-brand-border p-1 flex items-center justify-center shrink-0 overflow-hidden">
         <img src="logo.jpg" alt="Logo" class="max-w-full max-h-full object-contain">
       </div>
       <div class="truncate">
-        <h1 class="text-sm font-extrabold tracking-wider text-white uppercase leading-none truncate">THE GRIND</h1>
+        <div class="flex items-center gap-1.5">
+          <h1 id="artist-title" class="text-sm font-extrabold tracking-wider text-white uppercase leading-none truncate">CLAUDIA BINDI</h1>
+          <button onclick="openArtistSelectionScreen()" class="text-[10px] px-1.5 py-0.5 rounded bg-brand-card border border-brand-border text-brand-muted hover:text-white transition-all">Cambia</button>
+        </div>
         <h2 class="text-xs font-bold tracking-widest text-neutral-300 uppercase leading-tight mt-0.5 truncate">WAITING LIST</h2>
-        <p class="text-[10px] text-brand-muted font-medium leading-tight mt-0.5 truncate">Tattoo Client Priority System</p>
       </div>
     </div>
 
@@ -72,7 +119,7 @@
         <i data-lucide="mic" class="w-5 h-5 pointer-events-none"></i>
         <span id="voice-pulse" class="hidden absolute top-0 right-0 w-3 h-3 bg-red-500 rounded-full animate-ping pointer-events-none"></span>
       </button>
-      <button type="button" onclick="openModal(false)" class="px-3.5 py-2 rounded-full bg-white text-black font-semibold text-sm hover:bg-neutral-200 transition-all active:scale-95 flex items-center gap-1.5 cursor-pointer">
+      <button type="button" onclick="openModal(false)" id="btn-new-client" class="px-3.5 py-2 rounded-full text-black font-semibold text-sm transition-all active:scale-95 flex items-center gap-1.5 cursor-pointer">
         <i data-lucide="plus" class="w-4 h-4 pointer-events-none"></i> Nuovo
       </button>
     </div>
@@ -93,17 +140,15 @@
       </div>
       
       <div class="grid grid-cols-2 gap-2">
-        <!-- Filtro Luogo -->
-        <select id="filter-location" onchange="renderList()" class="bg-brand-card border border-brand-border rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-white w-full truncate">
-          <option value="ALL">Tutti i Luoghi</option>
-          <option value="The Grind">The Grind</option>
-          <option value="Milano City Ink">Milano City Ink</option>
-          <option value="Roma">Roma</option>
-          <option value="Pordenone">Pordenone</option>
-          <option value="Convention">Convention</option>
-          <option value="Seminario Cla">Seminario Cla</option>
-          <option value="Seminario Pos">Seminario Pos</option>
-        </select>
+        <div class="flex gap-1">
+          <!-- Filtro Luogo -->
+          <select id="filter-location" onchange="renderList()" class="bg-brand-card border border-brand-border rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-white w-full truncate">
+            <!-- Popolato Dinamicamente -->
+          </select>
+          <button onclick="openManageLocationsModal()" class="p-2 bg-brand-card border border-brand-border rounded-xl text-brand-muted hover:text-white transition-all shrink-0" title="Gestisci Luoghi">
+            <i data-lucide="settings" class="w-4 h-4"></i>
+          </button>
+        </div>
 
         <!-- Filtro Tipologia & Priorità -->
         <select id="filter-priority" onchange="renderList()" class="bg-brand-card border border-brand-border rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-white w-full truncate">
@@ -123,12 +168,12 @@
 
     <div id="empty-state" class="hidden py-16 text-center space-y-3">
       <i data-lucide="inbox" class="w-12 h-12 mx-auto text-brand-muted stroke-1"></i>
-      <p class="text-brand-muted text-sm">Nessun cliente presente con i filtri selezionati.</p>
+      <p class="text-brand-muted text-sm">Nessun cliente presente in questa lista d'attesa.</p>
     </div>
 
   </main>
 
-  <!-- MODALE FORM -->
+  <!-- MODALE FORM CLIENTE -->
   <div id="modal" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm hidden flex items-end sm:items-center justify-center p-0 sm:p-4">
     <div class="bg-brand-card border border-brand-border w-full max-w-md rounded-t-2xl sm:rounded-2xl p-6 space-y-5 max-h-[90vh] overflow-y-auto custom-scrollbar">
       
@@ -155,13 +200,7 @@
         <div>
           <label class="block text-xs font-medium text-brand-muted mb-1">Luogo *</label>
           <select id="field-location" required onchange="handleLocationChange()" class="w-full bg-brand-black border border-brand-border rounded-xl px-3 py-2 text-sm text-white focus:outline-none focus:border-white">
-            <option value="The Grind">The Grind</option>
-            <option value="Milano City Ink">Milano City Ink</option>
-            <option value="Roma">Roma</option>
-            <option value="Pordenone">Pordenone</option>
-            <option value="Convention">Convention</option>
-            <option value="Seminario Cla">Seminario Cla</option>
-            <option value="Seminario Pos">Seminario Pos</option>
+            <!-- Popolato Dinamicamente -->
           </select>
         </div>
 
@@ -187,10 +226,35 @@
 
         <div class="flex gap-2 pt-2">
           <button type="button" onclick="closeModal()" class="flex-1 py-2.5 rounded-xl border border-brand-border text-brand-muted hover:text-white font-medium text-sm transition-all">Annulla</button>
-          <button type="submit" class="flex-1 py-2.5 rounded-xl bg-white text-black font-semibold text-sm hover:bg-neutral-200 transition-all">Salva Cliente</button>
+          <button type="submit" id="btn-save-modal" class="flex-1 py-2.5 rounded-xl text-black font-semibold text-sm transition-all">Salva Cliente</button>
         </div>
       </form>
 
+    </div>
+  </div>
+
+  <!-- MODALE GESTIONE LUOGHI -->
+  <div id="locations-modal" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm hidden flex items-end sm:items-center justify-center p-0 sm:p-4">
+    <div class="bg-brand-card border border-brand-border w-full max-w-md rounded-t-2xl sm:rounded-2xl p-6 space-y-4 max-h-[90vh] overflow-y-auto custom-scrollbar">
+      
+      <div class="flex justify-between items-center border-b border-brand-border pb-3">
+        <h2 class="text-base font-bold text-white uppercase tracking-wider">Gestione Luoghi</h2>
+        <button type="button" onclick="closeManageLocationsModal()" class="text-brand-muted hover:text-white p-1">
+          <i data-lucide="x" class="w-5 h-5"></i>
+        </button>
+      </div>
+
+      <div class="flex gap-2">
+        <input type="text" id="new-location-name" placeholder="Nuovo Luogo..." class="flex-1 bg-brand-black border border-brand-border rounded-xl px-3 py-2 text-sm text-white focus:outline-none">
+        <label class="flex items-center gap-1.5 text-xs text-brand-muted px-2 border border-brand-border rounded-xl bg-brand-black cursor-pointer">
+          <input type="checkbox" id="new-location-single-priority" class="rounded"> Single Rank
+        </label>
+        <button onclick="addCustomLocation()" id="btn-add-loc" class="px-3 py-2 rounded-xl text-black font-semibold text-xs transition-all">Aggiungi</button>
+      </div>
+
+      <div id="locations-list" class="space-y-2 pt-2">
+        <!-- Lista luoghi editabili -->
+      </div>
     </div>
   </div>
 
@@ -198,6 +262,53 @@
   <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
 
   <script>
+    // =========================================================================
+    // CONFIGURAZIONE ARTISTI E LUOGHI
+    // =========================================================================
+    const ARTISTS_CONFIG = {
+      claudia: {
+        id: 'claudia',
+        name: 'Claudia Bindi',
+        color: '#ec4899',
+        defaultLocations: [
+          { name: 'The Grind', isSinglePriority: false },
+          { name: 'Milano City Ink', isSinglePriority: false },
+          { name: 'Roma', isSinglePriority: false },
+          { name: 'Pordenone', isSinglePriority: false },
+          { name: 'Convention', isSinglePriority: true },
+          { name: 'Seminario Cla', isSinglePriority: true },
+          { name: 'Seminario Pos', isSinglePriority: true }
+        ]
+      },
+      posco: {
+        id: 'posco',
+        name: 'Posco Losco',
+        color: '#3b82f6',
+        defaultLocations: [
+          { name: 'Seminari', isSinglePriority: true },
+          { name: 'Tele per seminari', isSinglePriority: true }
+        ]
+      },
+      davide: {
+        id: 'davide',
+        name: 'Davide Saba',
+        color: '#f97316',
+        defaultLocations: [
+          { name: 'Alghero', isSinglePriority: false },
+          { name: 'Cagliari', isSinglePriority: false },
+          { name: 'The Grind', isSinglePriority: false },
+          { name: 'Milano City Ink', isSinglePriority: false },
+          { name: 'Petracore', isSinglePriority: false },
+          { name: 'Convention', isSinglePriority: true }
+        ]
+      }
+    };
+
+    let currentArtistId = localStorage.getItem('selected_artist_id') || null;
+
+    // =========================================================================
+    // CONFIGURAZIONE FIREBASE
+    // =========================================================================
 const firebaseConfig = {
   apiKey: "AIzaSyDccFCqeRlOxyR9SkHGYBKVkruL4XOA1SQ",
   authDomain: "thegrind-waitinglist.firebaseapp.com",
@@ -208,11 +319,11 @@ const firebaseConfig = {
   measurementId: "G-L2SMGSKYFV"
 };
 
+
     let db = null;
     let useLocalStorage = false;
     let clientsData = [];
-
-    const EVENT_LOCATIONS = ['Convention', 'Seminario Cla', 'Seminario Pos'];
+    let customLocations = JSON.parse(localStorage.getItem('custom_artist_locations')) || {};
 
     try {
       if (firebaseConfig.apiKey !== "INSERISCI_LA_TUA_API_KEY") {
@@ -229,6 +340,73 @@ const firebaseConfig = {
       loadFromLocalStorage();
     }
 
+    // Initialize Artist Screen / UI
+    if (!currentArtistId) {
+      openArtistSelectionScreen();
+    } else {
+      document.getElementById('artist-selector-screen').classList.add('hidden');
+      applyArtistTheme(currentArtistId);
+    }
+
+    // =========================================================================
+    // GESTIONE ARTISTA & TEMA
+    // =========================================================================
+    function selectArtist(artistId) {
+      currentArtistId = artistId;
+      localStorage.setItem('selected_artist_id', artistId);
+      document.getElementById('artist-selector-screen').classList.add('hidden');
+      applyArtistTheme(artistId);
+      renderList();
+    }
+
+    function openArtistSelectionScreen() {
+      document.getElementById('artist-selector-screen').classList.remove('hidden');
+    }
+
+    function applyArtistTheme(artistId) {
+      const config = ARTISTS_CONFIG[artistId];
+      if (!config) return;
+
+      document.getElementById('artist-title').innerText = config.name.toUpperCase();
+      document.documentElement.style.setProperty('--artist-color', config.color);
+
+      // Aggiorna pulsanti e dettagli colorati
+      const btnNew = document.getElementById('btn-new-client');
+      const btnSave = document.getElementById('btn-save-modal');
+      const btnAddLoc = document.getElementById('btn-add-loc');
+
+      [btnNew, btnSave, btnAddLoc].forEach(btn => {
+        if (btn) btn.style.backgroundColor = config.color;
+      });
+
+      populateLocationDropdowns();
+    }
+
+    function getArtistLocations() {
+      if (!currentArtistId) return [];
+      if (customLocations[currentArtistId]) {
+        return customLocations[currentArtistId];
+      }
+      return ARTISTS_CONFIG[currentArtistId].defaultLocations;
+    }
+
+    function populateLocationDropdowns() {
+      const locations = getArtistLocations();
+      const filterLoc = document.getElementById('filter-location');
+      const fieldLoc = document.getElementById('field-location');
+
+      filterLoc.innerHTML = '<option value="ALL">Tutti i Luoghi</option>';
+      fieldLoc.innerHTML = '';
+
+      locations.forEach(loc => {
+        filterLoc.innerHTML += `<option value="${escapeHtml(loc.name)}">${escapeHtml(loc.name)}</option>`;
+        fieldLoc.innerHTML += `<option value="${escapeHtml(loc.name)}">${escapeHtml(loc.name)}</option>`;
+      });
+    }
+
+    // =========================================================================
+    // GESTIONE DATI (FIREBASE / LOCALSTORAGE)
+    // =========================================================================
     function initFirebaseListener() {
       db.collection("waiting_list").onSnapshot(snapshot => {
         clientsData = snapshot.docs.map(doc => ({
@@ -256,6 +434,9 @@ const firebaseConfig = {
     }
 
     async function saveClient(client) {
+      // Assegna artista corrente
+      client.artistId = currentArtistId;
+
       if (!useLocalStorage && db) {
         if (client.id) {
           const id = client.id;
@@ -288,6 +469,9 @@ const firebaseConfig = {
       }
     }
 
+    // =========================================================================
+    // ORDINAMENTO E RENDERING
+    // =========================================================================
     const PRIORITY_LABELS = {
       1: { text: 'Continuo – ASAP', badge: 'bg-white text-black font-bold' },
       2: { text: 'Nuovo – ASAP', badge: 'bg-neutral-300 text-black font-medium' },
@@ -297,25 +481,27 @@ const firebaseConfig = {
     };
 
     function renderList() {
+      if (!currentArtistId) return;
+
       const searchQuery = document.getElementById('search-input').value.toLowerCase().trim();
       const locationFilter = document.getElementById('filter-location').value;
       const priorityFilter = document.getElementById('filter-priority').value;
 
       let filtered = clientsData.filter(c => {
-        // Ricerca testo
+        // Assegnazione automatica a Claudia se manca l'artistId (preserva il vecchio database)
+        const clientArtist = c.artistId || 'claudia';
+        if (clientArtist !== currentArtistId) return false;
+
         const matchesSearch = searchQuery === '' || 
                               c.name.toLowerCase().includes(searchQuery) || 
                               (c.notes && c.notes.toLowerCase().includes(searchQuery)) ||
                               c.contact.includes(searchQuery);
 
-        // Filtro Luogo
         const matchesLocation = (locationFilter === 'ALL') || (c.location === locationFilter);
 
-        // Normalizzazione Priorità
         const p = String(c.priority !== undefined && c.priority !== null ? c.priority : '4');
-
-        // Filtro Tipologia
         let matchesPriority = true;
+
         if (priorityFilter === 'ALL_CONTINUO') {
           matchesPriority = (p === '1' || p === '3');
         } else if (priorityFilter === 'ALL_NUOVO') {
@@ -329,14 +515,11 @@ const firebaseConfig = {
         return matchesSearch && matchesLocation && matchesPriority;
       });
 
-      // Ordinamento
       filtered.sort((a, b) => {
         const pA = parseInt(a.priority !== undefined ? a.priority : 4);
         const pB = parseInt(b.priority !== undefined ? b.priority : 4);
 
-        if (pA !== pB) {
-          return pA - pB;
-        }
+        if (pA !== pB) return pA - pB;
         return new Date(a.date) - new Date(b.date);
       });
 
@@ -414,17 +597,86 @@ const firebaseConfig = {
       if (window.lucide) lucide.createIcons();
     }
 
+    // =========================================================================
+    // MODALE GESTIONE LUOGHI
+    // =========================================================================
+    function openManageLocationsModal() {
+      renderManageLocationsList();
+      document.getElementById('locations-modal').classList.remove('hidden');
+    }
+
+    function closeManageLocationsModal() {
+      document.getElementById('locations-modal').classList.add('hidden');
+      populateLocationDropdowns();
+      renderList();
+    }
+
+    function renderManageLocationsList() {
+      const locations = getArtistLocations();
+      const container = document.getElementById('locations-list');
+      container.innerHTML = '';
+
+      locations.forEach((loc, index) => {
+        container.innerHTML += `
+          <div class="flex items-center justify-between bg-brand-black p-2.5 rounded-xl border border-brand-border text-xs">
+            <span class="text-white font-medium">${escapeHtml(loc.name)} ${loc.isSinglePriority ? '<span class="text-[10px] text-brand-muted">(Single Rank)</span>' : ''}</span>
+            <button onclick="removeLocation(${index})" class="text-red-400 hover:text-red-300 p-1">
+              <i data-lucide="trash-2" class="w-4 h-4"></i>
+            </button>
+          </div>
+        `;
+      });
+
+      if (window.lucide) lucide.createIcons();
+    }
+
+    function addCustomLocation() {
+      const input = document.getElementById('new-location-name');
+      const isSingle = document.getElementById('new-location-single-priority').checked;
+      const name = input.value.trim();
+
+      if (!name) return;
+
+      const locations = [...getArtistLocations()];
+      locations.push({ name: name, isSinglePriority: isSingle });
+
+      if (!customLocations[currentArtistId]) customLocations[currentArtistId] = [];
+      customLocations[currentArtistId] = locations;
+
+      localStorage.setItem('custom_artist_locations', JSON.stringify(customLocations));
+      input.value = '';
+      document.getElementById('new-location-single-priority').checked = false;
+
+      renderManageLocationsList();
+    }
+
+    function removeLocation(index) {
+      let locations = [...getArtistLocations()];
+      locations.splice(index, 1);
+
+      if (!customLocations[currentArtistId]) customLocations[currentArtistId] = [];
+      customLocations[currentArtistId] = locations;
+
+      localStorage.setItem('custom_artist_locations', JSON.stringify(customLocations));
+      renderManageLocationsList();
+    }
+
     function handleLocationChange() {
       const selectedLoc = document.getElementById('field-location').value;
       const priorityContainer = document.getElementById('priority-container');
+      const locations = getArtistLocations();
 
-      if (EVENT_LOCATIONS.includes(selectedLoc)) {
+      const locObj = locations.find(l => l.name === selectedLoc);
+      if (locObj && locObj.isSinglePriority) {
         priorityContainer.classList.add('hidden');
       } else {
         priorityContainer.classList.remove('hidden');
       }
     }
 
+    // =========================================================================
+    // MODALE CLIENTE & FORM
+    // =========================================================================
     function openModal(isEdit = false) {
       if (!isEdit) {
         document.getElementById('client-form').reset();
@@ -460,13 +712,15 @@ const firebaseConfig = {
       e.preventDefault();
 
       const selectedLoc = document.getElementById('field-location').value;
-      const isEvent = EVENT_LOCATIONS.includes(selectedLoc);
+      const locations = getArtistLocations();
+      const locObj = locations.find(l => l.name === selectedLoc);
+      const isSingle = locObj ? locObj.isSinglePriority : false;
 
       const clientData = {
         id: document.getElementById('field-id').value || null,
         name: document.getElementById('field-name').value.trim(),
         contact: document.getElementById('field-contact').value.trim(),
-        priority: isEvent ? '0' : String(document.getElementById('field-priority').value),
+        priority: isSingle ? '0' : String(document.getElementById('field-priority').value),
         location: selectedLoc,
         date: document.getElementById('field-date').value,
         notes: document.getElementById('field-notes').value.trim()
@@ -476,12 +730,15 @@ const firebaseConfig = {
       closeModal();
     }
 
+    // =========================================================================
+    // RICONOSCIMENTO VOCALE
+    // =========================================================================
     function startVoiceRecognition(e) {
       if (e) e.preventDefault();
       const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
 
       if (!SpeechRecognition) {
-        alert("Il tuo browser non supporta la dettatura vocale. Usa Safari su iOS o Chrome su Android.");
+        alert("Il tuo browser non supporta la dettatura vocale.");
         return;
       }
 
@@ -521,22 +778,17 @@ const firebaseConfig = {
         if (words.length > 0) document.getElementById('field-name').value = capitalizeWords(words.slice(0, 2).join(' '));
       }
 
-      if (text.includes('milano')) {
-        document.getElementById('field-location').value = 'Milano City Ink';
-      } else if (text.includes('roma')) {
-        document.getElementById('field-location').value = 'Roma';
-      } else if (text.includes('pordenone')) {
-        document.getElementById('field-location').value = 'Pordenone';
-      } else if (text.includes('convention')) {
-        document.getElementById('field-location').value = 'Convention';
-      } else if (text.includes('cla')) {
-        document.getElementById('field-location').value = 'Seminario Cla';
-      } else if (text.includes('pos')) {
-        document.getElementById('field-location').value = 'Seminario Pos';
-      } else {
-        document.getElementById('field-location').value = 'The Grind';
+      const locations = getArtistLocations();
+      let matchedLoc = locations[0]?.name || 'The Grind';
+
+      for (let loc of locations) {
+        if (text.includes(loc.name.toLowerCase())) {
+          matchedLoc = loc.name;
+          break;
+        }
       }
 
+      document.getElementById('field-location').value = matchedLoc;
       handleLocationChange();
 
       const isContinuo = text.includes('continuo') || text.includes('proseguire') || text.includes('progetto');
@@ -582,5 +834,3 @@ const firebaseConfig = {
   </script>
 </body>
 </html>
-
-```
