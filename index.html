@@ -94,46 +94,46 @@
 <body class="min-h-screen flex flex-col pb-10">
 
   <!-- SCHERMATA SELEZIONE ARTISTA E LISTA SPESA (PAGINA PRINCIPALE) -->
-  <div id="artist-selector-screen" class="fixed inset-0 z-50 bg-brand-black flex flex-col items-center justify-center p-4 sm:p-6 space-y-4 overflow-y-auto">
+  <div id="artist-selector-screen" class="fixed inset-0 z-50 bg-brand-black flex flex-col items-center justify-start pt-6 sm:pt-10 p-4 space-y-3 overflow-y-auto">
     
     <!-- CONTENUTO SELEZIONE ARTISTI -->
-    <div id="home-artists-view" class="w-full max-w-sm flex flex-col items-center space-y-4">
-      <div class="text-center space-y-3">
-        <!-- LOGO MOLTO PIÙ GRANDE COME ELEMENTO PRINCIPALE -->
-        <div class="logo-hover-effect w-44 h-44 sm:w-56 sm:h-56 mx-auto flex items-center justify-center overflow-visible cursor-pointer transition-all duration-300">
+    <div id="home-artists-view" class="w-full max-w-sm flex flex-col items-center space-y-3">
+      <div class="text-center space-y-2">
+        <!-- LOGO GRANDE COME ELEMENTO PRINCIPALE -->
+        <div class="logo-hover-effect w-36 h-36 sm:w-48 sm:h-48 mx-auto flex items-center justify-center overflow-visible cursor-pointer transition-all duration-300">
           <img src="logo.jpg" alt="Logo The Grind" class="max-w-full max-h-full object-contain transition-all duration-300">
         </div>
 
         <div>
-          <h1 class="font-heading text-2xl sm:text-3xl font-black tracking-wide text-white uppercase">THE GRIND TATTOO FINEST</h1>
-          <p class="text-xs sm:text-sm text-brand-muted tracking-[0.35em] uppercase font-bold mt-1.5">PICK YOUR ARTIST</p>
+          <h1 class="font-heading text-xl sm:text-2xl font-black tracking-wide text-white uppercase">THE GRIND TATTOO FINEST</h1>
+          <p class="text-[11px] sm:text-xs text-brand-muted tracking-[0.3em] uppercase font-bold mt-1">PICK THE ARTIST</p>
         </div>
       </div>
 
-      <!-- PULSANTI PIÙ PICCOLI, CENTRATI E RACCOLTI (NON PIÙ A TUTTA LARGHEZZA) -->
-      <div class="w-full flex flex-col items-center space-y-2.5">
+      <!-- PULSANTI PIÙ PICCOLI IN LARGHEZZA, CENTRATI E CON TESTO LEGGERMENTE PIÙ GRANDE -->
+      <div class="w-full flex flex-col items-center space-y-2">
         
-        <button onclick="selectArtist('claudia')" class="w-full max-w-[270px] py-2.5 px-4 rounded-xl bg-brand-card border border-pink-500/30 hover:border-pink-500 hover:bg-pink-500/10 hover:scale-[1.03] hover:shadow-[0_0_20px_rgba(236,72,153,0.2)] grid grid-cols-[20px_1fr_20px] items-center transition-all duration-300 active:scale-95 group cursor-pointer">
+        <button onclick="selectArtist('claudia')" class="w-full max-w-[270px] py-2.5 px-3.5 rounded-xl bg-brand-card border border-pink-500/30 hover:border-pink-500 hover:bg-pink-500/10 hover:scale-[1.03] hover:shadow-[0_0_20px_rgba(236,72,153,0.2)] grid grid-cols-[20px_1fr_20px] items-center transition-all duration-300 active:scale-95 group cursor-pointer">
           <div class="w-2.5 h-2.5 rounded-full bg-pink-500 shadow-[0_0_10px_#ec4899] justify-self-start"></div>
-          <span class="font-artistHome text-xs sm:text-sm text-white tracking-wider text-center group-hover:text-pink-400 transition-colors">Claudia Bindi</span>
+          <span class="font-artistHome text-sm sm:text-base text-white tracking-wider text-center group-hover:text-pink-400 transition-colors">Claudia Bindi</span>
           <i data-lucide="chevron-right" class="w-4 h-4 text-pink-500 justify-self-end transform group-hover:translate-x-1 transition-transform"></i>
         </button>
 
-        <button onclick="selectArtist('posco')" class="w-full max-w-[270px] py-2.5 px-4 rounded-xl bg-brand-card border border-blue-500/30 hover:border-blue-500 hover:bg-blue-500/10 hover:scale-[1.03] hover:shadow-[0_0_20px_rgba(59,130,246,0.2)] grid grid-cols-[20px_1fr_20px] items-center transition-all duration-300 active:scale-95 group cursor-pointer">
+        <button onclick="selectArtist('posco')" class="w-full max-w-[270px] py-2.5 px-3.5 rounded-xl bg-brand-card border border-blue-500/30 hover:border-blue-500 hover:bg-blue-500/10 hover:scale-[1.03] hover:shadow-[0_0_20px_rgba(59,130,246,0.2)] grid grid-cols-[20px_1fr_20px] items-center transition-all duration-300 active:scale-95 group cursor-pointer">
           <div class="w-2.5 h-2.5 rounded-full bg-blue-500 shadow-[0_0_10px_#3b82f6] justify-self-start"></div>
-          <span class="font-artistHome text-xs sm:text-sm text-white tracking-wider text-center group-hover:text-blue-400 transition-colors">Posco Losco</span>
+          <span class="font-artistHome text-sm sm:text-base text-white tracking-wider text-center group-hover:text-blue-400 transition-colors">Posco Losco</span>
           <i data-lucide="chevron-right" class="w-4 h-4 text-blue-500 justify-self-end transform group-hover:translate-x-1 transition-transform"></i>
         </button>
 
-        <button onclick="selectArtist('davide')" class="w-full max-w-[270px] py-2.5 px-4 rounded-xl bg-brand-card border border-orange-500/30 hover:border-orange-500 hover:bg-orange-500/10 hover:scale-[1.03] hover:shadow-[0_0_20px_rgba(249,115,22,0.2)] grid grid-cols-[20px_1fr_20px] items-center transition-all duration-300 active:scale-95 group cursor-pointer">
+        <button onclick="selectArtist('davide')" class="w-full max-w-[270px] py-2.5 px-3.5 rounded-xl bg-brand-card border border-orange-500/30 hover:border-orange-500 hover:bg-orange-500/10 hover:scale-[1.03] hover:shadow-[0_0_20px_rgba(249,115,22,0.2)] grid grid-cols-[20px_1fr_20px] items-center transition-all duration-300 active:scale-95 group cursor-pointer">
           <div class="w-2.5 h-2.5 rounded-full bg-orange-500 shadow-[0_0_10px_#f97316] justify-self-start"></div>
-          <span class="font-artistHome text-xs sm:text-sm text-white tracking-wider text-center group-hover:text-orange-400 transition-colors">Davide Saba</span>
+          <span class="font-artistHome text-sm sm:text-base text-white tracking-wider text-center group-hover:text-orange-400 transition-colors">Davide Saba</span>
           <i data-lucide="chevron-right" class="w-4 h-4 text-orange-500 justify-self-end transform group-hover:translate-x-1 transition-transform"></i>
         </button>
 
-        <button onclick="selectArtist('egodi')" class="w-full max-w-[270px] py-2.5 px-4 rounded-xl bg-brand-card border border-purple-500/30 hover:border-purple-500 hover:bg-purple-500/10 hover:scale-[1.03] hover:shadow-[0_0_20px_rgba(168,85,247,0.2)] grid grid-cols-[20px_1fr_20px] items-center transition-all duration-300 active:scale-95 group cursor-pointer">
+        <button onclick="selectArtist('egodi')" class="w-full max-w-[270px] py-2.5 px-3.5 rounded-xl bg-brand-card border border-purple-500/30 hover:border-purple-500 hover:bg-purple-500/10 hover:scale-[1.03] hover:shadow-[0_0_20px_rgba(168,85,247,0.2)] grid grid-cols-[20px_1fr_20px] items-center transition-all duration-300 active:scale-95 group cursor-pointer">
           <div class="w-2.5 h-2.5 rounded-full bg-purple-500 shadow-[0_0_10px_#a855f7] justify-self-start"></div>
-          <span class="font-artistHome text-xs sm:text-sm text-white tracking-wider text-center group-hover:text-purple-400 transition-colors">Egodì Ink</span>
+          <span class="font-artistHome text-sm sm:text-base text-white tracking-wider text-center group-hover:text-purple-400 transition-colors">Egodì Ink</span>
           <i data-lucide="chevron-right" class="w-4 h-4 text-purple-500 justify-self-end transform group-hover:translate-x-1 transition-transform"></i>
         </button>
 
