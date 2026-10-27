@@ -24,9 +24,9 @@
               muted: '#737373'
             },
             artist: {
-              claudia: '#ec4899', // Rosa
-              posco: '#3b82f6',   // Blu
-              davide: '#f97316'   // Arancio
+              claudia: '#ec4899',
+              posco: '#3b82f6',
+              davide: '#f97316'
             }
           }
         }
@@ -55,9 +55,6 @@
       filter: invert(1);
       cursor: pointer;
     }
-    .artist-accent-border { border-color: var(--artist-color) !important; }
-    .artist-accent-bg { background-color: var(--artist-color) !important; }
-    .artist-accent-text { color: var(--artist-color) !important; }
   </style>
 </head>
 <body class="min-h-screen flex flex-col pb-10">
@@ -141,7 +138,6 @@
       
       <div class="grid grid-cols-2 gap-2">
         <div class="flex gap-1">
-          <!-- Filtro Luogo -->
           <select id="filter-location" onchange="renderList()" class="bg-brand-card border border-brand-border rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-white w-full truncate">
             <!-- Popolato Dinamicamente -->
           </select>
@@ -150,7 +146,6 @@
           </button>
         </div>
 
-        <!-- Filtro Tipologia & Priorità -->
         <select id="filter-priority" onchange="renderList()" class="bg-brand-card border border-brand-border rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-white w-full truncate">
           <option value="ALL">Tutte le Tipologie</option>
           <option value="1">Continuo – ASAP</option>
@@ -206,7 +201,7 @@
 
         <div id="priority-container">
           <label class="block text-xs font-medium text-brand-muted mb-1">Tipo Progetto & Priorità *</label>
-          <select id="field-priority" required class="w-full bg-brand-black border border-brand-border rounded-xl px-3 py-2 text-sm text-white focus:outline-none focus:border-white">
+          <select id="field-priority" class="w-full bg-brand-black border border-brand-border rounded-xl px-3 py-2 text-sm text-white focus:outline-none focus:border-white">
             <option value="1">Continuo Progetto – Prima possibile (Rank 1)</option>
             <option value="2">Nuovo Tatuaggio – Prima possibile (Rank 2)</option>
             <option value="3">Continuo Progetto – Senza fretta (Rank 3)</option>
@@ -252,9 +247,7 @@
         <button onclick="addCustomLocation()" id="btn-add-loc" class="px-3 py-2 rounded-xl text-black font-semibold text-xs transition-all">Aggiungi</button>
       </div>
 
-      <div id="locations-list" class="space-y-2 pt-2">
-        <!-- Lista luoghi editabili -->
-      </div>
+      <div id="locations-list" class="space-y-2 pt-2"></div>
     </div>
   </div>
 
@@ -262,9 +255,6 @@
   <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
 
   <script>
-    // =========================================================================
-    // CONFIGURAZIONE ARTISTI E LUOGHI
-    // =========================================================================
     const ARTISTS_CONFIG = {
       claudia: {
         id: 'claudia',
@@ -306,9 +296,6 @@
 
     let currentArtistId = localStorage.getItem('selected_artist_id') || null;
 
-    // =========================================================================
-    // CONFIGURAZIONE FIREBASE
-    // =========================================================================
 const firebaseConfig = {
   apiKey: "AIzaSyDccFCqeRlOxyR9SkHGYBKVkruL4XOA1SQ",
   authDomain: "thegrind-waitinglist.firebaseapp.com",
@@ -340,7 +327,6 @@ const firebaseConfig = {
       loadFromLocalStorage();
     }
 
-    // Initialize Artist Screen / UI
     if (!currentArtistId) {
       openArtistSelectionScreen();
     } else {
@@ -348,9 +334,6 @@ const firebaseConfig = {
       applyArtistTheme(currentArtistId);
     }
 
-    // =========================================================================
-    // GESTIONE ARTISTA & TEMA
-    // =========================================================================
     function selectArtist(artistId) {
       currentArtistId = artistId;
       localStorage.setItem('selected_artist_id', artistId);
@@ -370,7 +353,6 @@ const firebaseConfig = {
       document.getElementById('artist-title').innerText = config.name.toUpperCase();
       document.documentElement.style.setProperty('--artist-color', config.color);
 
-      // Aggiorna pulsanti e dettagli colorati
       const btnNew = document.getElementById('btn-new-client');
       const btnSave = document.getElementById('btn-save-modal');
       const btnAddLoc = document.getElementById('btn-add-loc');
@@ -404,9 +386,6 @@ const firebaseConfig = {
       });
     }
 
-    // =========================================================================
-    // GESTIONE DATI (FIREBASE / LOCALSTORAGE)
-    // =========================================================================
     function initFirebaseListener() {
       db.collection("waiting_list").onSnapshot(snapshot => {
         clientsData = snapshot.docs.map(doc => ({
@@ -434,7 +413,6 @@ const firebaseConfig = {
     }
 
     async function saveClient(client) {
-      // Assegna artista corrente
       client.artistId = currentArtistId;
 
       if (!useLocalStorage && db) {
@@ -469,9 +447,6 @@ const firebaseConfig = {
       }
     }
 
-    // =========================================================================
-    // ORDINAMENTO E RENDERING
-    // =========================================================================
     const PRIORITY_LABELS = {
       1: { text: 'Continuo – ASAP', badge: 'bg-white text-black font-bold' },
       2: { text: 'Nuovo – ASAP', badge: 'bg-neutral-300 text-black font-medium' },
@@ -488,7 +463,6 @@ const firebaseConfig = {
       const priorityFilter = document.getElementById('filter-priority').value;
 
       let filtered = clientsData.filter(c => {
-        // Assegnazione automatica a Claudia se manca l'artistId (preserva il vecchio database)
         const clientArtist = c.artistId || 'claudia';
         if (clientArtist !== currentArtistId) return false;
 
@@ -597,9 +571,6 @@ const firebaseConfig = {
       if (window.lucide) lucide.createIcons();
     }
 
-    // =========================================================================
-    // MODALE GESTIONE LUOGHI
-    // =========================================================================
     function openManageLocationsModal() {
       renderManageLocationsList();
       document.getElementById('locations-modal').classList.remove('hidden');
@@ -664,19 +635,19 @@ const firebaseConfig = {
     function handleLocationChange() {
       const selectedLoc = document.getElementById('field-location').value;
       const priorityContainer = document.getElementById('priority-container');
+      const prioritySelect = document.getElementById('field-priority');
       const locations = getArtistLocations();
 
       const locObj = locations.find(l => l.name === selectedLoc);
       if (locObj && locObj.isSinglePriority) {
         priorityContainer.classList.add('hidden');
+        prioritySelect.removeAttribute('required');
       } else {
         priorityContainer.classList.remove('hidden');
+        prioritySelect.setAttribute('required', 'required');
       }
     }
 
-    // =========================================================================
-    // MODALE CLIENTE & FORM
-    // =========================================================================
     function openModal(isEdit = false) {
       if (!isEdit) {
         document.getElementById('client-form').reset();
@@ -700,7 +671,12 @@ const firebaseConfig = {
       document.getElementById('field-name').value = client.name;
       document.getElementById('field-contact').value = client.contact;
       document.getElementById('field-location').value = client.location;
-      document.getElementById('field-priority').value = String(client.priority !== undefined ? client.priority : '4');
+      
+      handleLocationChange();
+      if (client.priority !== undefined && client.priority !== '0') {
+        document.getElementById('field-priority').value = String(client.priority);
+      }
+
       document.getElementById('field-date').value = client.date;
       document.getElementById('field-notes').value = client.notes || '';
 
@@ -730,9 +706,6 @@ const firebaseConfig = {
       closeModal();
     }
 
-    // =========================================================================
-    // RICONOSCIMENTO VOCALE
-    // =========================================================================
     function startVoiceRecognition(e) {
       if (e) e.preventDefault();
       const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
