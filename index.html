@@ -108,7 +108,6 @@
         </div>
       </div>
 
-      <!-- PULSANTI ARTISTI CON FONT INGRANDITI E BILANCIATI -->
       <div class="w-full space-y-3">
         <button onclick="selectArtist('claudia')" class="w-full py-4 px-5 rounded-2xl bg-brand-card border border-pink-500/30 hover:border-pink-500 hover:bg-pink-500/10 hover:scale-[1.02] hover:shadow-[0_0_20px_rgba(236,72,153,0.2)] grid grid-cols-[24px_1fr_24px] items-center transition-all duration-300 active:scale-95 group cursor-pointer">
           <div class="w-3.5 h-3.5 rounded-full bg-pink-500 shadow-[0_0_10px_#ec4899] justify-self-start"></div>
@@ -130,12 +129,12 @@
       </div>
     </div>
 
-    <!-- VISTA LISTA SPESA (MOSTRATA SOLO NELLA PAGINA PRINCIPALE) -->
+    <!-- VISTA LISTA SPESA -->
     <div id="home-shopping-view" class="w-full max-w-md space-y-4 hidden">
       <div class="flex justify-between items-center bg-brand-card border border-brand-border p-4 rounded-2xl">
         <div>
           <h2 class="text-base font-bold text-white uppercase tracking-wider">Lista della Spesa</h2>
-          <p class="text-xs text-brand-muted mt-0.5">Gestisci articoli e quantità</p>
+          <p class="text-xs text-brand-muted mt-0.5">Ditta e gestione scorte</p>
         </div>
         <div class="flex gap-2">
           <button onclick="confirmClearShoppingList()" class="px-3 py-1.5 rounded-xl bg-red-500/20 text-red-400 border border-red-500/30 text-xs font-semibold hover:bg-red-500/30 transition-all">
@@ -147,10 +146,15 @@
         </div>
       </div>
 
+      <!-- FORM CON MICROFONO DEDICATO PER LA SPESA -->
       <div class="flex gap-2">
-        <input type="text" id="shopping-item-name" placeholder="Nome articolo (es. Aghi Kwadron)..." class="flex-1 bg-brand-card border border-brand-border rounded-xl px-3 py-2 text-sm text-white focus:outline-none focus:border-white">
-        <input type="number" id="shopping-item-qty" value="1" min="1" class="w-20 bg-brand-card border border-brand-border rounded-xl px-3 py-2 text-sm text-white text-center focus:outline-none focus:border-white">
-        <button onclick="addShoppingItemManual()" class="px-4 py-2 rounded-xl bg-emerald-600 text-white font-semibold text-sm hover:bg-emerald-500 transition-all">Aggiungi</button>
+        <input type="text" id="shopping-item-name" placeholder="Articolo (es. Sacchi spazzatura)..." class="flex-1 bg-brand-card border border-brand-border rounded-xl px-3 py-2 text-sm text-white focus:outline-none focus:border-white">
+        <input type="number" id="shopping-item-qty" value="1" min="1" class="w-16 bg-brand-card border border-brand-border rounded-xl px-2 py-2 text-sm text-white text-center focus:outline-none focus:border-white">
+        <button type="button" onclick="startShoppingVoiceRecognition()" class="p-2.5 rounded-xl bg-emerald-600/20 border border-emerald-500/40 text-emerald-400 hover:bg-emerald-600/30 transition-all active:scale-95 relative cursor-pointer shrink-0" title="Dettatura Vocale Spesa">
+          <i data-lucide="mic" class="w-5 h-5 pointer-events-none"></i>
+          <span id="shopping-voice-pulse" class="hidden absolute top-0 right-0 w-2.5 h-2.5 bg-emerald-400 rounded-full animate-ping pointer-events-none"></span>
+        </button>
+        <button onclick="addShoppingItemManual()" class="px-3.5 py-2 rounded-xl bg-emerald-600 text-white font-semibold text-sm hover:bg-emerald-500 transition-all shrink-0">Aggiungi</button>
       </div>
 
       <div id="shopping-list-container" class="space-y-2.5 max-h-[50vh] overflow-y-auto custom-scrollbar"></div>
@@ -186,7 +190,7 @@
     </div>
 
     <div class="flex items-center gap-2 shrink-0 z-10">
-      <button type="button" id="voice-btn" onclick="startVoiceRecognition(event)" class="p-2.5 rounded-full bg-brand-card border border-brand-border text-white hover:border-white transition-all active:scale-95 relative cursor-pointer" title="Comando Vocale">
+      <button type="button" id="voice-btn" onclick="startVoiceRecognition(event)" class="p-2.5 rounded-full bg-brand-card border border-brand-border text-white hover:border-white transition-all active:scale-95 relative cursor-pointer" title="Comando Vocale Cliente">
         <i data-lucide="mic" class="w-5 h-5 pointer-events-none"></i>
         <span id="voice-pulse" class="hidden absolute top-0 right-0 w-3 h-3 bg-red-500 rounded-full animate-ping pointer-events-none"></span>
       </button>
@@ -742,6 +746,88 @@ const firebaseConfig = {
     }
 
     // =========================================================================
+    // DETTATURA VOCALE PER LA LISTA DELLA SPESA
+    // =========================================================================
+    function startShoppingVoiceRecognition() {
+      const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+
+      if (!SpeechRecognition) {
+        alert("Il tuo browser non supporta la dettatura vocale.");
+        return;
+      }
+
+      const recognition = new SpeechRecognition();
+      recognition.lang = 'it-IT';
+      recognition.interimResults = false;
+
+      const pulse = document.getElementById('shopping-voice-pulse');
+      if (pulse) pulse.classList.remove('hidden');
+
+      recognition.start();
+
+      recognition.onresult = function(event) {
+        if (pulse) pulse.classList.add('hidden');
+        const transcript = event.results[0][0].transcript.toLowerCase().trim();
+        parseShoppingVoiceCommand(transcript);
+      };
+
+      recognition.onerror = function() {
+        if (pulse) pulse.classList.add('hidden');
+        alert("Errore o nessun comando vocale spesa rilevato.");
+      };
+
+      recognition.onend = function() {
+        if (pulse) pulse.classList.add('hidden');
+      };
+    }
+
+    function parseShoppingVoiceCommand(text) {
+      if (text.includes('elimina tutto') || text.includes('svuota lista') || text.includes('cancella tutto')) {
+        confirmClearShoppingList();
+        return;
+      }
+
+      let modMatch = text.match(/(?:modifica|cambia)\s+(?:la\s+)?quantità\s+(?:di\s+)?([a-zàèéìòù\s\d]+?)\s+(?:in|a)\s+(\d+)/i);
+      if (modMatch) {
+        const itemName = modMatch[1].trim();
+        const newQty = parseInt(modMatch[2]);
+        const item = shoppingList.find(i => i.name.toLowerCase().includes(itemName));
+        if (item) {
+          item.qty = newQty;
+          localStorage.setItem('shopping_list_data', JSON.stringify(shoppingList));
+          renderShoppingList();
+          return;
+        }
+      }
+
+      let itemName = '';
+      let qty = 1;
+
+      let qtyMatch = text.match(/(?:quantità|in quantità)\s+(\d+)/i);
+      if (qtyMatch) {
+        qty = parseInt(qtyMatch[1]);
+        itemName = text.replace(/(?:aggiungi|alla lista|in quantità|\d+)/gi, '').trim();
+      } else {
+        itemName = text.replace(/aggiungi/gi, '').replace(/alla lista/gi, '').trim();
+      }
+
+      if (itemName) {
+        itemName = capitalizeWords(itemName);
+        const existing = shoppingList.find(i => i.name.toLowerCase() === itemName.toLowerCase());
+        if (existing) {
+          existing.qty += qty;
+        } else {
+          shoppingList.push({ name: itemName, qty });
+        }
+        localStorage.setItem('shopping_list_data', JSON.stringify(shoppingList));
+        renderShoppingList();
+        return;
+      }
+
+      alert("Comando vocale spesa non riconosciuto. Esempio: 'aggiungi sacchi spazzatura in quantità 1'");
+    }
+
+    // =========================================================================
     // GESTIONE LUOGHI
     // =========================================================================
     function openManageLocationsModal() {
@@ -880,7 +966,7 @@ const firebaseConfig = {
     }
 
     // =========================================================================
-    // RICONOSCIMENTO VOCALE
+    // RICONOSCIMENTO VOCALE PER CLIENTI
     // =========================================================================
     function startVoiceRecognition(e) {
       if (e) e.preventDefault();
@@ -903,12 +989,7 @@ const firebaseConfig = {
       recognition.onresult = function(event) {
         pulse.classList.add('hidden');
         const transcript = event.results[0][0].transcript.toLowerCase().trim();
-        
-        if (isHomeShoppingActive || transcript.includes('lista') || transcript.includes('spesa') || transcript.includes('quantità') || transcript.includes('elimina tutto') || transcript.includes('svuota')) {
-          parseShoppingVoiceCommand(transcript);
-        } else {
-          parseVoiceCommand(transcript);
-        }
+        parseVoiceCommand(transcript);
       };
 
       recognition.onerror = function() {
@@ -919,61 +1000,6 @@ const firebaseConfig = {
       recognition.onend = function() {
         pulse.classList.add('hidden');
       };
-    }
-
-    function parseShoppingVoiceCommand(text) {
-      if (text.includes('elimina tutto') || text.includes('svuota lista') || text.includes('cancella tutto')) {
-        if (confirm("Vuoi davvero eliminare tutti gli elementi dalla lista della spesa?")) {
-          shoppingList = [];
-          localStorage.setItem('shopping_list_data', JSON.stringify(shoppingList));
-          if (isHomeShoppingActive) renderShoppingList();
-        }
-        return;
-      }
-
-      let modMatch = text.match(/(?:modifica|cambia)\s+(?:la\s+)?quantità\s+(?:di\s+)?([a-zàèéìòù\s\d]+?)\s+(?:in|a)\s+(\d+)/i);
-      if (modMatch) {
-        const itemName = modMatch[1].trim();
-        const newQty = parseInt(modMatch[2]);
-        const item = shoppingList.find(i => i.name.toLowerCase().includes(itemName));
-        if (item) {
-          item.qty = newQty;
-          localStorage.setItem('shopping_list_data', JSON.stringify(shoppingList));
-          if (isHomeShoppingActive) renderShoppingList();
-          return;
-        }
-      }
-
-      let addMatch = text.match(/(?:aggiungi)\s+([a-zàèéìòù\s\d]+?)(?:\s+(?:alla\s+lista|in\s+quantità|quantità)\s*(\d+)?)?$/i);
-      if (addMatch || text.includes('aggiungi')) {
-        let itemName = '';
-        let qty = 1;
-
-        let qtyMatch = text.match(/(?:quantità|in quantità)\s+(\d+)/i);
-        if (qtyMatch) {
-          qty = parseInt(qtyMatch[1]);
-          itemName = text.replace(/(?:aggiungi|alla lista|in quantità|\d+)/gi, '').trim();
-        } else {
-          itemName = text.replace(/aggiungi/gi, '').replace(/alla lista/gi, '').trim();
-        }
-
-        if (itemName) {
-          itemName = capitalizeWords(itemName);
-          const existing = shoppingList.find(i => i.name.toLowerCase() === itemName.toLowerCase());
-          if (existing) {
-            existing.qty += qty;
-          } else {
-            shoppingList.push({ name: itemName, qty });
-          }
-          localStorage.setItem('shopping_list_data', JSON.stringify(shoppingList));
-          
-          if (!isHomeShoppingActive) toggleShoppingViewHome();
-          else renderShoppingList();
-          return;
-        }
-      }
-
-      alert("Comando vocale spesa non riconosciuto. Esempio: 'aggiungi sacchi spazzatura in quantità 1'");
     }
 
     function parseVoiceCommand(text) {
