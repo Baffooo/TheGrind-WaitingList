@@ -14,7 +14,7 @@
 
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Audiowide&family=Space+Grotesk:wght@600;700;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Audiowide&family=Space+Grotesk:wght@600;700;800;900&display=swap" rel="stylesheet">
 
   <script>
     tailwind.config = {
@@ -97,16 +97,17 @@
   <div id="artist-selector-screen" class="fixed inset-0 z-50 bg-brand-black flex flex-col items-center justify-start pt-6 md:justify-center md:pt-0 p-4 md:p-8 overflow-y-auto">
     
     <!-- CONTENUTO SELEZIONE ARTISTI -->
-    <div id="home-artists-view" class="w-full max-w-sm md:max-w-md flex flex-col items-center space-y-4 md:space-y-6">
-      <div class="text-center space-y-2.5 md:space-y-4">
+    <div id="home-artists-view" class="w-full max-w-xl flex flex-col items-center space-y-4 md:space-y-6">
+      <div class="text-center space-y-2.5 md:space-y-4 w-full">
         <!-- LOGO GRANDE MOBILE / HUGE DESKTOP -->
-        <div class="logo-hover-effect w-36 h-36 sm:w-44 sm:h-44 md:w-64 md:h-64 mx-auto flex items-center justify-center overflow-visible cursor-pointer transition-all duration-300">
+        <div class="logo-hover-effect w-36 h-36 sm:w-44 sm:h-44 md:w-60 md:h-60 mx-auto flex items-center justify-center overflow-visible cursor-pointer transition-all duration-300">
           <img src="logo.jpg" alt="Logo The Grind" class="max-w-full max-h-full object-contain transition-all duration-300">
         </div>
 
-        <div>
-          <h1 class="font-heading text-xl sm:text-2xl md:text-4xl font-black tracking-wide text-white uppercase">THE GRIND TATTOO FINEST</h1>
-          <p class="text-[11px] sm:text-xs md:text-base text-brand-muted tracking-[0.3em] md:tracking-[0.4em] uppercase font-bold mt-1 md:mt-2">PICK THE ARTIST</p>
+        <div class="w-full">
+          <!-- TITOLO IN UNA SINGOLA RIGA SENZA ANDARE A CAPO -->
+          <h1 class="font-heading text-xl sm:text-2xl md:text-3xl lg:text-4xl font-black tracking-wide text-white uppercase whitespace-nowrap text-center">THE GRIND TATTOO FINEST</h1>
+          <p class="text-[11px] sm:text-xs md:text-sm text-brand-muted tracking-[0.35em] md:tracking-[0.45em] uppercase font-bold mt-1 md:mt-2 text-center">PICK THE ARTIST</p>
         </div>
       </div>
 
@@ -140,7 +141,7 @@
       </div>
     </div>
 
-    <!-- VISTA LISTA SPESA (CON LOGO E ICONA HOME) -->
+    <!-- VISTA LISTA SPESA (CON SYNC CLOUD E MODIFICA) -->
     <div id="home-shopping-view" class="w-full max-w-md space-y-3 hidden my-auto">
       <div class="flex justify-between items-center bg-brand-card border border-brand-border p-3.5 rounded-2xl">
         <div class="flex items-center gap-3">
@@ -162,7 +163,7 @@
         </div>
       </div>
 
-      <input type="hidden" id="shopping-item-edit-index" value="-1">
+      <input type="hidden" id="shopping-item-edit-id" value="">
 
       <div class="grid grid-cols-[1fr_50px_auto] gap-1.5 items-center bg-brand-card border border-brand-border p-2 rounded-xl">
         <input type="text" id="shopping-item-name" placeholder="Articolo..." class="w-full bg-brand-black border border-brand-border rounded-lg px-2.5 py-2 text-xs text-white focus:outline-none focus:border-white">
@@ -190,7 +191,6 @@
   <!-- HEADER PAGINA ARTISTA (CON LOGO SPARKLER ANCHE QUI) -->
   <header class="sticky top-0 z-30 bg-brand-black/95 backdrop-blur-md border-b border-brand-border px-4 py-2.5 flex justify-between items-center gap-2">
     <div class="flex items-center gap-3 min-w-0 flex-1">
-      <!-- AGGIUNTO LOGO-HOVER-EFFECT ANCHE NELL'HEADER ARTISTA -->
       <div onclick="openArtistSelectionScreen()" class="logo-hover-effect w-11 h-11 flex items-center justify-center shrink-0 overflow-visible cursor-pointer group" title="Cambia Artista">
         <img src="logo.jpg" alt="Logo" class="max-w-full max-h-full object-contain transition-transform">
       </div>
@@ -387,11 +387,10 @@
       }
     };
 
-    // AL REFRESH TORNA SEMPRE ALLA PAGINA PRINCIPALE
     localStorage.removeItem('selected_artist_id');
     let currentArtistId = null;
     let isHomeShoppingActive = false;
-    let shoppingList = JSON.parse(localStorage.getItem('shopping_list_data')) || [];
+    let shoppingList = [];
 
 const firebaseConfig = {
   apiKey: "AIzaSyDccFCqeRlOxyR9SkHGYBKVkruL4XOA1SQ",
@@ -413,7 +412,7 @@ const firebaseConfig = {
         firebase.initializeApp(firebaseConfig);
         db = firebase.firestore();
         document.getElementById('status-indicator').innerText = "Cloud Sync (Firebase)";
-        initFirebaseListener();
+        initFirebaseListeners();
       } else {
         throw new Error("Firebase non configurato, proseguo in locale.");
       }
@@ -480,7 +479,8 @@ const firebaseConfig = {
       });
     }
 
-    function initFirebaseListener() {
+    function initFirebaseListeners() {
+      // 1. Synchronize Client Waiting List
       db.collection("waiting_list").onSnapshot(snapshot => {
         clientsData = snapshot.docs.map(doc => ({
           id: doc.id,
@@ -488,20 +488,34 @@ const firebaseConfig = {
         }));
         renderList();
       }, error => {
-        console.error("Errore Firebase:", error);
-        document.getElementById('status-indicator').innerText = "Errore Connessione Cloud";
+        console.error("Errore Firebase Clients:", error);
+      });
+
+      // 2. Synchronize Shopping List across all devices
+      db.collection("shopping_list").onSnapshot(snapshot => {
+        shoppingList = snapshot.docs.map(doc => ({
+          id: doc.id,
+          ...doc.data()
+        }));
+        if (isHomeShoppingActive) renderShoppingList();
+      }, error => {
+        console.error("Errore Firebase Shopping List:", error);
       });
     }
 
     function loadFromLocalStorage() {
       const data = localStorage.getItem('tattoo_waiting_list');
       clientsData = data ? JSON.parse(data) : [];
+      
+      const shopData = localStorage.getItem('shopping_list_data');
+      shoppingList = shopData ? JSON.parse(shopData) : [];
       renderList();
     }
 
     function saveLocal() {
       if (useLocalStorage) {
         localStorage.setItem('tattoo_waiting_list', JSON.stringify(clientsData));
+        localStorage.setItem('shopping_list_data', JSON.stringify(shoppingList));
         renderList();
       }
     }
@@ -666,7 +680,7 @@ const firebaseConfig = {
     }
 
     // =========================================================================
-    // GESTIONE LISTA SPESA CON MODIFICA E TESTI LUNGI FORMATTATI
+    // GESTIONE LISTA SPESA (SINCRONIZZATA SU FIREBASE CLOUD)
     // =========================================================================
     function toggleShoppingViewHome() {
       isHomeShoppingActive = !isHomeShoppingActive;
@@ -702,6 +716,7 @@ const firebaseConfig = {
       }
 
       shoppingList.forEach((item, index) => {
+        const itemId = item.id || index;
         const row = document.createElement('div');
         row.className = 'bg-brand-card border border-brand-border rounded-xl p-3 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2.5';
         row.innerHTML = `
@@ -711,10 +726,10 @@ const firebaseConfig = {
           </div>
           <div class="flex items-center gap-1.5 shrink-0 self-end sm:self-center">
             <span class="text-xs text-neutral-400 bg-brand-black px-2 py-1 rounded-lg border border-brand-border font-mono mr-1">Q.tà: <strong>${item.qty}</strong></span>
-            <button onclick="updateShoppingQty(${index}, 1)" class="w-7 h-7 rounded-lg bg-brand-black border border-brand-border text-white hover:border-white flex items-center justify-center text-xs font-bold" title="Aumenta Q.tà">+</button>
-            <button onclick="updateShoppingQty(${index}, -1)" class="w-7 h-7 rounded-lg bg-brand-black border border-brand-border text-white hover:border-white flex items-center justify-center text-xs font-bold" title="Diminuisci Q.tà">-</button>
-            <button onclick="editShoppingItem(${index})" class="w-7 h-7 rounded-lg bg-blue-500/10 border border-blue-500/20 text-blue-400 hover:bg-blue-500/20 flex items-center justify-center text-xs" title="Modifica Articolo"><i data-lucide="edit-3" class="w-3.5 h-3.5"></i></button>
-            <button onclick="removeShoppingItem(${index})" class="w-7 h-7 rounded-lg bg-red-500/10 border border-red-500/20 text-red-400 hover:bg-red-500/20 flex items-center justify-center text-xs" title="Elimina Articolo"><i data-lucide="trash-2" class="w-3.5 h-3.5"></i></button>
+            <button onclick="updateShoppingQty('${itemId}', 1)" class="w-7 h-7 rounded-lg bg-brand-black border border-brand-border text-white hover:border-white flex items-center justify-center text-xs font-bold" title="Aumenta Q.tà">+</button>
+            <button onclick="updateShoppingQty('${itemId}', -1)" class="w-7 h-7 rounded-lg bg-brand-black border border-brand-border text-white hover:border-white flex items-center justify-center text-xs font-bold" title="Diminuisci Q.tà">-</button>
+            <button onclick="editShoppingItem('${itemId}')" class="w-7 h-7 rounded-lg bg-blue-500/10 border border-blue-500/20 text-blue-400 hover:bg-blue-500/20 flex items-center justify-center text-xs" title="Modifica Articolo"><i data-lucide="edit-3" class="w-3.5 h-3.5"></i></button>
+            <button onclick="removeShoppingItem('${itemId}')" class="w-7 h-7 rounded-lg bg-red-500/10 border border-red-500/20 text-red-400 hover:bg-red-500/20 flex items-center justify-center text-xs" title="Elimina Articolo"><i data-lucide="trash-2" class="w-3.5 h-3.5"></i></button>
           </div>
         `;
         container.appendChild(row);
@@ -723,41 +738,57 @@ const firebaseConfig = {
       if (window.lucide) lucide.createIcons();
     }
 
-    function addShoppingItemManual() {
+    async function addShoppingItemManual() {
       const nameInput = document.getElementById('shopping-item-name');
       const qtyInput = document.getElementById('shopping-item-qty');
-      const editIndexInput = document.getElementById('shopping-item-edit-index');
+      const editIdInput = document.getElementById('shopping-item-edit-id');
       
       const name = nameInput.value.trim();
       const qty = parseInt(qtyInput.value) || 1;
-      const editIndex = parseInt(editIndexInput.value);
+      const editId = editIdInput.value;
 
       if (!name) return;
 
-      if (editIndex >= 0 && editIndex < shoppingList.length) {
-        shoppingList[editIndex].name = name;
-        shoppingList[editIndex].qty = qty;
-      } else {
-        const existing = shoppingList.find(i => i.name.toLowerCase() === name.toLowerCase());
-        if (existing) {
-          existing.qty += qty;
+      if (!useLocalStorage && db) {
+        if (editId) {
+          await db.collection("shopping_list").doc(editId).update({ name, qty });
         } else {
-          shoppingList.push({ name, qty });
+          const existing = shoppingList.find(i => i.name.toLowerCase() === name.toLowerCase());
+          if (existing && existing.id) {
+            await db.collection("shopping_list").doc(existing.id).update({ qty: existing.qty + qty });
+          } else {
+            await db.collection("shopping_list").add({ name, qty, createdAt: Date.now() });
+          }
         }
+      } else {
+        if (editId) {
+          const idx = shoppingList.findIndex(i => String(i.id || i) === String(editId));
+          if (idx !== -1) {
+            shoppingList[idx].name = name;
+            shoppingList[idx].qty = qty;
+          }
+        } else {
+          const existing = shoppingList.find(i => i.name.toLowerCase() === name.toLowerCase());
+          if (existing) {
+            existing.qty += qty;
+          } else {
+            shoppingList.push({ id: 'local_' + Date.now(), name, qty });
+          }
+        }
+        saveLocal();
+        renderShoppingList();
       }
 
-      localStorage.setItem('shopping_list_data', JSON.stringify(shoppingList));
       resetShoppingForm();
-      renderShoppingList();
     }
 
-    function editShoppingItem(index) {
-      const item = shoppingList[index];
+    function editShoppingItem(id) {
+      const item = shoppingList.find(i => String(i.id || shoppingList.indexOf(i)) === String(id));
       if (!item) return;
 
       document.getElementById('shopping-item-name').value = item.name;
       document.getElementById('shopping-item-qty').value = item.qty;
-      document.getElementById('shopping-item-edit-index').value = index;
+      document.getElementById('shopping-item-edit-id').value = item.id || shoppingList.indexOf(item);
 
       const btn = document.getElementById('shopping-submit-btn');
       btn.innerText = 'Salva';
@@ -770,7 +801,7 @@ const firebaseConfig = {
     function resetShoppingForm() {
       document.getElementById('shopping-item-name').value = '';
       document.getElementById('shopping-item-qty').value = '1';
-      document.getElementById('shopping-item-edit-index').value = '-1';
+      document.getElementById('shopping-item-edit-id').value = '';
 
       const btn = document.getElementById('shopping-submit-btn');
       btn.innerText = 'Aggiungi';
@@ -778,28 +809,55 @@ const firebaseConfig = {
       btn.classList.add('bg-emerald-600', 'hover:bg-emerald-500');
     }
 
-    function updateShoppingQty(index, delta) {
-      shoppingList[index].qty += delta;
-      if (shoppingList[index].qty <= 0) {
-        shoppingList.splice(index, 1);
-      }
-      localStorage.setItem('shopping_list_data', JSON.stringify(shoppingList));
-      renderShoppingList();
-    }
+    async function updateShoppingQty(id, delta) {
+      const item = shoppingList.find(i => String(i.id || shoppingList.indexOf(i)) === String(id));
+      if (!item) return;
 
-    function removeShoppingItem(index) {
-      shoppingList.splice(index, 1);
-      localStorage.setItem('shopping_list_data', JSON.stringify(shoppingList));
-      resetShoppingForm();
-      renderShoppingList();
-    }
+      const newQty = item.qty + delta;
 
-    function confirmClearShoppingList() {
-      if (confirm("Sei sicuro di voler eliminare tutti gli elementi dalla lista della spesa?")) {
-        shoppingList = [];
-        localStorage.setItem('shopping_list_data', JSON.stringify(shoppingList));
-        resetShoppingForm();
+      if (!useLocalStorage && db && item.id) {
+        if (newQty <= 0) {
+          await db.collection("shopping_list").doc(item.id).delete();
+        } else {
+          await db.collection("shopping_list").doc(item.id).update({ qty: newQty });
+        }
+      } else {
+        item.qty = newQty;
+        if (item.qty <= 0) {
+          shoppingList = shoppingList.filter(i => String(i.id || shoppingList.indexOf(i)) !== String(id));
+        }
+        saveLocal();
         renderShoppingList();
+      }
+    }
+
+    async function removeShoppingItem(id) {
+      const item = shoppingList.find(i => String(i.id || shoppingList.indexOf(i)) === String(id));
+      if (!item) return;
+
+      if (!useLocalStorage && db && item.id) {
+        await db.collection("shopping_list").doc(item.id).delete();
+      } else {
+        shoppingList = shoppingList.filter(i => String(i.id || shoppingList.indexOf(i)) !== String(id));
+        saveLocal();
+        renderShoppingList();
+      }
+      resetShoppingForm();
+    }
+
+    async function confirmClearShoppingList() {
+      if (confirm("Sei sicuro di voler eliminare tutti gli elementi dalla lista della spesa?")) {
+        if (!useLocalStorage && db) {
+          const snapshot = await db.collection("shopping_list").get();
+          const batch = db.batch();
+          snapshot.docs.forEach(doc => batch.delete(doc.ref));
+          await batch.commit();
+        } else {
+          shoppingList = [];
+          saveLocal();
+          renderShoppingList();
+        }
+        resetShoppingForm();
       }
     }
 
