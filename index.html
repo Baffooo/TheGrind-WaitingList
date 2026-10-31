@@ -75,9 +75,15 @@
     /* Pulsanti artista: effetto hover solo dove esiste un mouse */
     .artist-btn { transition: all 0.2s ease; }
     .artist-btn:active { transform: scale(0.97); }
+    .artist-name { transition: color 0.25s ease; }
     @media (hover: hover) {
-      .artist-btn:hover { border-color: var(--c) !important; box-shadow: 0 0 20px var(--cg); transform: scale(1.03); }
+      /* Mouse: il nome si colora, il pulsante prende un tono più sfumato */
+      .artist-btn:hover { border-color: var(--cm) !important; background-color: var(--cbg) !important; box-shadow: 0 0 18px var(--cg); transform: scale(1.02); }
+      .artist-btn:hover .artist-name { color: var(--c); }
     }
+    /* Touch: stesso feedback mentre tieni premuto */
+    .artist-btn:active { background-color: var(--cbg) !important; }
+    .artist-btn:active .artist-name { color: var(--c); }
 
     @keyframes logoSparkleBounce {
       0% { transform: translateY(0) scale(1) rotate(0deg); filter: drop-shadow(0 0 20px rgba(255,255,255,0.3)) brightness(1); }
@@ -116,7 +122,10 @@
       </div>
 
       <div id="artist-buttons" class="w-full flex flex-col items-center space-y-2 md:space-y-3.5"></div>
-      <p class="text-[10px] text-neutral-700 pt-4">v3</p>
+      <div class="pt-4 flex items-center gap-3 text-[11px] text-neutral-500">
+        <span id="app-version" class="font-mono">v4</span>
+        <button type="button" onclick="forceUpdate()" class="underline underline-offset-2 hover:text-neutral-300 px-2 py-1">Controlla aggiornamenti</button>
+      </div>
     </div>
 
     <!-- Vista lista della spesa -->
@@ -175,14 +184,14 @@
   <div id="artist-view" class="hidden">
 
   <!-- ===================== HEADER PAGINA ARTISTA ===================== -->
-  <header class="sticky top-0 z-30 bg-brand-black/95 backdrop-blur-md border-b border-brand-border px-4 pb-2.5 flex justify-between items-center gap-2 safe-top" style="--pt-base:0.625rem">
+  <header class="sticky top-0 z-30 bg-brand-black/95 backdrop-blur-md border-b border-brand-border px-4 pb-3 flex justify-between items-center gap-2 safe-top" style="--pt-base:0.875rem">
     <div class="flex items-center gap-3 min-w-0 flex-1">
       <div onclick="openArtistSelectionScreen()" class="logo-hover-effect w-11 h-11 flex items-center justify-center shrink-0 overflow-visible cursor-pointer" title="Cambia Artista">
         <img src="logo.jpg" alt="Logo" class="max-w-full max-h-full object-contain">
       </div>
-      <div class="truncate">
+      <div class="min-w-0">
         <div onclick="openArtistSelectionScreen()" class="flex items-center gap-1.5 cursor-pointer group" title="Clicca per cambiare artista">
-          <h1 id="artist-title" class="font-heading font-bold text-sm tracking-wider text-white uppercase leading-none truncate group-hover:underline">CLAUDIA BINDI</h1>
+          <h1 id="artist-title" class="font-heading font-bold text-sm tracking-wider text-white uppercase leading-snug truncate group-hover:underline">CLAUDIA BINDI</h1>
           <i data-lucide="repeat" class="w-3 h-3 text-brand-muted group-hover:text-white shrink-0"></i>
         </div>
         <h2 class="text-[10px] font-bold tracking-widest text-neutral-300 uppercase leading-tight mt-0.5 truncate">WAITING LIST</h2>
@@ -200,7 +209,7 @@
   </header>
 
   <!-- ===================== LISTA D'ATTESA ARTISTA ===================== -->
-  <main id="main-waiting-section" class="max-w-2xl w-full mx-auto p-4 pb-12 space-y-4">
+  <main id="main-waiting-section" class="max-w-2xl w-full mx-auto px-4 pt-5 pb-12 space-y-4">
     <div class="flex justify-between items-center text-xs px-1 text-brand-muted gap-2">
       <span id="status-indicator">Inizializzazione...</span>
       <span id="list-counter" class="shrink-0"></span>
@@ -351,6 +360,12 @@
     </div>
   </div>
 
+  <!-- Banner aggiornamento -->
+  <div id="update-banner" class="hidden fixed left-3 right-3 z-[80] bg-white text-black rounded-xl px-4 py-3 flex items-center justify-between gap-3 shadow-2xl" style="bottom: calc(1rem + env(safe-area-inset-bottom));">
+    <span id="update-banner-text" class="text-sm font-medium"></span>
+    <button type="button" id="update-banner-btn" class="px-3 py-1.5 rounded-lg bg-black text-white text-sm font-semibold shrink-0">Aggiorna</button>
+  </div>
+
   <!-- Toast -->
   <div id="toast" class="hidden fixed left-1/2 -translate-x-1/2 z-[70] max-w-[90vw] px-4 py-2.5 rounded-xl bg-white text-black text-sm font-medium shadow-2xl" style="bottom: calc(5rem + env(safe-area-inset-bottom));"></div>
 
@@ -399,6 +414,14 @@
         ]
       }
     };
+
+    // Versione dell'app: aumentala ad ogni aggiornamento del file (l'app la usa per aggiornarsi da sola)
+    const APP_VERSION = 'v4';
+
+    // >>> CHIAVE GEMINI PER I COMANDI VOCALI (serve per usare la voce nell'app aggiunta alla Home di iPhone) <<<
+    // Lasciala vuota per usare solo il riconoscimento vocale del browser (non disponibile nell'app Home di iPhone).
+    const GEMINI_API_KEY = '';
+    const GEMINI_MODELS = ['gemini-flash-latest', 'gemini-2.5-flash']; // il secondo è il ripiego
 
     // >>> INCOLLA QUI LA TUA CONFIGURAZIONE FIREBASE (Impostazioni progetto → Le tue app → Config) <<<
 const firebaseConfig = {
@@ -534,9 +557,9 @@ const firebaseConfig = {
     function buildArtistButtons() {
       const container = $('artist-buttons');
       container.innerHTML = Object.values(ARTISTS_CONFIG).map(a => `
-        <button onclick="selectArtist('${a.id}')" class="w-full max-w-[300px] md:max-w-[380px] py-2.5 px-3.5 md:py-3.5 md:px-5 rounded-xl md:rounded-2xl bg-brand-card border artist-btn grid grid-cols-[44px_1fr_44px] items-center group cursor-pointer" style="border-color:${a.color}4d; --c:${a.color}; --cg:${a.color}40">
+        <button onclick="selectArtist('${a.id}')" class="w-full max-w-[300px] md:max-w-[380px] py-2.5 px-3.5 md:py-3.5 md:px-5 rounded-xl md:rounded-2xl bg-brand-card border artist-btn grid grid-cols-[44px_1fr_44px] items-center group cursor-pointer" style="border-color:${a.color}4d; --c:${a.color}; --cg:${a.color}40; --cbg:${a.color}1f; --cm:${a.color}99">
           <div class="w-2.5 h-2.5 md:w-3.5 md:h-3.5 rounded-full justify-self-start" style="background:${a.color};box-shadow:0 0 10px ${a.color}"></div>
-          <span class="font-artistHome text-sm sm:text-base md:text-lg text-white tracking-wider text-center">${escapeHtml(a.name)}</span>
+          <span class="artist-name font-artistHome text-sm sm:text-base md:text-lg text-white tracking-wider text-center">${escapeHtml(a.name)}</span>
           <div class="justify-self-end flex items-center gap-1.5">
             <span id="count-${a.id}" class="hidden text-[10px] font-mono font-bold px-1.5 py-0.5 rounded-full text-black" style="background:${a.color}"></span>
             <i data-lucide="chevron-right" class="w-4 h-4 md:w-5 md:h-5 transform group-hover:translate-x-1 transition-transform" style="color:${a.color}"></i>
@@ -1016,6 +1039,8 @@ const firebaseConfig = {
     // =====================================================================
     const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
     let rec = null;
+    let voiceBusy = false;     // trascrizione in corso
+    let voiceSession = 0;      // cambia ad ogni apertura/chiusura del pannello
     let listening = false;
     let voiceMode = null;      // 'client' | 'shopping'
     let parsedVoice = null;
@@ -1027,8 +1052,9 @@ const firebaseConfig = {
 
     function voiceUnsupportedReason() {
       if (!window.isSecureContext) return "Il microfono funziona solo su pagine https (o localhost): apri il sito dall'indirizzo https di GitHub Pages.";
-      if (!SR) return "Questo browser non supporta il riconoscimento vocale (Firefox, ad esempio). Scrivi il comando qui sotto oppure usa il microfono della tastiera del telefono.";
-      if (isIOSStandalone()) return "Nell'app aggiunta alla Home di iPhone il riconoscimento vocale non è disponibile. Tocca il campo qui sotto e usa il microfono della tastiera 🎤, oppure apri il sito in Safari.";
+      if (voiceEngine() !== 'none') return null;
+      if (isIOSStandalone()) return "Nell'app aggiunta alla Home il browser non offre il riconoscimento vocale. Per usarlo serve la chiave Gemini nel file (GEMINI_API_KEY). Intanto puoi toccare il campo qui sotto e usare il microfono della tastiera 🎤.";
+      return "Questo browser non supporta il riconoscimento vocale (Firefox, ad esempio). Scrivi il comando qui sotto oppure usa il microfono della tastiera del telefono.";
       return null;
     }
 
@@ -1045,6 +1071,8 @@ const firebaseConfig = {
 
     function openVoice(mode) {
       voiceMode = mode;
+      voiceSession++;
+      voiceBusy = false;
       parsedVoice = null;
       $('voice-title').innerText = mode === 'client' ? 'Nuovo cliente a voce' : 'Lista della spesa a voce';
       $('voice-hint').innerHTML = mode === 'client'
@@ -1067,16 +1095,19 @@ const firebaseConfig = {
     }
 
     function closeVoice() {
+      voiceSession++;
       stopListening(true);
       $('voice-sheet').classList.add('hidden');
     }
 
     function toggleListening() {
+      if (voiceBusy) return;
       if (listening) stopListening(false);
       else { $('voice-text').value = ''; onVoiceTextChange(); startListening(); }
     }
 
     function stopListening(abort) {
+      if (recState) { finishRecording(!!abort); return; }
       if (rec) {
         try { abort ? rec.abort() : rec.stop(); } catch (e) {}
       }
@@ -1084,7 +1115,9 @@ const firebaseConfig = {
     }
 
     function startListening() {
-      if (!SR || listening) return;
+      if (listening) return;
+      if (voiceEngine() === 'gemini') { startRecording(); return; }
+      if (!SR) return;
       let finalText = '';
       let gotAnything = false;
       let hadError = false;
@@ -1132,6 +1165,178 @@ const firebaseConfig = {
       };
 
       try { rec.start(); } catch (e) { setVoiceStatus('Impossibile avviare il microfono. Riprova.'); }
+    }
+
+    // ---------- registrazione + trascrizione Gemini (funziona anche nell'app aggiunta alla Home) ----------
+    let recState = null;
+
+    function geminiAvailable() {
+      return !!GEMINI_API_KEY && !!(navigator.mediaDevices && navigator.mediaDevices.getUserMedia) && !!(window.AudioContext || window.webkitAudioContext);
+    }
+    function voiceEngine() {
+      if (!window.isSecureContext) return 'none';
+      if (geminiAvailable()) return 'gemini';
+      if (SR && !isIOSStandalone()) return 'native';
+      return 'none';
+    }
+
+    async function startRecording() {
+      if (recState || listening || voiceBusy) return;
+      const Ctx = window.AudioContext || window.webkitAudioContext;
+      let ctx;
+      try {
+        // Va creato subito, dentro il tocco dell'utente, altrimenti iOS lo blocca
+        ctx = new Ctx();
+        if (ctx.resume) ctx.resume();
+      } catch (e) { setVoiceStatus('Audio non disponibile su questo dispositivo.'); return; }
+
+      const session = voiceSession;
+      setVoiceStatus('Avvio il microfono…');
+      let stream;
+      try {
+        stream = await navigator.mediaDevices.getUserMedia({ audio: { channelCount: 1, echoCancellation: true, noiseSuppression: true } });
+      } catch (e) {
+        try { ctx.close(); } catch (_) {}
+        setVoiceStatus(e && e.name === 'NotAllowedError'
+          ? "Microfono non autorizzato. Consenti l'accesso quando iOS te lo chiede, oppure dalle impostazioni del telefono."
+          : 'Microfono non disponibile.');
+        return;
+      }
+      if (session !== voiceSession) {
+        stream.getTracks().forEach(t => t.stop());
+        try { ctx.close(); } catch (_) {}
+        return;
+      }
+
+      const source = ctx.createMediaStreamSource(stream);
+      const proc = ctx.createScriptProcessor(4096, 1, 1);
+      const st = { stream, ctx, source, proc, chunks: [], hasSpeech: false, silenceSince: 0, startedAt: Date.now(), stopping: false, session };
+      proc.onaudioprocess = (e) => {
+        const data = e.inputBuffer.getChannelData(0);
+        st.chunks.push(new Float32Array(data));
+        let sum = 0;
+        for (let i = 0; i < data.length; i++) sum += data[i] * data[i];
+        const rms = Math.sqrt(sum / data.length);
+        const now = Date.now();
+        if (rms > 0.012) { st.hasSpeech = true; st.silenceSince = 0; }
+        else if (st.hasSpeech) {
+          if (!st.silenceSince) st.silenceSince = now;
+          else if (now - st.silenceSince > 1800) finishRecording(false);   // pausa lunga: fine registrazione
+        }
+        if (now - st.startedAt > 25000) finishRecording(false);            // massimo 25 secondi
+      };
+      source.connect(proc);
+      proc.connect(ctx.destination);
+
+      recState = st;
+      listening = true;
+      updateMicUI();
+      setVoiceStatus('Sto registrando… parla, poi fai una pausa (o tocca il microfono) per terminare.');
+    }
+
+    async function finishRecording(cancel) {
+      const st = recState;
+      if (!st || st.stopping) return;
+      st.stopping = true;
+      recState = null;
+      try { st.proc.onaudioprocess = null; st.proc.disconnect(); st.source.disconnect(); } catch (e) {}
+      st.stream.getTracks().forEach(t => t.stop());
+      const rate = st.ctx.sampleRate;
+      try { st.ctx.close(); } catch (e) {}
+      listening = false;
+      updateMicUI();
+      if (cancel) return;
+
+      const samples = st.chunks.reduce((n, c) => n + c.length, 0);
+      if (!st.hasSpeech || samples < rate * 0.4) {
+        setVoiceStatus('Non ho sentito nulla. Tocca il microfono e riprova.');
+        return;
+      }
+
+      voiceBusy = true;
+      setVoiceStatus('Trascrivo…');
+      try {
+        const text = await transcribeWithGemini(encodeWav(st.chunks, rate));
+        if (st.session !== voiceSession) return;     // pannello chiuso nel frattempo
+        if (!text) { setVoiceStatus('Non ho capito nulla. Tocca il microfono e riprova.'); return; }
+        $('voice-text').value = text;
+        onVoiceTextChange();
+        setVoiceStatus("Controlla l'anteprima e premi Conferma. Puoi correggere il testo a mano.");
+      } catch (err) {
+        if (st.session !== voiceSession) return;
+        console.error(err);
+        let msg = 'Trascrizione non riuscita. Riprova o scrivi il comando.';
+        if (err && err.status === 400) msg = 'Chiave Gemini non valida o richiesta rifiutata (400).';
+        else if (err && err.status === 403) msg = 'Chiave Gemini non autorizzata per questo sito: controlla le restrizioni della chiave (403).';
+        else if (err && err.status === 429) msg = 'Troppe richieste a Gemini: riprova tra un minuto.';
+        else if (err && err.message === 'model') msg = 'Modello Gemini non disponibile: aggiorna GEMINI_MODELS nel file.';
+        else if (err instanceof TypeError) msg = 'Connessione assente o bloccata: serve internet per la trascrizione.';
+        setVoiceStatus(msg);
+      } finally {
+        if (st.session === voiceSession) voiceBusy = false;
+      }
+    }
+
+    function encodeWav(chunks, inRate) {
+      let len = 0;
+      chunks.forEach(c => len += c.length);
+      const merged = new Float32Array(len);
+      let o = 0;
+      chunks.forEach(c => { merged.set(c, o); o += c.length; });
+
+      const outRate = 16000;
+      const ratio = inRate / outRate;
+      const outLen = Math.floor(len / ratio);
+      const pcm = new Int16Array(outLen);
+      for (let i = 0; i < outLen; i++) {
+        const start = Math.floor(i * ratio);
+        const end = Math.min(Math.floor((i + 1) * ratio), len);
+        let s = 0, n = 0;
+        for (let j = start; j < end; j++) { s += merged[j]; n++; }
+        const v = Math.max(-1, Math.min(1, n ? s / n : 0));
+        pcm[i] = v < 0 ? v * 0x8000 : v * 0x7fff;
+      }
+
+      const buf = new ArrayBuffer(44 + pcm.length * 2);
+      const dv = new DataView(buf);
+      const str = (off, s) => { for (let i = 0; i < s.length; i++) dv.setUint8(off + i, s.charCodeAt(i)); };
+      str(0, 'RIFF'); dv.setUint32(4, 36 + pcm.length * 2, true); str(8, 'WAVE');
+      str(12, 'fmt '); dv.setUint32(16, 16, true); dv.setUint16(20, 1, true); dv.setUint16(22, 1, true);
+      dv.setUint32(24, outRate, true); dv.setUint32(28, outRate * 2, true); dv.setUint16(32, 2, true); dv.setUint16(34, 16, true);
+      str(36, 'data'); dv.setUint32(40, pcm.length * 2, true);
+      for (let i = 0; i < pcm.length; i++) dv.setInt16(44 + i * 2, pcm[i], true);
+      return buf;
+    }
+
+    function arrayBufferToBase64(buf) {
+      const bytes = new Uint8Array(buf);
+      let bin = '';
+      const step = 0x8000;
+      for (let i = 0; i < bytes.length; i += step) bin += String.fromCharCode.apply(null, bytes.subarray(i, i + step));
+      return btoa(bin);
+    }
+
+    async function transcribeWithGemini(wavBuffer) {
+      const b64 = arrayBufferToBase64(wavBuffer);
+      const hints = voiceMode === 'client' ? ' Possibili luoghi citati: ' + getArtistLocations().map(l => l.name).join(', ') + '.' : '';
+      const prompt = 'Trascrivi fedelmente in italiano questa registrazione vocale. Scrivi i numeri di telefono e le quantità con le cifre (es. 333 1234567, 3 cartucce).' + hints + ' Rispondi solo con la trascrizione, senza commenti né virgolette. Se non si sente parlato, rispondi con una riga vuota.';
+      let lastErr = null;
+      for (const model of GEMINI_MODELS) {
+        const res = await fetch('https://generativelanguage.googleapis.com/v1beta/models/' + model + ':generateContent?key=' + encodeURIComponent(GEMINI_API_KEY), {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            contents: [{ parts: [{ text: prompt }, { inline_data: { mime_type: 'audio/wav', data: b64 } }] }],
+            generationConfig: { temperature: 0 }
+          })
+        });
+        if (res.status === 404) { lastErr = new Error('model'); continue; }
+        if (!res.ok) { const e = new Error('http'); e.status = res.status; throw e; }
+        const data = await res.json();
+        const parts = (data.candidates && data.candidates[0] && data.candidates[0].content && data.candidates[0].content.parts) || [];
+        return parts.map(p => p.text || '').join('').trim().replace(/^["“«]+|["”»]+$/g, '').trim();
+      }
+      throw lastErr || new Error('model');
     }
 
     // ---------- parsing numeri/telefono ----------
@@ -1322,6 +1527,84 @@ const firebaseConfig = {
     // =====================================================================
     // AVVIO
     // =====================================================================
+    // Abilita lo stato :active anche su iPhone
+    document.addEventListener('touchstart', function () {}, { passive: true });
+
+    // =====================================================================
+    // AGGIORNAMENTO AUTOMATICO (nessun bisogno di reinstallare l'app)
+    // =====================================================================
+    if (location.search) { try { history.replaceState(null, '', location.pathname); } catch (e) {} }
+
+    let updateChecking = false;
+    let lastUpdateCheck = 0;
+
+    async function clearAppCaches() {
+      try {
+        if ('serviceWorker' in navigator) {
+          const regs = await navigator.serviceWorker.getRegistrations();
+          await Promise.all(regs.map(r => r.unregister()));
+        }
+        if (window.caches) {
+          const keys = await caches.keys();
+          await Promise.all(keys.map(k => caches.delete(k)));
+        }
+      } catch (e) {}
+    }
+
+    function anyOverlayOpen() {
+      return ['modal', 'locations-modal', 'voice-sheet'].some(id => !$(id).classList.contains('hidden'));
+    }
+
+    function showUpdateBanner(latest) {
+      $('update-banner-text').innerText = 'Nuova versione ' + latest + ' disponibile';
+      $('update-banner-btn').onclick = () => applyUpdate(latest, true);
+      $('update-banner').classList.remove('hidden');
+    }
+
+    async function applyUpdate(latest, manual) {
+      if (!manual && anyOverlayOpen()) { showUpdateBanner(latest); return; }
+      try { sessionStorage.setItem('update_tried', latest); } catch (e) {}
+      showToast('Aggiorno a ' + latest + '…', 1500);
+      await clearAppCaches();
+      setTimeout(() => location.replace(location.pathname + '?v=' + encodeURIComponent(latest) + '&t=' + Date.now()), 400);
+    }
+
+    async function checkForUpdate(force) {
+      const now = Date.now();
+      if (updateChecking || (!force && now - lastUpdateCheck < 60000)) return;
+      updateChecking = true;
+      lastUpdateCheck = now;
+      try {
+        const res = await fetch(location.pathname + '?check=' + now, { cache: 'no-store' });
+        if (!res.ok) throw new Error('http ' + res.status);
+        const html = await res.text();
+        const m = html.match(/APP_VERSION = '(v\d+(?:\.\d+)*)'/);
+        const latest = m && m[1];
+        if (latest && latest !== APP_VERSION) {
+          let tried = null;
+          try { tried = sessionStorage.getItem('update_tried'); } catch (e) {}
+          if (tried === latest) showUpdateBanner(latest);   // evita cicli di ricarica
+          else applyUpdate(latest, false);
+        } else if (force) {
+          showToast('Sei aggiornato (' + APP_VERSION + ')');
+        }
+      } catch (e) {
+        if (force) showToast("Impossibile controllare gli aggiornamenti (sei offline?)", 3500);
+      } finally {
+        updateChecking = false;
+      }
+    }
+
+    function forceUpdate() {
+      showToast('Controllo aggiornamenti…', 1200);
+      checkForUpdate(true);
+    }
+
+    // Controlla all'apertura e ogni volta che l'app torna in primo piano
+    document.addEventListener('visibilitychange', () => { if (!document.hidden) checkForUpdate(false); });
+    window.addEventListener('pageshow', () => checkForUpdate(false));
+    window.addEventListener('online', () => checkForUpdate(false));
+
     // Effetto scintillio sui loghi al tocco/click
     document.addEventListener('pointerdown', e => {
       const el = e.target.closest && e.target.closest('.logo-hover-effect');
@@ -1340,6 +1623,8 @@ const firebaseConfig = {
 
     document.addEventListener("DOMContentLoaded", () => {
       buildArtistButtons();
+      $('app-version').innerText = APP_VERSION;
+      setTimeout(() => checkForUpdate(false), 1500);
       renderHomeCounts();
       renderShoppingList();
       refreshIcons();
