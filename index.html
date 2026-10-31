@@ -112,7 +112,7 @@
 
       <div id="artist-buttons" class="w-full flex flex-col items-center space-y-2 md:space-y-3.5"></div>
       <div class="pt-4 flex items-center gap-3 text-[11px] text-neutral-500">
-        <span id="app-version" class="font-mono">v4.2</span>
+        <span id="app-version" class="font-mono">v4.3</span>
         <button type="button" onclick="forceUpdate()" class="underline underline-offset-2 hover:text-neutral-300 px-2 py-1">Aggiorna</button>
       </div>
     </div>
@@ -336,7 +336,7 @@
         <p id="voice-status" class="text-sm text-neutral-300 leading-snug">Pronto.</p>
       </div>
 
-      <textarea id="voice-text" rows="3" oninput="onVoiceTextChange()" placeholder="Il testo detto compare qui. Puoi correggerlo o scriverlo a mano." class="w-full bg-brand-black border border-brand-border rounded-xl px-3 py-2 text-sm text-white focus:outline-none focus:border-white"></textarea>
+      <textarea id="voice-text" rows="3" oninput="onVoiceTextChange()" placeholder="Il testo detto compare qui in tempo reale..." class="w-full bg-brand-black border border-brand-border rounded-xl px-3 py-2 text-sm text-white focus:outline-none focus:border-white"></textarea>
 
       <p id="voice-hint" class="text-[11px] text-brand-muted leading-relaxed"></p>
 
@@ -404,11 +404,7 @@
       }
     };
 
-    const APP_VERSION = 'v4.2';
-
-    // API Key Gemini integrata permanentemente
-    let GEMINI_API_KEY = 'AQ.Ab8RN6LkObvc_KpKWUUM4usJWTsYaFMgh_gJx2H0IrPPWT0W3Q';
-    const GEMINI_MODELS = ['gemini-1.5-flash', 'gemini-flash-latest', 'gemini-2.5-flash'];
+    const APP_VERSION = 'v4.3';
 
 const firebaseConfig = {
   apiKey: "AIzaSyDccFCqeRlOxyR9SkHGYBKVkruL4XOA1SQ",
@@ -993,25 +989,17 @@ const firebaseConfig = {
       try { await shopRemoveMany(shoppingList.map(i => i.id)); resetShoppingForm(); } catch (e) { showToast('Errore', 3000); }
     }
 
-    // COMANDI VOCALI & GEMINI API INTEGRATION
+    // =====================================================================
+    // RICONOSCIMENTO VOCALE NATIVO (Istantaneo & Reale)
+    // =====================================================================
     const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
     let rec = null;
-    let voiceBusy = false;
-    let voiceSession = 0;
     let listening = false;
     let voiceMode = null;
     let parsedVoice = null;
 
     const NUM_WORDS = { zero: 0, un: 1, uno: 1, una: 1, due: 2, tre: 3, quattro: 4, cinque: 5, sei: 6, sette: 7, otto: 8, nove: 9, dieci: 10 };
     const DIGIT_WORDS = { zero: 0, uno: 1, due: 2, tre: 3, quattro: 4, cinque: 5, sei: 6, sette: 7, otto: 8, nove: 9 };
-
-    function isIOSStandalone() { return window.navigator.standalone === true; }
-
-    function voiceUnsupportedReason() {
-      if (!window.isSecureContext) return "Il microfono funziona solo su pagine https (o localhost).";
-      if (voiceEngine() !== 'none') return null;
-      return "Browser non supporta il riconoscimento vocale.";
-    }
 
     function setVoiceStatus(text) { $('voice-status').innerText = text; }
 
@@ -1024,8 +1012,6 @@ const firebaseConfig = {
 
     function openVoice(mode) {
       voiceMode = mode;
-      voiceSession++;
-      voiceBusy = false;
       parsedVoice = null;
       $('voice-title').innerText = mode === 'client' ? 'Nuovo cliente a voce' : 'Lista della spesa a voce';
       $('voice-hint').innerHTML = mode === 'client'
@@ -1037,47 +1023,40 @@ const firebaseConfig = {
       $('voice-sheet').classList.remove('hidden');
       refreshIcons();
 
-      const reason = voiceUnsupportedReason();
-      updateMicUI();
-      if (reason && !GEMINI_API_KEY) {
-        setVoiceStatus(reason);
+      if (!SR) {
+        setVoiceStatus("Il riconoscimento vocale nativo non è supportato da questo browser. Puoi digitare o usare la dettatura da tastiera 🎤.");
+        updateMicUI();
         return;
       }
       startListening();
     }
 
     function closeVoice() {
-      voiceSession++;
       stopListening(true);
       $('voice-sheet').classList.add('hidden');
     }
 
     function toggleListening() {
-      if (voiceBusy) return;
       if (listening) stopListening(false);
       else { $('voice-text').value = ''; onVoiceTextChange(); startListening(); }
     }
 
     function stopListening(abort) {
-      if (recState) { finishRecording(!!abort); return; }
       if (rec) { try { abort ? rec.abort() : rec.stop(); } catch (e) {} }
-      if (abort) { rec = null; listening = false; updateMicUI(); }
+      listening = false;
+      updateMicUI();
     }
 
     function startListening() {
-      if (listening) return;
-      if (voiceEngine() === 'gemini') { startRecording(); return; }
-      if (!SR) return;
+      if (!SR || listening) return;
       let finalText = '';
-      let gotAnything = false;
-      let hadError = false;
 
       rec = new SR();
       rec.lang = 'it-IT';
       rec.interimResults = true;
-      rec.continuous = false;
+      rec.continuous = true;
 
-      rec.onstart = () => { listening = true; updateMicUI(); setVoiceStatus('Ascoltando… parla ora'); };
+      rec.onstart = () => { listening = true; updateMicUI(); setVoiceStatus('Ascoltando in tempo reale… parla ora'); };
       rec.onresult = (event) => {
         let interim = '';
         for (let i = event.resultIndex; i < event.results.length; i++) {
@@ -1085,167 +1064,20 @@ const firebaseConfig = {
           if (event.results[i].isFinal) finalText += t + ' ';
           else interim += t;
         }
-        gotAnything = true;
         $('voice-text').value = (finalText + interim).trim();
         onVoiceTextChange();
       };
-      rec.onerror = (e) => { hadError = true; setVoiceStatus('Errore microfono: ' + e.error); };
-      rec.onend = () => { listening = false; updateMicUI(); };
-      try { rec.start(); } catch (e) { setVoiceStatus('Impossibile avviare il microfono.'); }
-    }
-
-    let recState = null;
-
-    function geminiAvailable() {
-      return !!GEMINI_API_KEY && !!(navigator.mediaDevices && navigator.mediaDevices.getUserMedia) && !!(window.AudioContext || window.webkitAudioContext);
-    }
-    function voiceEngine() {
-      if (!window.isSecureContext) return 'none';
-      if (geminiAvailable()) return 'gemini';
-      if (SR && !isIOSStandalone()) return 'native';
-      return 'none';
-    }
-
-    async function startRecording() {
-      if (recState || listening || voiceBusy) return;
-      const Ctx = window.AudioContext || window.webkitAudioContext;
-      let ctx;
-      try {
-        ctx = new Ctx();
-        if (ctx.resume) ctx.resume();
-      } catch (e) { setVoiceStatus('Audio non disponibile.'); return; }
-
-      const session = voiceSession;
-      setVoiceStatus('Avvio microfono...');
-      let stream;
-      try {
-        stream = await navigator.mediaDevices.getUserMedia({ audio: { channelCount: 1, echoCancellation: true, noiseSuppression: true } });
-      } catch (e) {
-        try { ctx.close(); } catch (_) {}
-        setVoiceStatus('Permesso microfono negato.');
-        return;
-      }
-      if (session !== voiceSession) { stream.getTracks().forEach(t => t.stop()); try { ctx.close(); } catch (_) {} return; }
-
-      const source = ctx.createMediaStreamSource(stream);
-      const proc = ctx.createScriptProcessor(4096, 1, 1);
-      const st = { stream, ctx, source, proc, chunks: [], hasSpeech: false, silenceSince: 0, startedAt: Date.now(), stopping: false, session };
-      proc.onaudioprocess = (e) => {
-        const data = e.inputBuffer.getChannelData(0);
-        st.chunks.push(new Float32Array(data));
-        let sum = 0;
-        for (let i = 0; i < data.length; i++) sum += data[i] * data[i];
-        const rms = Math.sqrt(sum / data.length);
-        const now = Date.now();
-        if (rms > 0.012) { st.hasSpeech = true; st.silenceSince = 0; }
-        else if (st.hasSpeech) {
-          if (!st.silenceSince) st.silenceSince = now;
-          else if (now - st.silenceSince > 1800) finishRecording(false);
-        }
-        if (now - st.startedAt > 25000) finishRecording(false);
+      rec.onerror = (e) => {
+        if (e.error !== 'aborted') setVoiceStatus('Errore microfono: ' + e.error);
       };
-      source.connect(proc);
-      proc.connect(ctx.destination);
+      rec.onend = () => {
+        listening = false;
+        updateMicUI();
+        if (!$('voice-text').value.trim()) setVoiceStatus('Nessun testo rilevato. Tocca il microfono per riprovare.');
+        else setVoiceStatus('Ascoltata completata. Controlla l\'anteprima.');
+      };
 
-      recState = st;
-      listening = true;
-      updateMicUI();
-      setVoiceStatus('Registrazione in corso… parla e fai una pausa per terminare.');
-    }
-
-    async function finishRecording(cancel) {
-      const st = recState;
-      if (!st || st.stopping) return;
-      st.stopping = true;
-      recState = null;
-      try { st.proc.onaudioprocess = null; st.proc.disconnect(); st.source.disconnect(); } catch (e) {}
-      st.stream.getTracks().forEach(t => t.stop());
-      const rate = st.ctx.sampleRate;
-      try { st.ctx.close(); } catch (e) {}
-      listening = false;
-      updateMicUI();
-      if (cancel) return;
-
-      const samples = st.chunks.reduce((n, c) => n + c.length, 0);
-      if (!st.hasSpeech || samples < rate * 0.4) {
-        setVoiceStatus('Nessun audio rilevato.');
-        return;
-      }
-
-      voiceBusy = true;
-      setVoiceStatus('Trascrizione con Gemini in corso...');
-      try {
-        const text = await transcribeWithGemini(encodeWav(st.chunks, rate));
-        if (st.session !== voiceSession) return;
-        if (!text) { setVoiceStatus('Non ho capito. Riprova.'); return; }
-        $('voice-text').value = text;
-        onVoiceTextChange();
-        setVoiceStatus("Trascrizione completata. Controlla e premi Conferma.");
-      } catch (err) {
-        if (st.session !== voiceSession) return;
-        setVoiceStatus('Errore durante la trascrizione Gemini.');
-      } finally {
-        if (st.session === voiceSession) voiceBusy = false;
-      }
-    }
-
-    function encodeWav(chunks, inRate) {
-      let len = 0;
-      chunks.forEach(c => len += c.length);
-      const merged = new Float32Array(len);
-      let o = 0;
-      chunks.forEach(c => { merged.set(c, o); o += c.length; });
-
-      const outRate = 16000;
-      const ratio = inRate / outRate;
-      const outLen = Math.floor(len / ratio);
-      const pcm = new Int16Array(outLen);
-      for (let i = 0; i < outLen; i++) {
-        const start = Math.floor(i * ratio);
-        const end = Math.min(Math.floor((i + 1) * ratio), len);
-        let s = 0, n = 0;
-        for (let j = start; j < end; j++) { s += merged[j]; n++; }
-        const v = Math.max(-1, Math.min(1, n ? s / n : 0));
-        pcm[i] = v < 0 ? v * 0x8000 : v * 0x7fff;
-      }
-
-      const buf = new ArrayBuffer(44 + pcm.length * 2);
-      const dv = new DataView(buf);
-      const str = (off, s) => { for (let i = 0; i < s.length; i++) dv.setUint8(off + i, s.charCodeAt(i)); };
-      str(0, 'RIFF'); dv.setUint32(4, 36 + pcm.length * 2, true); str(8, 'WAVE');
-      str(12, 'fmt '); dv.setUint32(16, 16, true); dv.setUint16(20, 1, true); dv.setUint16(22, 1, true);
-      dv.setUint32(24, outRate, true); dv.setUint32(28, outRate * 2, true); dv.setUint16(32, 2, true); dv.setUint16(34, 16, true);
-      str(36, 'data'); dv.setUint32(40, pcm.length * 2, true);
-      for (let i = 0; i < pcm.length; i++) dv.setInt16(44 + i * 2, pcm[i], true);
-      return buf;
-    }
-
-    function arrayBufferToBase64(buf) {
-      const bytes = new Uint8Array(buf);
-      let bin = '';
-      const step = 0x8000;
-      for (let i = 0; i < bytes.length; i += step) bin += String.fromCharCode.apply(null, bytes.subarray(i, i + step));
-      return btoa(bin);
-    }
-
-    async function transcribeWithGemini(wavBuffer) {
-      const b64 = arrayBufferToBase64(wavBuffer);
-      const prompt = 'Trascrivi fedelmente in italiano questa registrazione vocale. Rispondi solo con la trascrizione.';
-      for (const model of GEMINI_MODELS) {
-        const res = await fetch('https://generativelanguage.googleapis.com/v1beta/models/' + model + ':generateContent?key=' + encodeURIComponent(GEMINI_API_KEY), {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            contents: [{ parts: [{ text: prompt }, { inline_data: { mime_type: 'audio/wav', data: b64 } }] }],
-            generationConfig: { temperature: 0 }
-          })
-        });
-        if (!res.ok) continue;
-        const data = await res.json();
-        const parts = (data.candidates && data.candidates[0] && data.candidates[0].content && data.candidates[0].content.parts) || [];
-        return parts.map(p => p.text || '').join('').trim().replace(/^["“«]+|["”»]+$/g, '').trim();
-      }
-      throw new Error('Gemini error');
+      try { rec.start(); } catch (e) { setVoiceStatus('Impossibile avviare il microfono.'); }
     }
 
     function extractPhone(text) {
