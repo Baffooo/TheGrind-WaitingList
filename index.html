@@ -10,6 +10,7 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="The Grind">
   <meta name="theme-color" content="#0a0a0a">
+  <script>if (window.navigator.standalone) document.documentElement.classList.add('is-standalone');</script>
   <script src="https://cdn.tailwindcss.com"></script>
 
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -63,6 +64,10 @@
        !important perché altrimenti le classi p-*/py-* di Tailwind li annullano. */
     .safe-top { padding-top: calc(env(safe-area-inset-top, 0px) + var(--pt-base, 0px)) !important; }
     .safe-bottom { padding-bottom: calc(env(safe-area-inset-bottom, 0px) + var(--pb-base, 0px)) !important; }
+    /* App aggiunta alla Home di iPhone: margine minimo garantito sotto la barra di stato */
+    html.is-standalone .safe-top { padding-top: calc(max(env(safe-area-inset-top, 0px), 47px) + var(--pt-base, 0px)) !important; }
+    /* Effetto logo al tocco (attivato da JavaScript, funziona su iPhone) */
+    .logo-playing img { animation: logoSparkleBounce 0.8s ease-in-out infinite alternate; }
 
     /* Tocchi immediati: niente attesa/zoom da doppio tap su pulsanti e campi */
     button, a, select, input, textarea, label, [onclick] { touch-action: manipulation; }
@@ -92,10 +97,10 @@
     .mic-listening { animation: micRing 1.1s ease-out infinite; }
   </style>
 </head>
-<body class="flex flex-col pb-10">
+<body class="flex flex-col">
 
   <!-- ===================== HOME: SELEZIONE ARTISTA + LISTA SPESA ===================== -->
-  <div id="artist-selector-screen" class="fixed inset-0 z-50 bg-brand-black flex flex-col items-center justify-start p-4 md:p-8 overflow-y-auto safe-top" style="--pt-base:1.5rem">
+  <div id="artist-selector-screen" class="bg-brand-black flex flex-col items-center justify-start p-4 md:p-8 safe-top" style="--pt-base:1.5rem; min-height:100vh; min-height:100dvh;">
 
     <div id="home-artists-view" class="w-full max-w-2xl flex flex-col items-center space-y-4 md:space-y-6 pb-24 my-auto">
       <div class="text-center space-y-2.5 md:space-y-4 w-full">
@@ -111,6 +116,7 @@
       </div>
 
       <div id="artist-buttons" class="w-full flex flex-col items-center space-y-2 md:space-y-3.5"></div>
+      <p class="text-[10px] text-neutral-700 pt-4">v3</p>
     </div>
 
     <!-- Vista lista della spesa -->
@@ -158,12 +164,15 @@
     </div>
 
     <!-- Bottone carrello -->
-    <div id="home-shopping-fab" class="absolute left-0 right-0 flex justify-center pointer-events-none" style="bottom: calc(1.5rem + env(safe-area-inset-bottom));">
+    <div id="home-shopping-fab" class="fixed z-40 left-0 right-0 flex justify-center pointer-events-none" style="bottom: calc(1.5rem + env(safe-area-inset-bottom));">
       <button onclick="toggleShoppingViewHome()" id="shopping-fab-btn" class="pointer-events-auto p-4 rounded-full bg-emerald-600 text-white shadow-[0_4px_25px_rgba(16,185,129,0.5)] hover:bg-emerald-500 hover:scale-110 transition-all active:scale-95 flex items-center justify-center cursor-pointer" title="Apri Lista della Spesa">
         <i data-lucide="shopping-cart" class="w-6 h-6"></i>
       </button>
     </div>
   </div>
+
+  <!-- ===================== PAGINA ARTISTA (separata dalla home) ===================== -->
+  <div id="artist-view" class="hidden">
 
   <!-- ===================== HEADER PAGINA ARTISTA ===================== -->
   <header class="sticky top-0 z-30 bg-brand-black/95 backdrop-blur-md border-b border-brand-border px-4 pb-2.5 flex justify-between items-center gap-2 safe-top" style="--pt-base:0.625rem">
@@ -191,7 +200,7 @@
   </header>
 
   <!-- ===================== LISTA D'ATTESA ARTISTA ===================== -->
-  <main id="main-waiting-section" class="flex-1 max-w-2xl w-full mx-auto p-4 space-y-4">
+  <main id="main-waiting-section" class="max-w-2xl w-full mx-auto p-4 pb-12 space-y-4">
     <div class="flex justify-between items-center text-xs px-1 text-brand-muted gap-2">
       <span id="status-indicator">Inizializzazione...</span>
       <span id="list-counter" class="shrink-0"></span>
@@ -231,6 +240,8 @@
       <p class="text-brand-muted text-sm">Nessun cliente presente in questa lista d'attesa.</p>
     </div>
   </main>
+
+  </div><!-- fine #artist-view -->
 
   <!-- ===================== MODALE CLIENTE ===================== -->
   <div id="modal" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm hidden flex items-end sm:items-center justify-center p-0 sm:p-4" onclick="if(event.target===this)closeModal()">
@@ -548,6 +559,7 @@ const firebaseConfig = {
     function selectArtist(artistId) {
       currentArtistId = artistId;
       $('artist-selector-screen').classList.add('hidden');
+      $('artist-view').classList.remove('hidden');
       $('search-input').value = '';
       $('filter-priority').value = 'ALL';
       applyArtistTheme(artistId);
@@ -558,7 +570,9 @@ const firebaseConfig = {
 
     function openArtistSelectionScreen() {
       currentArtistId = null;
+      $('artist-view').classList.add('hidden');
       $('artist-selector-screen').classList.remove('hidden');
+      window.scrollTo(0, 0);
       if (isHomeShoppingActive) toggleShoppingViewHome();
     }
 
@@ -1308,6 +1322,15 @@ const firebaseConfig = {
     // =====================================================================
     // AVVIO
     // =====================================================================
+    // Effetto scintillio sui loghi al tocco/click
+    document.addEventListener('pointerdown', e => {
+      const el = e.target.closest && e.target.closest('.logo-hover-effect');
+      if (!el) return;
+      el.classList.add('logo-playing');
+      clearTimeout(el._logoTimer);
+      el._logoTimer = setTimeout(() => el.classList.remove('logo-playing'), 1600);
+    });
+
     document.addEventListener('keydown', e => {
       if (e.key !== 'Escape') return;
       if (!$('voice-sheet').classList.contains('hidden')) closeVoice();
