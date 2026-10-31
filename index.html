@@ -20,7 +20,6 @@
   <script>
     tailwind.config = {
       darkMode: 'class',
-      // Gli effetti :hover si attivano solo su dispositivi con mouse (evita il "doppio tocco" su iPhone)
       future: { hoverOnlyWhenSupported: true },
       theme: {
         extend: {
@@ -55,33 +54,24 @@
     .custom-scrollbar::-webkit-scrollbar-thumb { background: #262626; border-radius: 2px; }
     input[type="date"]::-webkit-calendar-picker-indicator { filter: invert(1); cursor: pointer; }
 
-    /* Su telefono i campi < 16px fanno zoomare iOS al focus */
     @media (max-width: 640px) {
       input, select, textarea { font-size: 16px !important; }
     }
 
-    /* Margini di sicurezza (notch / barra di stato / home indicator).
-       !important perché altrimenti le classi p-*/py-* di Tailwind li annullano. */
     .safe-top { padding-top: calc(env(safe-area-inset-top, 0px) + var(--pt-base, 0px)) !important; }
     .safe-bottom { padding-bottom: calc(env(safe-area-inset-bottom, 0px) + var(--pb-base, 0px)) !important; }
-    /* App aggiunta alla Home di iPhone: margine minimo garantito sotto la barra di stato */
-    html.is-standalone .safe-top { padding-top: calc(max(env(safe-area-inset-top, 0px), 47px) + var(--pt-base, 0px)) !important; }
-    /* Effetto logo al tocco (attivato da JavaScript, funziona su iPhone) */
+    html.is-standalone .safe-top { padding-top: calc(max(env(safe-area-inset-top, 0px), 52px) + var(--pt-base, 0px)) !important; }
+    
     .logo-playing img { animation: logoSparkleBounce 0.8s ease-in-out infinite alternate; }
-
-    /* Tocchi immediati: niente attesa/zoom da doppio tap su pulsanti e campi */
     button, a, select, input, textarea, label, [onclick] { touch-action: manipulation; }
 
-    /* Pulsanti artista: effetto hover solo dove esiste un mouse */
     .artist-btn { transition: all 0.2s ease; }
     .artist-btn:active { transform: scale(0.97); }
     .artist-name { transition: color 0.25s ease; }
     @media (hover: hover) {
-      /* Mouse: il nome si colora, il pulsante prende un tono più sfumato */
       .artist-btn:hover { border-color: var(--cm) !important; background-color: var(--cbg) !important; box-shadow: 0 0 18px var(--cg); transform: scale(1.02); }
       .artist-btn:hover .artist-name { color: var(--c); }
     }
-    /* Touch: stesso feedback mentre tieni premuto */
     .artist-btn:active { background-color: var(--cbg) !important; }
     .artist-btn:active .artist-name { color: var(--c); }
 
@@ -115,7 +105,6 @@
         </div>
 
         <div class="w-full">
-          <!-- Titolo sempre su una riga: la dimensione si adatta alla larghezza dello schermo -->
           <h1 class="font-heading text-[clamp(0.95rem,5vw,2rem)] font-black tracking-wide text-white uppercase whitespace-nowrap text-center">THE GRIND TATTOO FINEST</h1>
           <p class="text-[11px] sm:text-xs md:text-sm text-brand-muted tracking-[0.35em] md:tracking-[0.45em] uppercase font-bold mt-1 md:mt-2 text-center">PICK THE ARTIST</p>
         </div>
@@ -123,8 +112,8 @@
 
       <div id="artist-buttons" class="w-full flex flex-col items-center space-y-2 md:space-y-3.5"></div>
       <div class="pt-4 flex items-center gap-3 text-[11px] text-neutral-500">
-        <span id="app-version" class="font-mono">v4</span>
-        <button type="button" onclick="forceUpdate()" class="underline underline-offset-2 hover:text-neutral-300 px-2 py-1">Controlla aggiornamenti</button>
+        <span id="app-version" class="font-mono">v4.2</span>
+        <button type="button" onclick="forceUpdate()" class="underline underline-offset-2 hover:text-neutral-300 px-2 py-1">Aggiorna</button>
       </div>
     </div>
 
@@ -180,11 +169,11 @@
     </div>
   </div>
 
-  <!-- ===================== PAGINA ARTISTA (separata dalla home) ===================== -->
+  <!-- ===================== PAGINA ARTISTA ===================== -->
   <div id="artist-view" class="hidden">
 
   <!-- ===================== HEADER PAGINA ARTISTA ===================== -->
-  <header class="sticky top-0 z-30 bg-brand-black/95 backdrop-blur-md border-b border-brand-border px-4 pb-3 flex justify-between items-center gap-2 safe-top" style="--pt-base:0.875rem">
+  <header class="sticky top-0 z-30 bg-brand-black/95 backdrop-blur-md border-b border-brand-border px-4 py-3.5 flex justify-between items-center gap-2 safe-top shadow-md" style="--pt-base:1.25rem">
     <div class="flex items-center gap-3 min-w-0 flex-1">
       <div onclick="openArtistSelectionScreen()" class="logo-hover-effect w-11 h-11 flex items-center justify-center shrink-0 overflow-visible cursor-pointer" title="Cambia Artista">
         <img src="logo.jpg" alt="Logo" class="max-w-full max-h-full object-contain">
@@ -415,15 +404,12 @@
       }
     };
 
-    // Versione dell'app: aumentala ad ogni aggiornamento del file (l'app la usa per aggiornarsi da sola)
-    const APP_VERSION = 'v4';
+    const APP_VERSION = 'v4.2';
 
-    // >>> CHIAVE GEMINI PER I COMANDI VOCALI (serve per usare la voce nell'app aggiunta alla Home di iPhone) <<<
-    // Lasciala vuota per usare solo il riconoscimento vocale del browser (non disponibile nell'app Home di iPhone).
-    const GEMINI_API_KEY = '';
-    const GEMINI_MODELS = ['gemini-flash-latest', 'gemini-2.5-flash']; // il secondo è il ripiego
+    // API Key Gemini integrata permanentemente
+    let GEMINI_API_KEY = 'AQ.Ab8RN6LkObvc_KpKWUUM4usJWTsYaFMgh_gJx2H0IrPPWT0W3Q';
+    const GEMINI_MODELS = ['gemini-1.5-flash', 'gemini-flash-latest', 'gemini-2.5-flash'];
 
-    // >>> INCOLLA QUI LA TUA CONFIGURAZIONE FIREBASE (Impostazioni progetto → Le tue app → Config) <<<
 const firebaseConfig = {
   apiKey: "AIzaSyDccFCqeRlOxyR9SkHGYBKVkruL4XOA1SQ",
   authDomain: "thegrind-waitinglist.firebaseapp.com",
@@ -434,9 +420,6 @@ const firebaseConfig = {
   measurementId: "G-L2SMGSKYFV"
 };
 
-    // =====================================================================
-    // STATO
-    // =====================================================================
     const $ = id => document.getElementById(id);
     let currentArtistId = null;
     let isHomeShoppingActive = false;
@@ -450,9 +433,6 @@ const firebaseConfig = {
       try { const v = JSON.parse(str); return v === null || v === undefined ? fallback : v; } catch (e) { return fallback; }
     }
 
-    // =====================================================================
-    // UTILITÀ
-    // =====================================================================
     function escapeHtml(str) {
       if (str === undefined || str === null) return '';
       return String(str).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;");
@@ -463,7 +443,6 @@ const firebaseConfig = {
       return parts.length === 3 ? `${parts[2]}/${parts[1]}/${parts[0]}` : dateStr;
     }
     function todayStr() {
-      // Data locale (valueAsDate usa UTC e di notte può sbagliare giorno)
       const d = new Date();
       const p = n => String(n).padStart(2, '0');
       return `${d.getFullYear()}-${p(d.getMonth() + 1)}-${p(d.getDate())}`;
@@ -485,9 +464,6 @@ const firebaseConfig = {
       toastTimer = setTimeout(() => t.classList.add('hidden'), ms);
     }
 
-    // =====================================================================
-    // INIZIALIZZAZIONE FIREBASE / LOCALE
-    // =====================================================================
     try {
       if (firebaseConfig.apiKey !== "INSERISCI_LA_TUA_API_KEY") {
         firebase.initializeApp(firebaseConfig);
@@ -512,7 +488,6 @@ const firebaseConfig = {
         renderList();
       }, error => {
         console.error("Errore Firebase Clients:", error);
-        $('status-indicator').innerText = "Errore Firebase: controlla le regole del database";
       });
 
       db.collection("shopping_list").onSnapshot(snapshot => {
@@ -520,15 +495,12 @@ const firebaseConfig = {
         renderShoppingList();
       }, error => {
         console.error("Errore Firebase Shopping List:", error);
-        showToast("Lista spesa: errore di sincronizzazione (regole Firestore?)", 4500);
       });
 
-      // Luoghi personalizzati sincronizzati tra dispositivi
       db.collection("settings").doc("locations").onSnapshot(doc => {
         if (doc.exists) {
           customLocations = doc.data() || {};
         } else if (Object.keys(customLocations).length > 0) {
-          // Migrazione una tantum da localStorage al cloud
           db.collection("settings").doc("locations").set(customLocations).catch(() => {});
         }
         if (currentArtistId) populateLocationDropdowns();
@@ -551,9 +523,6 @@ const firebaseConfig = {
       renderShoppingList();
     }
 
-    // =====================================================================
-    // HOME / ARTISTI
-    // =====================================================================
     function buildArtistButtons() {
       const container = $('artist-buttons');
       container.innerHTML = Object.values(ARTISTS_CONFIG).map(a => `
@@ -611,9 +580,6 @@ const firebaseConfig = {
       populateLocationDropdowns();
     }
 
-    // =====================================================================
-    // LUOGHI
-    // =====================================================================
     function getArtistLocations() {
       if (!currentArtistId) return [];
       return customLocations[currentArtistId] || ARTISTS_CONFIG[currentArtistId].defaultLocations;
@@ -688,9 +654,6 @@ const firebaseConfig = {
       $('priority-container').classList.toggle('hidden', single);
     }
 
-    // =====================================================================
-    // CLIENTI
-    // =====================================================================
     async function saveClient(client) {
       client.artistId = currentArtistId;
       try {
@@ -877,9 +840,6 @@ const firebaseConfig = {
       closeModal();
     }
 
-    // =====================================================================
-    // LISTA DELLA SPESA (cloud sync + fallback locale)
-    // =====================================================================
     function toggleShoppingViewHome() {
       isHomeShoppingActive = !isHomeShoppingActive;
       const fabBtn = $('shopping-fab-btn');
@@ -934,7 +894,6 @@ const firebaseConfig = {
       refreshIcons();
     }
 
-    // --- operazioni sui dati (cloud o locale) ---
     async function shopUpsert(name, qty) {
       const key = norm(name);
       const existing = shoppingList.find(i => norm(i.name) === key && !i.done);
@@ -1034,28 +993,24 @@ const firebaseConfig = {
       try { await shopRemoveMany(shoppingList.map(i => i.id)); resetShoppingForm(); } catch (e) { showToast('Errore', 3000); }
     }
 
-    // =====================================================================
-    // COMANDI VOCALI
-    // =====================================================================
+    // COMANDI VOCALI & GEMINI API INTEGRATION
     const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
     let rec = null;
-    let voiceBusy = false;     // trascrizione in corso
-    let voiceSession = 0;      // cambia ad ogni apertura/chiusura del pannello
+    let voiceBusy = false;
+    let voiceSession = 0;
     let listening = false;
-    let voiceMode = null;      // 'client' | 'shopping'
+    let voiceMode = null;
     let parsedVoice = null;
 
-    const NUM_WORDS = { zero: 0, un: 1, uno: 1, una: 1, due: 2, tre: 3, quattro: 4, cinque: 5, sei: 6, sette: 7, otto: 8, nove: 9, dieci: 10, undici: 11, dodici: 12, tredici: 13, quattordici: 14, quindici: 15, sedici: 16, diciassette: 17, diciotto: 18, diciannove: 19, venti: 20, trenta: 30, quaranta: 40, cinquanta: 50, cento: 100 };
+    const NUM_WORDS = { zero: 0, un: 1, uno: 1, una: 1, due: 2, tre: 3, quattro: 4, cinque: 5, sei: 6, sette: 7, otto: 8, nove: 9, dieci: 10 };
     const DIGIT_WORDS = { zero: 0, uno: 1, due: 2, tre: 3, quattro: 4, cinque: 5, sei: 6, sette: 7, otto: 8, nove: 9 };
 
     function isIOSStandalone() { return window.navigator.standalone === true; }
 
     function voiceUnsupportedReason() {
-      if (!window.isSecureContext) return "Il microfono funziona solo su pagine https (o localhost): apri il sito dall'indirizzo https di GitHub Pages.";
+      if (!window.isSecureContext) return "Il microfono funziona solo su pagine https (o localhost).";
       if (voiceEngine() !== 'none') return null;
-      if (isIOSStandalone()) return "Nell'app aggiunta alla Home il browser non offre il riconoscimento vocale. Per usarlo serve la chiave Gemini nel file (GEMINI_API_KEY). Intanto puoi toccare il campo qui sotto e usare il microfono della tastiera 🎤.";
-      return "Questo browser non supporta il riconoscimento vocale (Firefox, ad esempio). Scrivi il comando qui sotto oppure usa il microfono della tastiera del telefono.";
-      return null;
+      return "Browser non supporta il riconoscimento vocale.";
     }
 
     function setVoiceStatus(text) { $('voice-status').innerText = text; }
@@ -1065,8 +1020,6 @@ const firebaseConfig = {
       btn.classList.toggle('bg-red-600', listening);
       btn.classList.toggle('mic-listening', listening);
       btn.classList.toggle('bg-neutral-800', !listening);
-      btn.disabled = !!voiceUnsupportedReason();
-      btn.classList.toggle('opacity-40', btn.disabled);
     }
 
     function openVoice(mode) {
@@ -1076,8 +1029,8 @@ const firebaseConfig = {
       parsedVoice = null;
       $('voice-title').innerText = mode === 'client' ? 'Nuovo cliente a voce' : 'Lista della spesa a voce';
       $('voice-hint').innerHTML = mode === 'client'
-        ? 'Esempio: <em>"Aggiungi Mario Rossi, numero 333 1234567, The Grind, continuo progetto prima possibile, note: copertura braccio"</em>. Se non dici luogo o priorità, li scegli tu nel modulo.'
-        : 'Esempio: <em>"Aggiungi tre cartucce nere, due guanti medium e una scatola di aghi"</em>. Per togliere: <em>"Togli i guanti"</em>.';
+        ? 'Esempio: <em>"Aggiungi Mario Rossi, 333 1234567, The Grind, continuo progetto prima possibile"</em>'
+        : 'Esempio: <em>"Aggiungi tre cartucce nere e due guanti"</em>';
       $('voice-text').value = '';
       $('voice-preview').innerHTML = '';
       $('voice-confirm').disabled = true;
@@ -1086,9 +1039,8 @@ const firebaseConfig = {
 
       const reason = voiceUnsupportedReason();
       updateMicUI();
-      if (reason) {
+      if (reason && !GEMINI_API_KEY) {
         setVoiceStatus(reason);
-        setTimeout(() => $('voice-text').focus(), 100);
         return;
       }
       startListening();
@@ -1108,9 +1060,7 @@ const firebaseConfig = {
 
     function stopListening(abort) {
       if (recState) { finishRecording(!!abort); return; }
-      if (rec) {
-        try { abort ? rec.abort() : rec.stop(); } catch (e) {}
-      }
+      if (rec) { try { abort ? rec.abort() : rec.stop(); } catch (e) {} }
       if (abort) { rec = null; listening = false; updateMicUI(); }
     }
 
@@ -1126,10 +1076,8 @@ const firebaseConfig = {
       rec.lang = 'it-IT';
       rec.interimResults = true;
       rec.continuous = false;
-      rec.maxAlternatives = 1;
 
-      rec.onstart = () => { listening = true; updateMicUI(); setVoiceStatus('Sto ascoltando… parla ora'); };
-
+      rec.onstart = () => { listening = true; updateMicUI(); setVoiceStatus('Ascoltando… parla ora'); };
       rec.onresult = (event) => {
         let interim = '';
         for (let i = event.resultIndex; i < event.results.length; i++) {
@@ -1141,33 +1089,11 @@ const firebaseConfig = {
         $('voice-text').value = (finalText + interim).trim();
         onVoiceTextChange();
       };
-
-      rec.onerror = (e) => {
-        hadError = true;
-        const msgs = {
-          'not-allowed': "Microfono non autorizzato. Consenti l'accesso al microfono per questo sito nelle impostazioni del browser e riprova.",
-          'service-not-allowed': "Il browser non permette il riconoscimento vocale su questo dispositivo. Usa il microfono della tastiera.",
-          'no-speech': "Non ho sentito nulla. Tocca il microfono e riprova.",
-          'audio-capture': "Nessun microfono trovato.",
-          'network': "Il riconoscimento vocale ha bisogno di una connessione internet attiva.",
-          'language-not-supported': "Lingua italiana non supportata su questo browser."
-        };
-        if (e.error === 'aborted') return;
-        setVoiceStatus(msgs[e.error] || ('Errore del microfono (' + e.error + ').'));
-      };
-
-      rec.onend = () => {
-        listening = false;
-        updateMicUI();
-        if (hadError) return;
-        if (gotAnything && $('voice-text').value.trim()) setVoiceStatus('Controlla l\'anteprima e premi Conferma. Puoi correggere il testo a mano.');
-        else setVoiceStatus('Non ho capito nulla. Tocca il microfono e riprova.');
-      };
-
-      try { rec.start(); } catch (e) { setVoiceStatus('Impossibile avviare il microfono. Riprova.'); }
+      rec.onerror = (e) => { hadError = true; setVoiceStatus('Errore microfono: ' + e.error); };
+      rec.onend = () => { listening = false; updateMicUI(); };
+      try { rec.start(); } catch (e) { setVoiceStatus('Impossibile avviare il microfono.'); }
     }
 
-    // ---------- registrazione + trascrizione Gemini (funziona anche nell'app aggiunta alla Home) ----------
     let recState = null;
 
     function geminiAvailable() {
@@ -1185,28 +1111,21 @@ const firebaseConfig = {
       const Ctx = window.AudioContext || window.webkitAudioContext;
       let ctx;
       try {
-        // Va creato subito, dentro il tocco dell'utente, altrimenti iOS lo blocca
         ctx = new Ctx();
         if (ctx.resume) ctx.resume();
-      } catch (e) { setVoiceStatus('Audio non disponibile su questo dispositivo.'); return; }
+      } catch (e) { setVoiceStatus('Audio non disponibile.'); return; }
 
       const session = voiceSession;
-      setVoiceStatus('Avvio il microfono…');
+      setVoiceStatus('Avvio microfono...');
       let stream;
       try {
         stream = await navigator.mediaDevices.getUserMedia({ audio: { channelCount: 1, echoCancellation: true, noiseSuppression: true } });
       } catch (e) {
         try { ctx.close(); } catch (_) {}
-        setVoiceStatus(e && e.name === 'NotAllowedError'
-          ? "Microfono non autorizzato. Consenti l'accesso quando iOS te lo chiede, oppure dalle impostazioni del telefono."
-          : 'Microfono non disponibile.');
+        setVoiceStatus('Permesso microfono negato.');
         return;
       }
-      if (session !== voiceSession) {
-        stream.getTracks().forEach(t => t.stop());
-        try { ctx.close(); } catch (_) {}
-        return;
-      }
+      if (session !== voiceSession) { stream.getTracks().forEach(t => t.stop()); try { ctx.close(); } catch (_) {} return; }
 
       const source = ctx.createMediaStreamSource(stream);
       const proc = ctx.createScriptProcessor(4096, 1, 1);
@@ -1221,9 +1140,9 @@ const firebaseConfig = {
         if (rms > 0.012) { st.hasSpeech = true; st.silenceSince = 0; }
         else if (st.hasSpeech) {
           if (!st.silenceSince) st.silenceSince = now;
-          else if (now - st.silenceSince > 1800) finishRecording(false);   // pausa lunga: fine registrazione
+          else if (now - st.silenceSince > 1800) finishRecording(false);
         }
-        if (now - st.startedAt > 25000) finishRecording(false);            // massimo 25 secondi
+        if (now - st.startedAt > 25000) finishRecording(false);
       };
       source.connect(proc);
       proc.connect(ctx.destination);
@@ -1231,7 +1150,7 @@ const firebaseConfig = {
       recState = st;
       listening = true;
       updateMicUI();
-      setVoiceStatus('Sto registrando… parla, poi fai una pausa (o tocca il microfono) per terminare.');
+      setVoiceStatus('Registrazione in corso… parla e fai una pausa per terminare.');
     }
 
     async function finishRecording(cancel) {
@@ -1249,29 +1168,22 @@ const firebaseConfig = {
 
       const samples = st.chunks.reduce((n, c) => n + c.length, 0);
       if (!st.hasSpeech || samples < rate * 0.4) {
-        setVoiceStatus('Non ho sentito nulla. Tocca il microfono e riprova.');
+        setVoiceStatus('Nessun audio rilevato.');
         return;
       }
 
       voiceBusy = true;
-      setVoiceStatus('Trascrivo…');
+      setVoiceStatus('Trascrizione con Gemini in corso...');
       try {
         const text = await transcribeWithGemini(encodeWav(st.chunks, rate));
-        if (st.session !== voiceSession) return;     // pannello chiuso nel frattempo
-        if (!text) { setVoiceStatus('Non ho capito nulla. Tocca il microfono e riprova.'); return; }
+        if (st.session !== voiceSession) return;
+        if (!text) { setVoiceStatus('Non ho capito. Riprova.'); return; }
         $('voice-text').value = text;
         onVoiceTextChange();
-        setVoiceStatus("Controlla l'anteprima e premi Conferma. Puoi correggere il testo a mano.");
+        setVoiceStatus("Trascrizione completata. Controlla e premi Conferma.");
       } catch (err) {
         if (st.session !== voiceSession) return;
-        console.error(err);
-        let msg = 'Trascrizione non riuscita. Riprova o scrivi il comando.';
-        if (err && err.status === 400) msg = 'Chiave Gemini non valida o richiesta rifiutata (400).';
-        else if (err && err.status === 403) msg = 'Chiave Gemini non autorizzata per questo sito: controlla le restrizioni della chiave (403).';
-        else if (err && err.status === 429) msg = 'Troppe richieste a Gemini: riprova tra un minuto.';
-        else if (err && err.message === 'model') msg = 'Modello Gemini non disponibile: aggiorna GEMINI_MODELS nel file.';
-        else if (err instanceof TypeError) msg = 'Connessione assente o bloccata: serve internet per la trascrizione.';
-        setVoiceStatus(msg);
+        setVoiceStatus('Errore durante la trascrizione Gemini.');
       } finally {
         if (st.session === voiceSession) voiceBusy = false;
       }
@@ -1318,9 +1230,7 @@ const firebaseConfig = {
 
     async function transcribeWithGemini(wavBuffer) {
       const b64 = arrayBufferToBase64(wavBuffer);
-      const hints = voiceMode === 'client' ? ' Possibili luoghi citati: ' + getArtistLocations().map(l => l.name).join(', ') + '.' : '';
-      const prompt = 'Trascrivi fedelmente in italiano questa registrazione vocale. Scrivi i numeri di telefono e le quantità con le cifre (es. 333 1234567, 3 cartucce).' + hints + ' Rispondi solo con la trascrizione, senza commenti né virgolette. Se non si sente parlato, rispondi con una riga vuota.';
-      let lastErr = null;
+      const prompt = 'Trascrivi fedelmente in italiano questa registrazione vocale. Rispondi solo con la trascrizione.';
       for (const model of GEMINI_MODELS) {
         const res = await fetch('https://generativelanguage.googleapis.com/v1beta/models/' + model + ':generateContent?key=' + encodeURIComponent(GEMINI_API_KEY), {
           method: 'POST',
@@ -1330,18 +1240,15 @@ const firebaseConfig = {
             generationConfig: { temperature: 0 }
           })
         });
-        if (res.status === 404) { lastErr = new Error('model'); continue; }
-        if (!res.ok) { const e = new Error('http'); e.status = res.status; throw e; }
+        if (!res.ok) continue;
         const data = await res.json();
         const parts = (data.candidates && data.candidates[0] && data.candidates[0].content && data.candidates[0].content.parts) || [];
         return parts.map(p => p.text || '').join('').trim().replace(/^["“«]+|["”»]+$/g, '').trim();
       }
-      throw lastErr || new Error('model');
+      throw new Error('Gemini error');
     }
 
-    // ---------- parsing numeri/telefono ----------
     function extractPhone(text) {
-      // "tre tre tre uno due ..." -> "3 3 3 1 2 ..."
       const spokenRun = /\b(?:(?:zero|uno|due|tre|quattro|cinque|sei|sette|otto|nove)\s+){5,}(?:zero|uno|due|tre|quattro|cinque|sei|sette|otto|nove)\b/g;
       const t = text.replace(spokenRun, m => m.trim().split(/\s+/).map(w => DIGIT_WORDS[w]).join(' '));
       const m = t.match(/\+?\d[\d\s.\-]{6,}\d/);
@@ -1349,7 +1256,6 @@ const firebaseConfig = {
       return { phone: m[0].replace(/[\s.\-]/g, ''), rest: t.replace(m[0], ' ') };
     }
 
-    // ---------- parsing cliente ----------
     function locationVariants(loc, all) {
       const full = loc.name.toLowerCase();
       const v = [full];
@@ -1363,18 +1269,14 @@ const firebaseConfig = {
 
     function parseClientCommand(raw) {
       let text = ' ' + raw.toLowerCase().trim() + ' ';
-
-      // note: tutto ciò che segue la parola "note"
       let notes = '';
       const nm = text.match(/\b(?:note|nota|annotazioni|annotazione)\b\s*[:,]?\s*(.+)$/);
       if (nm) { notes = capFirst(nm[1].trim()); text = text.slice(0, nm.index) + ' '; }
 
-      // telefono
       const ph = extractPhone(text);
       const contact = ph.phone;
       text = ph.rest;
 
-      // luogo (match più lungo per primo)
       const locations = getArtistLocations();
       let location = null;
       const candidates = [];
@@ -1385,12 +1287,10 @@ const firebaseConfig = {
         if (idx !== -1) { location = c.loc; text = text.slice(0, idx) + ' ' + text.slice(idx + c.v.length); break; }
       }
 
-      // formule iniziali
       text = text.replace(/\b(?:nuovo|nuova)\s+(?:cliente|clienta)\b/g, ' ')
                  .replace(/\b(?:aggiungi|aggiungere|inserisci|inserire|metti|registra|crea)\b/g, ' ')
                  .replace(/\bcliente\b/g, ' ');
 
-      // tipo progetto + urgenza
       const isContinuo = /\b(continu\w*|prosegu\w*|prosecuzione|ritocc\w*|seconda sessione|altra sessione)\b/.test(text);
       const isAsap = /\b(asap|prima possibile|urgente|urgenza|subito|in fretta|con urgenza)\b/.test(text);
       const isRelax = /\b(senza fretta|relax|con calma|tranquill\w*)\b/.test(text);
@@ -1403,7 +1303,6 @@ const firebaseConfig = {
       else priority = '4';
       const priorityDetected = isContinuo || isAsap || isRelax || /\bnuov[oa]\b/.test(raw.toLowerCase());
 
-      // nome: ciò che resta, ripulito dalle parole di collegamento
       let nameText = text
         .replace(/\b(?:numero|telefono|cellulare|tel|luogo|sede|presso|per|a|in|il|la|lo|con|di telefono|progetto|tatuaggio|tatuaggi|priorit[aà]|lista|attesa|d'attesa|waiting|the)\b/g, ' ')
         .replace(/[^\p{L}\s'’]/gu, ' ')
@@ -1414,7 +1313,6 @@ const firebaseConfig = {
       return { kind: 'client', name, contact, location, priority, priorityDetected, notes };
     }
 
-    // ---------- parsing spesa ----------
     function parseShoppingCommand(raw) {
       let t = ' ' + raw.toLowerCase().trim() + ' ';
       let mode = 'add';
@@ -1442,7 +1340,6 @@ const firebaseConfig = {
       return { kind: 'shopping', mode, items };
     }
 
-    // ---------- anteprima + conferma ----------
     function onVoiceTextChange() {
       const raw = $('voice-text').value.trim();
       const preview = $('voice-preview');
@@ -1459,8 +1356,8 @@ const firebaseConfig = {
         const row = (label, value, ok) => `<div class="flex gap-2"><span class="text-brand-muted w-16 shrink-0">${label}</span><span class="${ok ? 'text-white' : 'text-amber-400'}">${value}</span></div>`;
         preview.innerHTML =
           row('Nome', p.name ? escapeHtml(p.name) : 'non rilevato', !!p.name) +
-          row('Telefono', p.contact ? escapeHtml(p.contact) : 'non rilevato: lo inserisci nel modulo', !!p.contact) +
-          row('Luogo', p.location ? escapeHtml(p.location.name) : 'non rilevato: lo scegli nel modulo', !!p.location) +
+          row('Telefono', p.contact ? escapeHtml(p.contact) : 'non rilevato', !!p.contact) +
+          row('Luogo', p.location ? escapeHtml(p.location.name) : 'non rilevato', !!p.location) +
           row('Tipo', escapeHtml(prioText), true) +
           (p.notes ? row('Note', escapeHtml(p.notes), true) : '');
         confirmBtn.innerText = 'Apri modulo';
@@ -1477,7 +1374,7 @@ const firebaseConfig = {
           preview.innerHTML = '<div class="text-brand-muted mb-1">Verranno rimossi:</div>' +
             p.items.map(i => {
               const matches = findShoppingMatches(i.name);
-              return `<div class="flex items-center gap-2"><span class="text-red-400 font-mono">−</span><span class="${matches.length ? 'text-white' : 'text-amber-400'}">${escapeHtml(i.name)}${matches.length ? ' → ' + escapeHtml(matches.map(m => m.name).join(', ')) : ' (non in lista)'}</span></div>`;
+              return `<div class="flex items-center gap-2"><span class="text-red-400 font-mono">−</span><span class="${matches.length ? 'text-white' : 'text-amber-400'}">${escapeHtml(i.name)}</span></div>`;
             }).join('');
           confirmBtn.innerText = 'Rimuovi';
         }
@@ -1516,24 +1413,14 @@ const firebaseConfig = {
           const ids = new Set();
           p.items.forEach(it => findShoppingMatches(it.name).forEach(m => ids.add(m.id)));
           await shopRemoveMany([...ids]);
-          showToast(ids.size ? `Rimossi ${ids.size} articoli` : 'Nessun articolo corrispondente in lista');
+          showToast(ids.size ? `Rimossi ${ids.size} articoli` : 'Nessun articolo corrispondente');
         }
       } catch (e) {
-        console.error(e);
-        showToast('Errore nel salvataggio: riprova', 4000);
+        showToast('Errore nel salvataggio', 4000);
       }
     }
 
-    // =====================================================================
-    // AVVIO
-    // =====================================================================
-    // Abilita lo stato :active anche su iPhone
     document.addEventListener('touchstart', function () {}, { passive: true });
-
-    // =====================================================================
-    // AGGIORNAMENTO AUTOMATICO (nessun bisogno di reinstallare l'app)
-    // =====================================================================
-    if (location.search) { try { history.replaceState(null, '', location.pathname); } catch (e) {} }
 
     let updateChecking = false;
     let lastUpdateCheck = 0;
@@ -1583,13 +1470,13 @@ const firebaseConfig = {
         if (latest && latest !== APP_VERSION) {
           let tried = null;
           try { tried = sessionStorage.getItem('update_tried'); } catch (e) {}
-          if (tried === latest) showUpdateBanner(latest);   // evita cicli di ricarica
+          if (tried === latest) showUpdateBanner(latest);
           else applyUpdate(latest, false);
         } else if (force) {
           showToast('Sei aggiornato (' + APP_VERSION + ')');
         }
       } catch (e) {
-        if (force) showToast("Impossibile controllare gli aggiornamenti (sei offline?)", 3500);
+        if (force) showToast("Impossibile controllare aggiornamenti", 3500);
       } finally {
         updateChecking = false;
       }
@@ -1600,12 +1487,10 @@ const firebaseConfig = {
       checkForUpdate(true);
     }
 
-    // Controlla all'apertura e ogni volta che l'app torna in primo piano
     document.addEventListener('visibilitychange', () => { if (!document.hidden) checkForUpdate(false); });
     window.addEventListener('pageshow', () => checkForUpdate(false));
     window.addEventListener('online', () => checkForUpdate(false));
 
-    // Effetto scintillio sui loghi al tocco/click
     document.addEventListener('pointerdown', e => {
       const el = e.target.closest && e.target.closest('.logo-hover-effect');
       if (!el) return;
