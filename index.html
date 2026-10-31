@@ -2,7 +2,7 @@
 <html lang="it" class="dark">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
   <title>The Grind Waiting List Multi-Artist</title>
   <link rel="icon" type="image/jpeg" href="logo.jpg">
   <link rel="apple-touch-icon" href="logo.jpg">
@@ -31,133 +31,95 @@
               card: '#121212',
               border: '#262626',
               muted: '#737373'
-            },
-            artist: {
-              claudia: '#ec4899',
-              posco: '#3b82f6',
-              davide: '#f97316',
-              egodi: '#a855f7'
             }
           }
         }
       }
     }
   </script>
-  <script src="https://unpkg.com/lucide@latest"></script>
+  <script src="https://unpkg.com/lucide@0.454.0/dist/umd/lucide.min.js"></script>
   <style>
     body {
       background-color: #0a0a0a;
       color: #f5f5f5;
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
       -webkit-tap-highlight-color: transparent;
+      min-height: 100vh;
+      min-height: 100dvh;
     }
-    .custom-scrollbar::-webkit-scrollbar {
-      width: 4px;
+    .custom-scrollbar::-webkit-scrollbar { width: 4px; }
+    .custom-scrollbar::-webkit-scrollbar-track { background: #0a0a0a; }
+    .custom-scrollbar::-webkit-scrollbar-thumb { background: #262626; border-radius: 2px; }
+    input[type="date"]::-webkit-calendar-picker-indicator { filter: invert(1); cursor: pointer; }
+
+    /* Su telefono i campi < 16px fanno zoomare iOS al focus */
+    @media (max-width: 640px) {
+      input, select, textarea { font-size: 16px !important; }
     }
-    .custom-scrollbar::-webkit-scrollbar-track {
-      background: #0a0a0a;
-    }
-    .custom-scrollbar::-webkit-scrollbar-thumb {
-      background: #262626;
-      border-radius: 2px;
-    }
-    input[type="date"]::-webkit-calendar-picker-indicator {
-      filter: invert(1);
-      cursor: pointer;
-    }
+
+    .safe-top { padding-top: env(safe-area-inset-top); }
+    .safe-bottom { padding-bottom: env(safe-area-inset-bottom); }
 
     @keyframes logoSparkleBounce {
-      0% {
-        transform: translateY(0) scale(1) rotate(0deg);
-        filter: drop-shadow(0 0 20px rgba(255, 255, 255, 0.3)) brightness(1);
-      }
-      30% {
-        transform: translateY(-12px) scale(1.08) rotate(-2deg);
-        filter: drop-shadow(0 0 35px rgba(255, 255, 255, 0.8)) brightness(1.35);
-      }
-      60% {
-        transform: translateY(-5px) scale(1.03) rotate(1deg);
-        filter: drop-shadow(0 0 45px rgba(255, 255, 255, 1)) brightness(1.6);
-      }
-      100% {
-        transform: translateY(0) scale(1) rotate(0deg);
-        filter: drop-shadow(0 0 20px rgba(255, 255, 255, 0.3)) brightness(1);
-      }
+      0% { transform: translateY(0) scale(1) rotate(0deg); filter: drop-shadow(0 0 20px rgba(255,255,255,0.3)) brightness(1); }
+      30% { transform: translateY(-12px) scale(1.08) rotate(-2deg); filter: drop-shadow(0 0 35px rgba(255,255,255,0.8)) brightness(1.35); }
+      60% { transform: translateY(-5px) scale(1.03) rotate(1deg); filter: drop-shadow(0 0 45px rgba(255,255,255,1)) brightness(1.6); }
+      100% { transform: translateY(0) scale(1) rotate(0deg); filter: drop-shadow(0 0 20px rgba(255,255,255,0.3)) brightness(1); }
     }
-
     .logo-hover-effect:hover img,
-    .logo-hover-effect:active img {
-      animation: logoSparkleBounce 0.8s ease-in-out infinite alternate;
+    .logo-hover-effect:active img { animation: logoSparkleBounce 0.8s ease-in-out infinite alternate; }
+
+    @keyframes micRing {
+      0% { box-shadow: 0 0 0 0 rgba(239,68,68,0.6); }
+      100% { box-shadow: 0 0 0 18px rgba(239,68,68,0); }
     }
+    .mic-listening { animation: micRing 1.1s ease-out infinite; }
   </style>
 </head>
-<body class="min-h-screen flex flex-col pb-10">
+<body class="flex flex-col pb-10">
 
-  <!-- SCHERMATA SELEZIONE ARTISTA E LISTA SPESA (PAGINA PRINCIPALE) -->
-  <div id="artist-selector-screen" class="fixed inset-0 z-50 bg-brand-black flex flex-col items-center justify-start pt-6 md:justify-center md:pt-0 p-4 md:p-8 overflow-y-auto">
-    
-    <!-- CONTENUTO SELEZIONE ARTISTI -->
-    <div id="home-artists-view" class="w-full max-w-xl flex flex-col items-center space-y-4 md:space-y-6">
+  <!-- ===================== HOME: SELEZIONE ARTISTA + LISTA SPESA ===================== -->
+  <div id="artist-selector-screen" class="fixed inset-0 z-50 bg-brand-black flex flex-col items-center justify-start pt-6 md:justify-center md:pt-0 p-4 md:p-8 overflow-y-auto safe-top">
+
+    <div id="home-artists-view" class="w-full max-w-2xl flex flex-col items-center space-y-4 md:space-y-6 pb-24">
       <div class="text-center space-y-2.5 md:space-y-4 w-full">
-        <!-- LOGO GRANDE MOBILE / HUGE DESKTOP -->
         <div class="logo-hover-effect w-36 h-36 sm:w-44 sm:h-44 md:w-60 md:h-60 mx-auto flex items-center justify-center overflow-visible cursor-pointer transition-all duration-300">
           <img src="logo.jpg" alt="Logo The Grind" class="max-w-full max-h-full object-contain transition-all duration-300">
         </div>
 
         <div class="w-full">
-          <!-- TITOLO IN UNA SINGOLA RIGA SENZA ANDARE A CAPO -->
-          <h1 class="font-heading text-xl sm:text-2xl md:text-3xl lg:text-4xl font-black tracking-wide text-white uppercase whitespace-nowrap text-center">THE GRIND TATTOO FINEST</h1>
+          <!-- Titolo sempre su una riga: la dimensione si adatta alla larghezza dello schermo -->
+          <h1 class="font-heading text-[clamp(0.95rem,5vw,2rem)] font-black tracking-wide text-white uppercase whitespace-nowrap text-center">THE GRIND TATTOO FINEST</h1>
           <p class="text-[11px] sm:text-xs md:text-sm text-brand-muted tracking-[0.35em] md:tracking-[0.45em] uppercase font-bold mt-1 md:mt-2 text-center">PICK THE ARTIST</p>
         </div>
       </div>
 
-      <!-- PULSANTI ARTISTI: SCALATI E PROPORZIONATI PER DESKTOP -->
-      <div class="w-full flex flex-col items-center space-y-2 md:space-y-3.5">
-        
-        <button onclick="selectArtist('claudia')" class="w-full max-w-[270px] md:max-w-[340px] py-2.5 px-3.5 md:py-3.5 md:px-5 rounded-xl md:rounded-2xl bg-brand-card border border-pink-500/30 hover:border-pink-500 hover:bg-pink-500/10 hover:scale-[1.03] hover:shadow-[0_0_20px_rgba(236,72,153,0.2)] grid grid-cols-[20px_1fr_20px] md:grid-cols-[24px_1fr_24px] items-center transition-all duration-300 active:scale-95 group cursor-pointer">
-          <div class="w-2.5 h-2.5 md:w-3.5 md:h-3.5 rounded-full bg-pink-500 shadow-[0_0_10px_#ec4899] justify-self-start"></div>
-          <span class="font-artistHome text-sm sm:text-base md:text-lg text-white tracking-wider text-center group-hover:text-pink-400 transition-colors">Claudia Bindi</span>
-          <i data-lucide="chevron-right" class="w-4 h-4 md:w-5 md:h-5 text-pink-500 justify-self-end transform group-hover:translate-x-1 transition-transform"></i>
-        </button>
-
-        <button onclick="selectArtist('posco')" class="w-full max-w-[270px] md:max-w-[340px] py-2.5 px-3.5 md:py-3.5 md:px-5 rounded-xl md:rounded-2xl bg-brand-card border border-blue-500/30 hover:border-blue-500 hover:bg-blue-500/10 hover:scale-[1.03] hover:shadow-[0_0_20px_rgba(59,130,246,0.2)] grid grid-cols-[20px_1fr_20px] md:grid-cols-[24px_1fr_24px] items-center transition-all duration-300 active:scale-95 group cursor-pointer">
-          <div class="w-2.5 h-2.5 md:w-3.5 md:h-3.5 rounded-full bg-blue-500 shadow-[0_0_10px_#3b82f6] justify-self-start"></div>
-          <span class="font-artistHome text-sm sm:text-base md:text-lg text-white tracking-wider text-center group-hover:text-blue-400 transition-colors">Posco Losco</span>
-          <i data-lucide="chevron-right" class="w-4 h-4 md:w-5 md:h-5 text-blue-500 justify-self-end transform group-hover:translate-x-1 transition-transform"></i>
-        </button>
-
-        <button onclick="selectArtist('davide')" class="w-full max-w-[270px] md:max-w-[340px] py-2.5 px-3.5 md:py-3.5 md:px-5 rounded-xl md:rounded-2xl bg-brand-card border border-orange-500/30 hover:border-orange-500 hover:bg-orange-500/10 hover:scale-[1.03] hover:shadow-[0_0_20px_rgba(249,115,22,0.2)] grid grid-cols-[20px_1fr_20px] md:grid-cols-[24px_1fr_24px] items-center transition-all duration-300 active:scale-95 group cursor-pointer">
-          <div class="w-2.5 h-2.5 md:w-3.5 md:h-3.5 rounded-full bg-orange-500 shadow-[0_0_10px_#f97316] justify-self-start"></div>
-          <span class="font-artistHome text-sm sm:text-base md:text-lg text-white tracking-wider text-center group-hover:text-orange-400 transition-colors">Davide Saba</span>
-          <i data-lucide="chevron-right" class="w-4 h-4 md:w-5 md:h-5 text-orange-500 justify-self-end transform group-hover:translate-x-1 transition-transform"></i>
-        </button>
-
-        <button onclick="selectArtist('egodi')" class="w-full max-w-[270px] md:max-w-[340px] py-2.5 px-3.5 md:py-3.5 md:px-5 rounded-xl md:rounded-2xl bg-brand-card border border-purple-500/30 hover:border-purple-500 hover:bg-purple-500/10 hover:scale-[1.03] hover:shadow-[0_0_20px_rgba(168,85,247,0.2)] grid grid-cols-[20px_1fr_20px] md:grid-cols-[24px_1fr_24px] items-center transition-all duration-300 active:scale-95 group cursor-pointer">
-          <div class="w-2.5 h-2.5 md:w-3.5 md:h-3.5 rounded-full bg-purple-500 shadow-[0_0_10px_#a855f7] justify-self-start"></div>
-          <span class="font-artistHome text-sm sm:text-base md:text-lg text-white tracking-wider text-center group-hover:text-purple-400 transition-colors">Egodì Ink</span>
-          <i data-lucide="chevron-right" class="w-4 h-4 md:w-5 md:h-5 text-purple-500 justify-self-end transform group-hover:translate-x-1 transition-transform"></i>
-        </button>
-
-      </div>
+      <div id="artist-buttons" class="w-full flex flex-col items-center space-y-2 md:space-y-3.5"></div>
     </div>
 
-    <!-- VISTA LISTA SPESA (CON SYNC CLOUD E MODIFICA) -->
-    <div id="home-shopping-view" class="w-full max-w-md space-y-3 hidden my-auto">
-      <div class="flex justify-between items-center bg-brand-card border border-brand-border p-3.5 rounded-2xl">
-        <div class="flex items-center gap-3">
-          <div class="logo-hover-effect w-10 h-10 flex items-center justify-center overflow-visible cursor-pointer">
+    <!-- Vista lista della spesa -->
+    <div id="home-shopping-view" class="w-full max-w-md space-y-3 hidden my-auto pb-24">
+      <div class="flex justify-between items-center bg-brand-card border border-brand-border p-3.5 rounded-2xl gap-2">
+        <div class="flex items-center gap-3 min-w-0">
+          <div class="logo-hover-effect w-10 h-10 flex items-center justify-center overflow-visible cursor-pointer shrink-0">
             <img src="logo.jpg" alt="Logo" class="max-w-full max-h-full object-contain">
           </div>
-          <div>
-            <h2 class="text-sm font-bold text-white uppercase tracking-wider">Lista della Spesa</h2>
-            <p class="text-[10px] text-brand-muted">Gestione scorte & materiali</p>
+          <div class="min-w-0">
+            <h2 class="text-sm font-bold text-white uppercase tracking-wider truncate">Lista della Spesa</h2>
+            <p id="shopping-subtitle" class="text-[10px] text-brand-muted">Gestione scorte &amp; materiali</p>
           </div>
         </div>
-        <div class="flex gap-2">
-          <button onclick="confirmClearShoppingList()" class="p-2 rounded-xl bg-red-500/20 text-red-400 border border-red-500/30 text-xs font-semibold hover:bg-red-500/30 transition-all" title="Elimina Tutto">
+        <div class="flex gap-1.5 shrink-0">
+          <button onclick="openVoice('shopping')" class="p-2 rounded-xl bg-emerald-600/20 text-emerald-300 border border-emerald-500/40 hover:bg-emerald-600/30 transition-all" title="Aggiungi a voce">
+            <i data-lucide="mic" class="w-4 h-4"></i>
+          </button>
+          <button onclick="clearDoneShopping()" class="p-2 rounded-xl bg-brand-black border border-brand-border text-neutral-300 hover:text-white transition-all" title="Rimuovi gli articoli già comprati">
+            <i data-lucide="check-check" class="w-4 h-4"></i>
+          </button>
+          <button onclick="confirmClearShoppingList()" class="p-2 rounded-xl bg-red-500/20 text-red-400 border border-red-500/30 hover:bg-red-500/30 transition-all" title="Elimina tutto">
             <i data-lucide="trash-2" class="w-4 h-4"></i>
           </button>
-          <button onclick="toggleShoppingViewHome()" class="p-2 rounded-xl bg-brand-black border border-brand-border text-white text-xs font-semibold hover:bg-neutral-800 transition-all" title="Torna alla Home">
+          <button onclick="toggleShoppingViewHome()" class="p-2 rounded-xl bg-brand-black border border-brand-border text-white hover:bg-neutral-800 transition-all" title="Torna alla Home">
             <i data-lucide="home" class="w-4 h-4"></i>
           </button>
         </div>
@@ -165,13 +127,13 @@
 
       <input type="hidden" id="shopping-item-edit-id" value="">
 
-      <div class="grid grid-cols-[1fr_50px_auto] gap-1.5 items-center bg-brand-card border border-brand-border p-2 rounded-xl">
-        <input type="text" id="shopping-item-name" placeholder="Articolo..." class="w-full bg-brand-black border border-brand-border rounded-lg px-2.5 py-2 text-xs text-white focus:outline-none focus:border-white">
-        <input type="number" id="shopping-item-qty" value="1" min="1" class="w-full bg-brand-black border border-brand-border rounded-lg px-1 py-2 text-xs text-white text-center focus:outline-none focus:border-white">
+      <div class="grid grid-cols-[1fr_56px_auto] gap-1.5 items-center bg-brand-card border border-brand-border p-2 rounded-xl">
+        <input type="text" id="shopping-item-name" placeholder="Articolo..." onkeydown="if(event.key==='Enter'){addShoppingItemManual()}" class="w-full bg-brand-black border border-brand-border rounded-lg px-2.5 py-2 text-xs text-white focus:outline-none focus:border-white">
+        <input type="number" inputmode="numeric" id="shopping-item-qty" value="1" min="1" class="w-full bg-brand-black border border-brand-border rounded-lg px-1 py-2 text-xs text-white text-center focus:outline-none focus:border-white">
         <button id="shopping-submit-btn" onclick="addShoppingItemManual()" class="px-3 py-2 rounded-lg bg-emerald-600 text-white font-semibold text-xs hover:bg-emerald-500 transition-all whitespace-nowrap">Aggiungi</button>
       </div>
 
-      <div id="shopping-list-container" class="space-y-2 max-h-[50vh] overflow-y-auto custom-scrollbar"></div>
+      <div id="shopping-list-container" class="space-y-2 max-h-[55vh] max-h-[55dvh] overflow-y-auto custom-scrollbar"></div>
 
       <div id="shopping-empty-state" class="hidden py-8 text-center space-y-2">
         <i data-lucide="shopping-cart" class="w-10 h-10 mx-auto text-brand-muted stroke-1"></i>
@@ -179,20 +141,19 @@
       </div>
     </div>
 
-    <!-- BOTTONE FISSO IN BASSO SOLTANTO NELLA PAGINA PRINCIPALE -->
-    <div id="home-shopping-fab" class="absolute bottom-6 left-0 right-0 flex justify-center pointer-events-none">
+    <!-- Bottone carrello -->
+    <div id="home-shopping-fab" class="absolute left-0 right-0 flex justify-center pointer-events-none" style="bottom: calc(1.5rem + env(safe-area-inset-bottom));">
       <button onclick="toggleShoppingViewHome()" id="shopping-fab-btn" class="pointer-events-auto p-4 rounded-full bg-emerald-600 text-white shadow-[0_4px_25px_rgba(16,185,129,0.5)] hover:bg-emerald-500 hover:scale-110 transition-all active:scale-95 flex items-center justify-center cursor-pointer" title="Apri Lista della Spesa">
         <i data-lucide="shopping-cart" class="w-6 h-6"></i>
       </button>
     </div>
-
   </div>
 
-  <!-- HEADER PAGINA ARTISTA (CON LOGO SPARKLER ANCHE QUI) -->
-  <header class="sticky top-0 z-30 bg-brand-black/95 backdrop-blur-md border-b border-brand-border px-4 py-2.5 flex justify-between items-center gap-2">
+  <!-- ===================== HEADER PAGINA ARTISTA ===================== -->
+  <header class="sticky top-0 z-30 bg-brand-black/95 backdrop-blur-md border-b border-brand-border px-4 py-2.5 flex justify-between items-center gap-2 safe-top">
     <div class="flex items-center gap-3 min-w-0 flex-1">
-      <div onclick="openArtistSelectionScreen()" class="logo-hover-effect w-11 h-11 flex items-center justify-center shrink-0 overflow-visible cursor-pointer group" title="Cambia Artista">
-        <img src="logo.jpg" alt="Logo" class="max-w-full max-h-full object-contain transition-transform">
+      <div onclick="openArtistSelectionScreen()" class="logo-hover-effect w-11 h-11 flex items-center justify-center shrink-0 overflow-visible cursor-pointer" title="Cambia Artista">
+        <img src="logo.jpg" alt="Logo" class="max-w-full max-h-full object-contain">
       </div>
       <div class="truncate">
         <div onclick="openArtistSelectionScreen()" class="flex items-center gap-1.5 cursor-pointer group" title="Clicca per cambiare artista">
@@ -204,9 +165,8 @@
     </div>
 
     <div class="flex items-center gap-2 shrink-0 z-10">
-      <button type="button" id="voice-btn" onclick="startVoiceRecognition(event)" class="p-2.5 rounded-full bg-brand-card border border-brand-border text-white hover:border-white transition-all active:scale-95 relative cursor-pointer" title="Comando Vocale">
+      <button type="button" id="voice-btn" onclick="openVoice('client')" class="p-2.5 rounded-full bg-brand-card border border-brand-border text-white hover:border-white transition-all active:scale-95 cursor-pointer" title="Aggiungi cliente a voce">
         <i data-lucide="mic" class="w-5 h-5 pointer-events-none"></i>
-        <span id="voice-pulse" class="hidden absolute top-0 right-0 w-3 h-3 bg-red-500 rounded-full animate-ping pointer-events-none"></span>
       </button>
       <button type="button" onclick="openModal(false)" id="btn-new-client" class="px-3.5 py-2 rounded-full text-black font-semibold text-sm transition-all active:scale-95 flex items-center gap-1.5 cursor-pointer">
         <i data-lucide="plus" class="w-4 h-4 pointer-events-none"></i> Nuovo
@@ -214,23 +174,22 @@
     </div>
   </header>
 
-  <!-- SEZIONE PRINCIPALE WAITING LIST ARTISTA -->
+  <!-- ===================== LISTA D'ATTESA ARTISTA ===================== -->
   <main id="main-waiting-section" class="flex-1 max-w-2xl w-full mx-auto p-4 space-y-4">
-    <div class="flex justify-between items-center text-xs px-1 text-brand-muted">
+    <div class="flex justify-between items-center text-xs px-1 text-brand-muted gap-2">
       <span id="status-indicator">Inizializzazione...</span>
-      <span>Priorità: ASAP > Relax</span>
+      <span id="list-counter" class="shrink-0"></span>
     </div>
 
     <div class="space-y-2">
       <div class="relative w-full">
         <i data-lucide="search" class="w-4 h-4 absolute left-3 top-3 text-brand-muted"></i>
-        <input type="text" id="search-input" oninput="renderList()" placeholder="Cerca cliente o note..." class="w-full bg-brand-card border border-brand-border rounded-xl pl-9 pr-4 py-2 text-sm text-white focus:outline-none focus:border-white">
+        <input type="text" id="search-input" oninput="renderList()" placeholder="Cerca cliente, telefono o note..." class="w-full bg-brand-card border border-brand-border rounded-xl pl-9 pr-4 py-2 text-sm text-white focus:outline-none focus:border-white">
       </div>
-      
-      <div class="grid grid-cols-2 gap-2">
+
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
         <div class="flex gap-1">
-          <select id="filter-location" onchange="renderList()" class="bg-brand-card border border-brand-border rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-white w-full truncate">
-          </select>
+          <select id="filter-location" onchange="renderList()" class="bg-brand-card border border-brand-border rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-white w-full truncate"></select>
           <button onclick="openManageLocationsModal()" class="p-2 bg-brand-card border border-brand-border rounded-xl text-brand-muted hover:text-white transition-all shrink-0 cursor-pointer" title="Gestisci Luoghi">
             <i data-lucide="settings" class="w-4 h-4"></i>
           </button>
@@ -257,9 +216,9 @@
     </div>
   </main>
 
-  <!-- MODALE FORM CLIENTE -->
-  <div id="modal" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm hidden flex items-end sm:items-center justify-center p-0 sm:p-4">
-    <div class="bg-brand-card border border-brand-border w-full max-w-md rounded-t-2xl sm:rounded-2xl p-6 space-y-5 max-h-[90vh] overflow-y-auto custom-scrollbar">
+  <!-- ===================== MODALE CLIENTE ===================== -->
+  <div id="modal" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm hidden flex items-end sm:items-center justify-center p-0 sm:p-4" onclick="if(event.target===this)closeModal()">
+    <div class="bg-brand-card border border-brand-border w-full max-w-md rounded-t-2xl sm:rounded-2xl p-6 space-y-5 max-h-[90vh] max-h-[90dvh] overflow-y-auto custom-scrollbar safe-bottom">
       <div class="flex justify-between items-center border-b border-brand-border pb-3">
         <h2 id="modal-title" class="text-lg font-bold text-white uppercase tracking-wider">Nuovo Cliente</h2>
         <button type="button" onclick="closeModal()" class="text-brand-muted hover:text-white p-1">
@@ -282,12 +241,11 @@
 
         <div>
           <label class="block text-xs font-medium text-brand-muted mb-1">Luogo *</label>
-          <select id="field-location" required onchange="handleLocationChange()" class="w-full bg-brand-black border border-brand-border rounded-xl px-3 py-2 text-sm text-white focus:outline-none focus:border-white">
-          </select>
+          <select id="field-location" required onchange="handleLocationChange()" class="w-full bg-brand-black border border-brand-border rounded-xl px-3 py-2 text-sm text-white focus:outline-none focus:border-white"></select>
         </div>
 
         <div id="priority-container">
-          <label class="block text-xs font-medium text-brand-muted mb-1">Tipo Progetto & Priorità *</label>
+          <label class="block text-xs font-medium text-brand-muted mb-1">Tipo Progetto &amp; Priorità *</label>
           <select id="field-priority" class="w-full bg-brand-black border border-brand-border rounded-xl px-3 py-2 text-sm text-white focus:outline-none focus:border-white">
             <option value="1">Continuo Progetto – Prima possibile (Rank 1)</option>
             <option value="2">Nuovo Tatuaggio – Prima possibile (Rank 2)</option>
@@ -314,9 +272,9 @@
     </div>
   </div>
 
-  <!-- MODALE GESTIONE LUOGHI -->
-  <div id="locations-modal" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm hidden flex items-end sm:items-center justify-center p-0 sm:p-4">
-    <div class="bg-brand-card border border-brand-border w-full max-w-md rounded-t-2xl sm:rounded-2xl p-6 space-y-4 max-h-[90vh] overflow-y-auto custom-scrollbar">
+  <!-- ===================== MODALE LUOGHI ===================== -->
+  <div id="locations-modal" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm hidden flex items-end sm:items-center justify-center p-0 sm:p-4" onclick="if(event.target===this)closeManageLocationsModal()">
+    <div class="bg-brand-card border border-brand-border w-full max-w-md rounded-t-2xl sm:rounded-2xl p-6 space-y-4 max-h-[90vh] max-h-[90dvh] overflow-y-auto custom-scrollbar safe-bottom">
       <div class="flex justify-between items-center border-b border-brand-border pb-3">
         <h2 class="text-base font-bold text-white uppercase tracking-wider">Gestione Luoghi</h2>
         <button type="button" onclick="closeManageLocationsModal()" class="text-brand-muted hover:text-white p-1">
@@ -324,9 +282,9 @@
         </button>
       </div>
 
-      <div class="flex gap-2">
-        <input type="text" id="new-location-name" placeholder="Nuovo Luogo..." class="flex-1 bg-brand-black border border-brand-border rounded-xl px-3 py-2 text-sm text-white focus:outline-none">
-        <label class="flex items-center gap-1.5 text-xs text-brand-muted px-2 border border-brand-border rounded-xl bg-brand-black cursor-pointer">
+      <div class="flex flex-wrap gap-2">
+        <input type="text" id="new-location-name" placeholder="Nuovo Luogo..." onkeydown="if(event.key==='Enter'){addCustomLocation()}" class="flex-1 min-w-[140px] bg-brand-black border border-brand-border rounded-xl px-3 py-2 text-sm text-white focus:outline-none">
+        <label class="flex items-center gap-1.5 text-xs text-brand-muted px-2 border border-brand-border rounded-xl bg-brand-black cursor-pointer py-2">
           <input type="checkbox" id="new-location-single-priority" class="rounded"> Single Rank
         </label>
         <button onclick="addCustomLocation()" id="btn-add-loc" class="px-3 py-2 rounded-xl text-black font-semibold text-xs transition-all">Aggiungi</button>
@@ -336,15 +294,49 @@
     </div>
   </div>
 
+  <!-- ===================== PANNELLO COMANDO VOCALE ===================== -->
+  <div id="voice-sheet" class="fixed inset-0 z-[60] bg-black/80 backdrop-blur-sm hidden flex items-end sm:items-center justify-center p-0 sm:p-4" onclick="if(event.target===this)closeVoice()">
+    <div class="bg-brand-card border border-brand-border w-full max-w-md rounded-t-2xl sm:rounded-2xl p-5 space-y-3 max-h-[92vh] max-h-[92dvh] overflow-y-auto custom-scrollbar safe-bottom">
+      <div class="flex justify-between items-center">
+        <h2 id="voice-title" class="text-base font-bold text-white uppercase tracking-wider">Comando vocale</h2>
+        <button type="button" onclick="closeVoice()" class="text-brand-muted hover:text-white p-1">
+          <i data-lucide="x" class="w-5 h-5 pointer-events-none"></i>
+        </button>
+      </div>
+
+      <div class="flex items-center gap-3">
+        <button type="button" id="voice-mic" onclick="toggleListening()" class="w-14 h-14 rounded-full bg-neutral-800 border border-brand-border text-white flex items-center justify-center shrink-0 transition-all active:scale-95">
+          <i data-lucide="mic" class="w-6 h-6 pointer-events-none"></i>
+        </button>
+        <p id="voice-status" class="text-sm text-neutral-300 leading-snug">Pronto.</p>
+      </div>
+
+      <textarea id="voice-text" rows="3" oninput="onVoiceTextChange()" placeholder="Il testo detto compare qui. Puoi correggerlo o scriverlo a mano." class="w-full bg-brand-black border border-brand-border rounded-xl px-3 py-2 text-sm text-white focus:outline-none focus:border-white"></textarea>
+
+      <p id="voice-hint" class="text-[11px] text-brand-muted leading-relaxed"></p>
+
+      <div id="voice-preview" class="text-xs text-neutral-200 space-y-1"></div>
+
+      <div class="flex gap-2 pt-1">
+        <button type="button" onclick="closeVoice()" class="flex-1 py-2.5 rounded-xl border border-brand-border text-brand-muted hover:text-white font-medium text-sm transition-all">Annulla</button>
+        <button type="button" id="voice-confirm" onclick="confirmVoice()" disabled class="flex-1 py-2.5 rounded-xl bg-emerald-600 text-white font-semibold text-sm transition-all disabled:opacity-30 disabled:cursor-not-allowed">Conferma</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast -->
+  <div id="toast" class="hidden fixed left-1/2 -translate-x-1/2 z-[70] max-w-[90vw] px-4 py-2.5 rounded-xl bg-white text-black text-sm font-medium shadow-2xl" style="bottom: calc(5rem + env(safe-area-inset-bottom));"></div>
+
   <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
 
   <script>
+    // =====================================================================
+    // CONFIGURAZIONE
+    // =====================================================================
     const ARTISTS_CONFIG = {
       claudia: {
-        id: 'claudia',
-        name: 'Claudia Bindi',
-        color: '#ec4899',
+        id: 'claudia', name: 'Claudia Bindi', color: '#ec4899', tw: 'pink',
         defaultLocations: [
           { name: 'The Grind', isSinglePriority: false },
           { name: 'Milano City Ink', isSinglePriority: false },
@@ -356,18 +348,14 @@
         ]
       },
       posco: {
-        id: 'posco',
-        name: 'Posco Losco',
-        color: '#3b82f6',
+        id: 'posco', name: 'Posco Losco', color: '#3b82f6', tw: 'blue',
         defaultLocations: [
           { name: 'Seminari', isSinglePriority: true },
           { name: 'Tele per seminari', isSinglePriority: true }
         ]
       },
       davide: {
-        id: 'davide',
-        name: 'Davide Saba',
-        color: '#f97316',
+        id: 'davide', name: 'Davide Saba', color: '#f97316', tw: 'orange',
         defaultLocations: [
           { name: 'Alghero', isSinglePriority: false },
           { name: 'Cagliari', isSinglePriority: false },
@@ -378,20 +366,14 @@
         ]
       },
       egodi: {
-        id: 'egodi',
-        name: 'Egodì Ink',
-        color: '#a855f7',
+        id: 'egodi', name: 'Egodì Ink', color: '#a855f7', tw: 'purple',
         defaultLocations: [
           { name: 'The Grind', isSinglePriority: false }
         ]
       }
     };
 
-    localStorage.removeItem('selected_artist_id');
-    let currentArtistId = null;
-    let isHomeShoppingActive = false;
-    let shoppingList = [];
-
+    // >>> INCOLLA QUI LA TUA CONFIGURAZIONE FIREBASE (Impostazioni progetto → Le tue app → Config) <<<
 const firebaseConfig = {
   apiKey: "AIzaSyDccFCqeRlOxyR9SkHGYBKVkruL4XOA1SQ",
   authDomain: "thegrind-waitinglist.firebaseapp.com",
@@ -402,157 +384,291 @@ const firebaseConfig = {
   measurementId: "G-L2SMGSKYFV"
 };
 
+    // =====================================================================
+    // STATO
+    // =====================================================================
+    const $ = id => document.getElementById(id);
+    let currentArtistId = null;
+    let isHomeShoppingActive = false;
+    let shoppingList = [];
+    let clientsData = [];
+    let customLocations = safeParse(localStorage.getItem('custom_artist_locations'), {});
     let db = null;
     let useLocalStorage = false;
-    let clientsData = [];
-    let customLocations = JSON.parse(localStorage.getItem('custom_artist_locations')) || {};
 
+    function safeParse(str, fallback) {
+      try { const v = JSON.parse(str); return v === null || v === undefined ? fallback : v; } catch (e) { return fallback; }
+    }
+
+    // =====================================================================
+    // UTILITÀ
+    // =====================================================================
+    function escapeHtml(str) {
+      if (str === undefined || str === null) return '';
+      return String(str).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;");
+    }
+    function formatDate(dateStr) {
+      if (!dateStr) return '';
+      const parts = dateStr.split('-');
+      return parts.length === 3 ? `${parts[2]}/${parts[1]}/${parts[0]}` : dateStr;
+    }
+    function todayStr() {
+      // Data locale (valueAsDate usa UTC e di notte può sbagliare giorno)
+      const d = new Date();
+      const p = n => String(n).padStart(2, '0');
+      return `${d.getFullYear()}-${p(d.getMonth() + 1)}-${p(d.getDate())}`;
+    }
+    function capitalizeWords(str) {
+      return str.split(/\s+/).filter(Boolean).map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ');
+    }
+    function capFirst(str) { return str ? str.charAt(0).toUpperCase() + str.slice(1) : str; }
+    function norm(str) { return String(str || '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').trim(); }
+    function newLocalId() { return 'local_' + Date.now() + '_' + Math.random().toString(36).slice(2, 7); }
+    function refreshIcons() { if (window.lucide) lucide.createIcons(); }
+
+    let toastTimer = null;
+    function showToast(msg, ms = 2600) {
+      const t = $('toast');
+      t.innerText = msg;
+      t.classList.remove('hidden');
+      clearTimeout(toastTimer);
+      toastTimer = setTimeout(() => t.classList.add('hidden'), ms);
+    }
+
+    // =====================================================================
+    // INIZIALIZZAZIONE FIREBASE / LOCALE
+    // =====================================================================
     try {
       if (firebaseConfig.apiKey !== "INSERISCI_LA_TUA_API_KEY") {
         firebase.initializeApp(firebaseConfig);
         db = firebase.firestore();
-        document.getElementById('status-indicator').innerText = "Cloud Sync (Firebase)";
+        try { db.enablePersistence({ synchronizeTabs: true }).catch(() => {}); } catch (e) {}
+        $('status-indicator').innerText = "Cloud Sync (Firebase)";
         initFirebaseListeners();
       } else {
         throw new Error("Firebase non configurato, proseguo in locale.");
       }
     } catch (e) {
       useLocalStorage = true;
-      document.getElementById('status-indicator').innerText = "Modalità Locale (LocalStorage)";
+      $('status-indicator').innerText = "Modalità Locale: i dati restano solo su questo dispositivo";
       loadFromLocalStorage();
     }
 
-    openArtistSelectionScreen();
+    function initFirebaseListeners() {
+      db.collection("waiting_list").onSnapshot(snapshot => {
+        clientsData = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+        $('status-indicator').innerText = snapshot.metadata.fromCache ? "Cloud Sync · in attesa di connessione" : "Cloud Sync attivo";
+        renderHomeCounts();
+        renderList();
+      }, error => {
+        console.error("Errore Firebase Clients:", error);
+        $('status-indicator').innerText = "Errore Firebase: controlla le regole del database";
+      });
+
+      db.collection("shopping_list").onSnapshot(snapshot => {
+        shoppingList = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+        renderShoppingList();
+      }, error => {
+        console.error("Errore Firebase Shopping List:", error);
+        showToast("Lista spesa: errore di sincronizzazione (regole Firestore?)", 4500);
+      });
+
+      // Luoghi personalizzati sincronizzati tra dispositivi
+      db.collection("settings").doc("locations").onSnapshot(doc => {
+        if (doc.exists) {
+          customLocations = doc.data() || {};
+        } else if (Object.keys(customLocations).length > 0) {
+          // Migrazione una tantum da localStorage al cloud
+          db.collection("settings").doc("locations").set(customLocations).catch(() => {});
+        }
+        if (currentArtistId) populateLocationDropdowns();
+      }, error => console.error("Errore Firebase Luoghi:", error));
+    }
+
+    function loadFromLocalStorage() {
+      clientsData = safeParse(localStorage.getItem('tattoo_waiting_list'), []);
+      shoppingList = safeParse(localStorage.getItem('shopping_list_data'), []);
+      renderHomeCounts();
+      renderList();
+    }
+
+    function saveLocal() {
+      if (!useLocalStorage) return;
+      localStorage.setItem('tattoo_waiting_list', JSON.stringify(clientsData));
+      localStorage.setItem('shopping_list_data', JSON.stringify(shoppingList));
+      renderHomeCounts();
+      renderList();
+      renderShoppingList();
+    }
+
+    // =====================================================================
+    // HOME / ARTISTI
+    // =====================================================================
+    function buildArtistButtons() {
+      const container = $('artist-buttons');
+      container.innerHTML = Object.values(ARTISTS_CONFIG).map(a => `
+        <button onclick="selectArtist('${a.id}')" class="w-full max-w-[300px] md:max-w-[380px] py-2.5 px-3.5 md:py-3.5 md:px-5 rounded-xl md:rounded-2xl bg-brand-card border hover:scale-[1.03] grid grid-cols-[44px_1fr_44px] items-center transition-all duration-300 active:scale-95 group cursor-pointer" style="border-color:${a.color}4d" onmouseover="this.style.borderColor='${a.color}';this.style.boxShadow='0 0 20px ${a.color}33'" onmouseout="this.style.borderColor='${a.color}4d';this.style.boxShadow='none'">
+          <div class="w-2.5 h-2.5 md:w-3.5 md:h-3.5 rounded-full justify-self-start" style="background:${a.color};box-shadow:0 0 10px ${a.color}"></div>
+          <span class="font-artistHome text-sm sm:text-base md:text-lg text-white tracking-wider text-center">${escapeHtml(a.name)}</span>
+          <div class="justify-self-end flex items-center gap-1.5">
+            <span id="count-${a.id}" class="hidden text-[10px] font-mono font-bold px-1.5 py-0.5 rounded-full text-black" style="background:${a.color}"></span>
+            <i data-lucide="chevron-right" class="w-4 h-4 md:w-5 md:h-5 transform group-hover:translate-x-1 transition-transform" style="color:${a.color}"></i>
+          </div>
+        </button>
+      `).join('');
+      refreshIcons();
+    }
+
+    function renderHomeCounts() {
+      Object.keys(ARTISTS_CONFIG).forEach(id => {
+        const el = $('count-' + id);
+        if (!el) return;
+        const n = clientsData.filter(c => (c.artistId || 'claudia') === id).length;
+        el.innerText = n;
+        el.classList.toggle('hidden', n === 0);
+      });
+    }
 
     function selectArtist(artistId) {
       currentArtistId = artistId;
-      localStorage.setItem('selected_artist_id', artistId);
-      document.getElementById('artist-selector-screen').classList.add('hidden');
+      $('artist-selector-screen').classList.add('hidden');
+      $('search-input').value = '';
+      $('filter-priority').value = 'ALL';
       applyArtistTheme(artistId);
+      $('filter-location').value = 'ALL';
       renderList();
+      window.scrollTo(0, 0);
     }
 
     function openArtistSelectionScreen() {
       currentArtistId = null;
-      localStorage.removeItem('selected_artist_id');
-      document.getElementById('artist-selector-screen').classList.remove('hidden');
+      $('artist-selector-screen').classList.remove('hidden');
       if (isHomeShoppingActive) toggleShoppingViewHome();
     }
 
     function applyArtistTheme(artistId) {
       const config = ARTISTS_CONFIG[artistId];
       if (!config) return;
-
-      document.getElementById('artist-title').innerText = config.name.toUpperCase();
+      $('artist-title').innerText = config.name.toUpperCase();
       document.documentElement.style.setProperty('--artist-color', config.color);
-
-      const btnNew = document.getElementById('btn-new-client');
-      const btnSave = document.getElementById('btn-save-modal');
-      const btnAddLoc = document.getElementById('btn-add-loc');
-
-      [btnNew, btnSave, btnAddLoc].forEach(btn => {
+      ['btn-new-client', 'btn-save-modal', 'btn-add-loc'].forEach(id => {
+        const btn = $(id);
         if (btn) btn.style.backgroundColor = config.color;
       });
-
       populateLocationDropdowns();
     }
 
+    // =====================================================================
+    // LUOGHI
+    // =====================================================================
     function getArtistLocations() {
       if (!currentArtistId) return [];
-      if (customLocations[currentArtistId]) {
-        return customLocations[currentArtistId];
-      }
-      return ARTISTS_CONFIG[currentArtistId].defaultLocations;
+      return customLocations[currentArtistId] || ARTISTS_CONFIG[currentArtistId].defaultLocations;
     }
 
     function populateLocationDropdowns() {
       const locations = getArtistLocations();
-      const filterLoc = document.getElementById('filter-location');
-      const fieldLoc = document.getElementById('field-location');
+      const filterLoc = $('filter-location');
+      const fieldLoc = $('field-location');
+      const prevFilter = filterLoc.value || 'ALL';
+      const prevField = fieldLoc.value;
 
-      filterLoc.innerHTML = '<option value="ALL">Tutti i Luoghi</option>';
-      fieldLoc.innerHTML = '';
+      filterLoc.innerHTML = '<option value="ALL">Tutti i Luoghi</option>' +
+        locations.map(l => `<option value="${escapeHtml(l.name)}">${escapeHtml(l.name)}</option>`).join('');
+      fieldLoc.innerHTML = locations.map(l => `<option value="${escapeHtml(l.name)}">${escapeHtml(l.name)}</option>`).join('');
 
-      locations.forEach(loc => {
-        filterLoc.innerHTML += `<option value="${escapeHtml(loc.name)}">${escapeHtml(loc.name)}</option>`;
-        fieldLoc.innerHTML += `<option value="${escapeHtml(loc.name)}">${escapeHtml(loc.name)}</option>`;
-      });
+      if ([...filterLoc.options].some(o => o.value === prevFilter)) filterLoc.value = prevFilter;
+      if (prevField && [...fieldLoc.options].some(o => o.value === prevField)) fieldLoc.value = prevField;
     }
 
-    function initFirebaseListeners() {
-      // 1. Synchronize Client Waiting List
-      db.collection("waiting_list").onSnapshot(snapshot => {
-        clientsData = snapshot.docs.map(doc => ({
-          id: doc.id,
-          ...doc.data()
-        }));
-        renderList();
-      }, error => {
-        console.error("Errore Firebase Clients:", error);
-      });
-
-      // 2. Synchronize Shopping List across all devices
-      db.collection("shopping_list").onSnapshot(snapshot => {
-        shoppingList = snapshot.docs.map(doc => ({
-          id: doc.id,
-          ...doc.data()
-        }));
-        if (isHomeShoppingActive) renderShoppingList();
-      }, error => {
-        console.error("Errore Firebase Shopping List:", error);
-      });
-    }
-
-    function loadFromLocalStorage() {
-      const data = localStorage.getItem('tattoo_waiting_list');
-      clientsData = data ? JSON.parse(data) : [];
-      
-      const shopData = localStorage.getItem('shopping_list_data');
-      shoppingList = shopData ? JSON.parse(shopData) : [];
-      renderList();
-    }
-
-    function saveLocal() {
-      if (useLocalStorage) {
-        localStorage.setItem('tattoo_waiting_list', JSON.stringify(clientsData));
-        localStorage.setItem('shopping_list_data', JSON.stringify(shoppingList));
-        renderList();
+    function saveLocations() {
+      localStorage.setItem('custom_artist_locations', JSON.stringify(customLocations));
+      if (!useLocalStorage && db) {
+        db.collection("settings").doc("locations").set(customLocations).catch(e => console.error(e));
       }
     }
 
+    function openManageLocationsModal() {
+      renderManageLocationsList();
+      $('locations-modal').classList.remove('hidden');
+    }
+    function closeManageLocationsModal() {
+      $('locations-modal').classList.add('hidden');
+      populateLocationDropdowns();
+      renderList();
+    }
+    function renderManageLocationsList() {
+      const locations = getArtistLocations();
+      $('locations-list').innerHTML = locations.map((loc, index) => `
+        <div class="flex items-center justify-between bg-brand-black p-2.5 rounded-xl border border-brand-border text-xs">
+          <span class="text-white font-medium">${escapeHtml(loc.name)} ${loc.isSinglePriority ? '<span class="text-[10px] text-brand-muted">(Single Rank)</span>' : ''}</span>
+          <button onclick="removeLocation(${index})" class="text-red-400 hover:text-red-300 p-1"><i data-lucide="trash-2" class="w-4 h-4"></i></button>
+        </div>
+      `).join('');
+      refreshIcons();
+    }
+    function addCustomLocation() {
+      const input = $('new-location-name');
+      const isSingle = $('new-location-single-priority').checked;
+      const name = input.value.trim();
+      if (!name) return;
+      const locations = [...getArtistLocations()];
+      if (locations.some(l => norm(l.name) === norm(name))) { showToast('Questo luogo esiste già'); return; }
+      locations.push({ name, isSinglePriority: isSingle });
+      customLocations[currentArtistId] = locations;
+      saveLocations();
+      input.value = '';
+      $('new-location-single-priority').checked = false;
+      renderManageLocationsList();
+    }
+    function removeLocation(index) {
+      const locations = [...getArtistLocations()];
+      locations.splice(index, 1);
+      customLocations[currentArtistId] = locations;
+      saveLocations();
+      renderManageLocationsList();
+    }
+    function handleLocationChange() {
+      const selectedLoc = $('field-location').value;
+      const locObj = getArtistLocations().find(l => l.name === selectedLoc);
+      const single = !!(locObj && locObj.isSinglePriority);
+      $('priority-container').classList.toggle('hidden', single);
+    }
+
+    // =====================================================================
+    // CLIENTI
+    // =====================================================================
     async function saveClient(client) {
       client.artistId = currentArtistId;
-
-      if (!useLocalStorage && db) {
-        if (client.id) {
+      try {
+        if (!useLocalStorage && db) {
           const id = client.id;
           delete client.id;
-          await db.collection("waiting_list").doc(id).set(client);
+          if (id) await db.collection("waiting_list").doc(id).set(client);
+          else await db.collection("waiting_list").add(client);
         } else {
-          delete client.id;
-          await db.collection("waiting_list").add(client);
+          if (client.id) {
+            const i = clientsData.findIndex(c => c.id === client.id);
+            if (i !== -1) clientsData[i] = client;
+          } else {
+            client.id = newLocalId();
+            clientsData.push(client);
+          }
+          saveLocal();
         }
-      } else {
-        if (client.id) {
-          const index = clientsData.findIndex(c => c.id === client.id);
-          if (index !== -1) clientsData[index] = client;
-        } else {
-          client.id = 'local_' + Date.now();
-          clientsData.push(client);
-        }
-        saveLocal();
+        showToast('Cliente salvato');
+      } catch (e) {
+        console.error(e);
+        showToast('Errore nel salvataggio: riprova', 4000);
       }
     }
 
     async function deleteClient(id) {
-      if (confirm("Sei sicuro di voler rimuovere questo cliente dalla lista d'attesa?")) {
-        if (!useLocalStorage && db) {
-          await db.collection("waiting_list").doc(id).delete();
-        } else {
-          clientsData = clientsData.filter(c => c.id !== id);
-          saveLocal();
-        }
-      }
+      if (!confirm("Sei sicuro di voler rimuovere questo cliente dalla lista d'attesa?")) return;
+      try {
+        if (!useLocalStorage && db) await db.collection("waiting_list").doc(id).delete();
+        else { clientsData = clientsData.filter(c => c.id !== id); saveLocal(); }
+      } catch (e) { showToast('Errore: impossibile eliminare', 4000); }
     }
 
     const PRIORITY_LABELS = {
@@ -566,33 +682,26 @@ const firebaseConfig = {
     function renderList() {
       if (!currentArtistId) return;
 
-      const searchQuery = document.getElementById('search-input').value.toLowerCase().trim();
-      const locationFilter = document.getElementById('filter-location').value;
-      const priorityFilter = document.getElementById('filter-priority').value;
+      const searchQuery = norm($('search-input').value);
+      const locationFilter = $('filter-location').value || 'ALL';
+      const priorityFilter = $('filter-priority').value;
 
-      let filtered = clientsData.filter(c => {
-        const clientArtist = c.artistId || 'claudia';
-        if (clientArtist !== currentArtistId) return false;
+      const filtered = clientsData.filter(c => {
+        if ((c.artistId || 'claudia') !== currentArtistId) return false;
 
-        const matchesSearch = searchQuery === '' || 
-                              c.name.toLowerCase().includes(searchQuery) || 
-                              (c.notes && c.notes.toLowerCase().includes(searchQuery)) ||
-                              c.contact.includes(searchQuery);
+        const matchesSearch = searchQuery === '' ||
+          norm(c.name).includes(searchQuery) ||
+          norm(c.notes).includes(searchQuery) ||
+          String(c.contact || '').replace(/\s/g, '').includes(searchQuery.replace(/\s/g, ''));
 
-        const matchesLocation = (locationFilter === 'ALL') || (c.location === locationFilter);
+        const matchesLocation = locationFilter === 'ALL' || c.location === locationFilter;
 
         const p = String(c.priority !== undefined && c.priority !== null ? c.priority : '4');
         let matchesPriority = true;
-
-        if (priorityFilter === 'ALL_CONTINUO') {
-          matchesPriority = (p === '1' || p === '3');
-        } else if (priorityFilter === 'ALL_NUOVO') {
-          matchesPriority = (p === '2' || p === '4');
-        } else if (priorityFilter === 'EVENT') {
-          matchesPriority = (p === '0');
-        } else if (priorityFilter !== 'ALL') {
-          matchesPriority = (p === priorityFilter);
-        }
+        if (priorityFilter === 'ALL_CONTINUO') matchesPriority = (p === '1' || p === '3');
+        else if (priorityFilter === 'ALL_NUOVO') matchesPriority = (p === '2' || p === '4');
+        else if (priorityFilter === 'EVENT') matchesPriority = (p === '0');
+        else if (priorityFilter !== 'ALL') matchesPriority = (p === priorityFilter);
 
         return matchesSearch && matchesLocation && matchesPriority;
       });
@@ -600,533 +709,602 @@ const firebaseConfig = {
       filtered.sort((a, b) => {
         const pA = parseInt(a.priority !== undefined ? a.priority : 4);
         const pB = parseInt(b.priority !== undefined ? b.priority : 4);
-
         if (pA !== pB) return pA - pB;
         return new Date(a.date) - new Date(b.date);
       });
 
-      const listContainer = document.getElementById('client-list');
-      const emptyState = document.getElementById('empty-state');
+      const total = clientsData.filter(c => (c.artistId || 'claudia') === currentArtistId).length;
+      $('list-counter').innerText = filtered.length === total ? `${total} in lista` : `${filtered.length} di ${total}`;
 
+      const listContainer = $('client-list');
+      const emptyState = $('empty-state');
       listContainer.innerHTML = '';
 
       if (filtered.length === 0) {
         emptyState.classList.remove('hidden');
         return;
-      } else {
-        emptyState.classList.add('hidden');
       }
+      emptyState.classList.add('hidden');
 
       filtered.forEach((client, index) => {
         const pVal = client.priority !== undefined ? client.priority : 4;
         const pInfo = PRIORITY_LABELS[pVal] || PRIORITY_LABELS[4];
-        const cleanPhone = client.contact.replace(/\D/g, '');
-        const waUrl = `https://wa.me/${cleanPhone}`;
+        let cleanPhone = String(client.contact || '').replace(/[^\d+]/g, '');
+        const waNumber = cleanPhone.replace(/^\+/, '').replace(/^00/, '');
+        const waUrl = `https://wa.me/${waNumber}`;
 
         const card = document.createElement('div');
-        card.className = 'bg-brand-card border border-brand-border rounded-xl p-4 space-y-3 transition-all hover:border-neutral-700 relative group';
-
+        card.className = 'bg-brand-card border border-brand-border rounded-xl p-4 space-y-3 transition-all hover:border-neutral-700 relative';
         card.innerHTML = `
           <div class="flex justify-between items-start gap-2">
-            <div class="flex items-center gap-2">
-              <span class="text-xs font-mono font-bold text-brand-muted bg-brand-black px-2 py-1 rounded-md border border-brand-border">#${index + 1}</span>
-              <h3 class="font-bold text-white text-base tracking-wide">${escapeHtml(client.name)}</h3>
+            <div class="flex items-center gap-2 min-w-0">
+              <span class="text-xs font-mono font-bold text-brand-muted bg-brand-black px-2 py-1 rounded-md border border-brand-border shrink-0">#${index + 1}</span>
+              <h3 class="font-bold text-white text-base tracking-wide truncate">${escapeHtml(client.name)}</h3>
             </div>
-            <span class="text-[10px] px-2.5 py-1 rounded-full uppercase tracking-wider ${pInfo.badge}">
-              ${pInfo.text}
-            </span>
+            <span class="text-[10px] px-2.5 py-1 rounded-full uppercase tracking-wider shrink-0 ${pInfo.badge}">${pInfo.text}</span>
           </div>
 
           <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs text-neutral-400">
-            <div class="flex items-center gap-1.5">
+            <div class="flex items-center gap-1.5 flex-wrap">
               <i data-lucide="phone" class="w-3.5 h-3.5 text-brand-muted pointer-events-none"></i>
-              <span>${escapeHtml(client.contact)}</span>
-              <a href="${waUrl}" target="_blank" class="ml-1 text-emerald-400 hover:text-emerald-300 font-semibold flex items-center gap-0.5">
-                [💬 WhatsApp]
-              </a>
+              <a href="tel:${escapeHtml(cleanPhone)}" class="hover:text-white">${escapeHtml(client.contact)}</a>
+              <a href="${waUrl}" target="_blank" rel="noopener" class="ml-1 text-emerald-400 hover:text-emerald-300 font-semibold">[💬 WhatsApp]</a>
             </div>
-
             <div class="flex items-center gap-1.5">
               <i data-lucide="map-pin" class="w-3.5 h-3.5 text-brand-muted pointer-events-none"></i>
               <span>${escapeHtml(client.location)}</span>
             </div>
-
             <div class="flex items-center gap-1.5 sm:col-span-2">
               <i data-lucide="calendar" class="w-3.5 h-3.5 text-brand-muted pointer-events-none"></i>
               <span>Data Inserimento: ${formatDate(client.date)}</span>
             </div>
           </div>
 
-          ${client.notes ? `
-            <div class="text-xs text-neutral-300 bg-brand-black/60 border border-brand-border/50 p-2.5 rounded-lg italic">
-              "${escapeHtml(client.notes)}"
-            </div>
-          ` : ''}
+          ${client.notes ? `<div class="text-xs text-neutral-300 bg-brand-black/60 border border-brand-border/50 p-2.5 rounded-lg italic">"${escapeHtml(client.notes)}"</div>` : ''}
 
-          <div class="flex justify-end gap-3 pt-1 border-t border-brand-border/40 text-xs">
-            <button type="button" onclick="editClient('${client.id}')" class="text-neutral-400 hover:text-white flex items-center gap-1 py-1">
+          <div class="flex justify-end gap-4 pt-1 border-t border-brand-border/40 text-xs">
+            <button type="button" onclick="editClient('${client.id}')" class="text-neutral-400 hover:text-white flex items-center gap-1 py-2">
               <i data-lucide="edit-3" class="w-3.5 h-3.5 pointer-events-none"></i> Modifica
             </button>
-            <button type="button" onclick="deleteClient('${client.id}')" class="text-red-400/80 hover:text-red-400 flex items-center gap-1 py-1">
+            <button type="button" onclick="deleteClient('${client.id}')" class="text-red-400/80 hover:text-red-400 flex items-center gap-1 py-2">
               <i data-lucide="trash-2" class="w-3.5 h-3.5 pointer-events-none"></i> Elimina
             </button>
           </div>
         `;
-
         listContainer.appendChild(card);
       });
 
-      if (window.lucide) lucide.createIcons();
+      refreshIcons();
     }
 
-    // =========================================================================
-    // GESTIONE LISTA SPESA (SINCRONIZZATA SU FIREBASE CLOUD)
-    // =========================================================================
+    function openModal(isEdit = false) {
+      if (!isEdit) {
+        $('client-form').reset();
+        $('field-id').value = '';
+        $('modal-title').innerText = 'Nuovo Cliente';
+        $('field-date').value = todayStr();
+      }
+      handleLocationChange();
+      $('modal').classList.remove('hidden');
+    }
+    function closeModal() { $('modal').classList.add('hidden'); }
+
+    function editClient(id) {
+      const client = clientsData.find(c => c.id === id);
+      if (!client) return;
+      $('field-id').value = client.id;
+      $('field-name').value = client.name;
+      $('field-contact').value = client.contact;
+      $('field-location').value = client.location;
+      if (client.priority !== undefined && String(client.priority) !== '0') {
+        $('field-priority').value = String(client.priority);
+      }
+      $('field-date').value = client.date;
+      $('field-notes').value = client.notes || '';
+      $('modal-title').innerText = 'Modifica Cliente';
+      openModal(true);
+    }
+
+    async function handleFormSubmit(e) {
+      e.preventDefault();
+      const selectedLoc = $('field-location').value;
+      const locObj = getArtistLocations().find(l => l.name === selectedLoc);
+      const isSingle = locObj ? locObj.isSinglePriority : false;
+
+      const clientData = {
+        id: $('field-id').value || null,
+        name: $('field-name').value.trim(),
+        contact: $('field-contact').value.trim(),
+        priority: isSingle ? '0' : String($('field-priority').value),
+        location: selectedLoc,
+        date: $('field-date').value,
+        notes: $('field-notes').value.trim()
+      };
+      await saveClient(clientData);
+      closeModal();
+    }
+
+    // =====================================================================
+    // LISTA DELLA SPESA (cloud sync + fallback locale)
+    // =====================================================================
     function toggleShoppingViewHome() {
       isHomeShoppingActive = !isHomeShoppingActive;
-      const artistView = document.getElementById('home-artists-view');
-      const shoppingView = document.getElementById('home-shopping-view');
-      const fabBtn = document.getElementById('shopping-fab-btn');
-
+      const fabBtn = $('shopping-fab-btn');
       if (isHomeShoppingActive) {
-        artistView.classList.add('hidden');
-        shoppingView.classList.remove('hidden');
+        $('home-artists-view').classList.add('hidden');
+        $('home-shopping-view').classList.remove('hidden');
         fabBtn.classList.remove('bg-emerald-600');
         fabBtn.classList.add('bg-white', 'text-black');
         renderShoppingList();
       } else {
-        shoppingView.classList.add('hidden');
-        artistView.classList.remove('hidden');
+        $('home-shopping-view').classList.add('hidden');
+        $('home-artists-view').classList.remove('hidden');
         fabBtn.classList.remove('bg-white', 'text-black');
         fabBtn.classList.add('bg-emerald-600', 'text-white');
         resetShoppingForm();
       }
     }
 
+    function sortedShopping() {
+      return [...shoppingList].sort((a, b) => (a.done ? 1 : 0) - (b.done ? 1 : 0) || (a.createdAt || 0) - (b.createdAt || 0));
+    }
+
     function renderShoppingList() {
-      const container = document.getElementById('shopping-list-container');
-      const emptyState = document.getElementById('shopping-empty-state');
+      const container = $('shopping-list-container');
+      const emptyState = $('shopping-empty-state');
+      const todo = shoppingList.filter(i => !i.done).length;
+      $('shopping-subtitle').innerText = shoppingList.length === 0 ? 'Gestione scorte & materiali' : `${todo} da comprare · ${shoppingList.length - todo} presi`;
+      if (!isHomeShoppingActive) return;
+
       container.innerHTML = '';
+      if (shoppingList.length === 0) { emptyState.classList.remove('hidden'); return; }
+      emptyState.classList.add('hidden');
 
-      if (shoppingList.length === 0) {
-        emptyState.classList.remove('hidden');
-        return;
-      } else {
-        emptyState.classList.add('hidden');
-      }
-
-      shoppingList.forEach((item, index) => {
-        const itemId = item.id || index;
+      sortedShopping().forEach((item, index) => {
         const row = document.createElement('div');
-        row.className = 'bg-brand-card border border-brand-border rounded-xl p-3 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2.5';
+        row.className = 'bg-brand-card border border-brand-border rounded-xl p-2.5 flex items-center gap-2 ' + (item.done ? 'opacity-50' : '');
         row.innerHTML = `
-          <div class="flex items-start gap-2.5 flex-1 min-w-0 w-full">
-            <span class="text-xs font-mono font-bold text-brand-muted bg-brand-black px-2 py-1 rounded-md border border-brand-border shrink-0">#${index + 1}</span>
-            <span class="font-medium text-white text-xs sm:text-sm leading-relaxed break-words flex-1">${escapeHtml(item.name)}</span>
-          </div>
-          <div class="flex items-center gap-1.5 shrink-0 self-end sm:self-center">
-            <span class="text-xs text-neutral-400 bg-brand-black px-2 py-1 rounded-lg border border-brand-border font-mono mr-1">Q.tà: <strong>${item.qty}</strong></span>
-            <button onclick="updateShoppingQty('${itemId}', 1)" class="w-7 h-7 rounded-lg bg-brand-black border border-brand-border text-white hover:border-white flex items-center justify-center text-xs font-bold" title="Aumenta Q.tà">+</button>
-            <button onclick="updateShoppingQty('${itemId}', -1)" class="w-7 h-7 rounded-lg bg-brand-black border border-brand-border text-white hover:border-white flex items-center justify-center text-xs font-bold" title="Diminuisci Q.tà">-</button>
-            <button onclick="editShoppingItem('${itemId}')" class="w-7 h-7 rounded-lg bg-blue-500/10 border border-blue-500/20 text-blue-400 hover:bg-blue-500/20 flex items-center justify-center text-xs" title="Modifica Articolo"><i data-lucide="edit-3" class="w-3.5 h-3.5"></i></button>
-            <button onclick="removeShoppingItem('${itemId}')" class="w-7 h-7 rounded-lg bg-red-500/10 border border-red-500/20 text-red-400 hover:bg-red-500/20 flex items-center justify-center text-xs" title="Elimina Articolo"><i data-lucide="trash-2" class="w-3.5 h-3.5"></i></button>
+          <button onclick="toggleShoppingDone('${item.id}')" class="w-7 h-7 rounded-full border ${item.done ? 'bg-emerald-600 border-emerald-500 text-white' : 'border-brand-border text-transparent hover:border-white'} flex items-center justify-center shrink-0" title="Segna come comprato">
+            <i data-lucide="check" class="w-4 h-4 pointer-events-none"></i>
+          </button>
+          <span class="font-medium text-white text-sm leading-snug break-words flex-1 min-w-0 ${item.done ? 'line-through' : ''}">${escapeHtml(item.name)}</span>
+          <div class="flex items-center gap-1 shrink-0">
+            <button onclick="updateShoppingQty('${item.id}', -1)" class="w-7 h-7 rounded-lg bg-brand-black border border-brand-border text-white hover:border-white flex items-center justify-center text-sm font-bold" title="Diminuisci">−</button>
+            <span class="text-xs text-white font-mono w-6 text-center">${item.qty}</span>
+            <button onclick="updateShoppingQty('${item.id}', 1)" class="w-7 h-7 rounded-lg bg-brand-black border border-brand-border text-white hover:border-white flex items-center justify-center text-sm font-bold" title="Aumenta">+</button>
+            <button onclick="editShoppingItem('${item.id}')" class="w-7 h-7 rounded-lg bg-blue-500/10 border border-blue-500/20 text-blue-400 hover:bg-blue-500/20 flex items-center justify-center" title="Modifica"><i data-lucide="edit-3" class="w-3.5 h-3.5 pointer-events-none"></i></button>
+            <button onclick="removeShoppingItem('${item.id}')" class="w-7 h-7 rounded-lg bg-red-500/10 border border-red-500/20 text-red-400 hover:bg-red-500/20 flex items-center justify-center" title="Elimina"><i data-lucide="trash-2" class="w-3.5 h-3.5 pointer-events-none"></i></button>
           </div>
         `;
         container.appendChild(row);
       });
+      refreshIcons();
+    }
 
-      if (window.lucide) lucide.createIcons();
+    // --- operazioni sui dati (cloud o locale) ---
+    async function shopUpsert(name, qty) {
+      const key = norm(name);
+      const existing = shoppingList.find(i => norm(i.name) === key && !i.done);
+      if (!useLocalStorage && db) {
+        if (existing) await db.collection("shopping_list").doc(existing.id).update({ qty: existing.qty + qty });
+        else await db.collection("shopping_list").add({ name, qty, done: false, createdAt: Date.now() });
+      } else {
+        if (existing) existing.qty += qty;
+        else shoppingList.push({ id: newLocalId(), name, qty, done: false, createdAt: Date.now() });
+        saveLocal();
+      }
+    }
+    async function shopUpdate(id, fields) {
+      if (!useLocalStorage && db) await db.collection("shopping_list").doc(id).update(fields);
+      else {
+        const item = shoppingList.find(i => i.id === id);
+        if (item) Object.assign(item, fields);
+        saveLocal();
+      }
+    }
+    async function shopRemoveMany(ids) {
+      if (!ids.length) return;
+      if (!useLocalStorage && db) {
+        const batch = db.batch();
+        ids.forEach(id => batch.delete(db.collection("shopping_list").doc(id)));
+        await batch.commit();
+      } else {
+        shoppingList = shoppingList.filter(i => !ids.includes(i.id));
+        saveLocal();
+      }
     }
 
     async function addShoppingItemManual() {
-      const nameInput = document.getElementById('shopping-item-name');
-      const qtyInput = document.getElementById('shopping-item-qty');
-      const editIdInput = document.getElementById('shopping-item-edit-id');
-      
-      const name = nameInput.value.trim();
-      const qty = parseInt(qtyInput.value) || 1;
-      const editId = editIdInput.value;
-
+      const name = capFirst($('shopping-item-name').value.trim());
+      const qty = Math.max(1, parseInt($('shopping-item-qty').value) || 1);
+      const editId = $('shopping-item-edit-id').value;
       if (!name) return;
-
-      if (!useLocalStorage && db) {
-        if (editId) {
-          await db.collection("shopping_list").doc(editId).update({ name, qty });
-        } else {
-          const existing = shoppingList.find(i => i.name.toLowerCase() === name.toLowerCase());
-          if (existing && existing.id) {
-            await db.collection("shopping_list").doc(existing.id).update({ qty: existing.qty + qty });
-          } else {
-            await db.collection("shopping_list").add({ name, qty, createdAt: Date.now() });
-          }
-        }
-      } else {
-        if (editId) {
-          const idx = shoppingList.findIndex(i => String(i.id || i) === String(editId));
-          if (idx !== -1) {
-            shoppingList[idx].name = name;
-            shoppingList[idx].qty = qty;
-          }
-        } else {
-          const existing = shoppingList.find(i => i.name.toLowerCase() === name.toLowerCase());
-          if (existing) {
-            existing.qty += qty;
-          } else {
-            shoppingList.push({ id: 'local_' + Date.now(), name, qty });
-          }
-        }
-        saveLocal();
-        renderShoppingList();
-      }
-
-      resetShoppingForm();
+      try {
+        if (editId) await shopUpdate(editId, { name, qty });
+        else await shopUpsert(name, qty);
+        resetShoppingForm();
+      } catch (e) { showToast('Errore nel salvataggio', 4000); }
     }
 
     function editShoppingItem(id) {
-      const item = shoppingList.find(i => String(i.id || shoppingList.indexOf(i)) === String(id));
+      const item = shoppingList.find(i => i.id === id);
       if (!item) return;
-
-      document.getElementById('shopping-item-name').value = item.name;
-      document.getElementById('shopping-item-qty').value = item.qty;
-      document.getElementById('shopping-item-edit-id').value = item.id || shoppingList.indexOf(item);
-
-      const btn = document.getElementById('shopping-submit-btn');
+      $('shopping-item-name').value = item.name;
+      $('shopping-item-qty').value = item.qty;
+      $('shopping-item-edit-id').value = item.id;
+      const btn = $('shopping-submit-btn');
       btn.innerText = 'Salva';
       btn.classList.remove('bg-emerald-600', 'hover:bg-emerald-500');
       btn.classList.add('bg-blue-600', 'hover:bg-blue-500');
-
-      document.getElementById('shopping-item-name').focus();
+      $('shopping-item-name').focus();
     }
 
     function resetShoppingForm() {
-      document.getElementById('shopping-item-name').value = '';
-      document.getElementById('shopping-item-qty').value = '1';
-      document.getElementById('shopping-item-edit-id').value = '';
-
-      const btn = document.getElementById('shopping-submit-btn');
+      $('shopping-item-name').value = '';
+      $('shopping-item-qty').value = '1';
+      $('shopping-item-edit-id').value = '';
+      const btn = $('shopping-submit-btn');
       btn.innerText = 'Aggiungi';
       btn.classList.remove('bg-blue-600', 'hover:bg-blue-500');
       btn.classList.add('bg-emerald-600', 'hover:bg-emerald-500');
     }
 
-    async function updateShoppingQty(id, delta) {
-      const item = shoppingList.find(i => String(i.id || shoppingList.indexOf(i)) === String(id));
+    async function toggleShoppingDone(id) {
+      const item = shoppingList.find(i => i.id === id);
       if (!item) return;
+      try { await shopUpdate(id, { done: !item.done }); } catch (e) { showToast('Errore', 3000); }
+    }
 
+    async function updateShoppingQty(id, delta) {
+      const item = shoppingList.find(i => i.id === id);
+      if (!item) return;
       const newQty = item.qty + delta;
-
-      if (!useLocalStorage && db && item.id) {
-        if (newQty <= 0) {
-          await db.collection("shopping_list").doc(item.id).delete();
-        } else {
-          await db.collection("shopping_list").doc(item.id).update({ qty: newQty });
-        }
-      } else {
-        item.qty = newQty;
-        if (item.qty <= 0) {
-          shoppingList = shoppingList.filter(i => String(i.id || shoppingList.indexOf(i)) !== String(id));
-        }
-        saveLocal();
-        renderShoppingList();
-      }
+      try {
+        if (newQty <= 0) await shopRemoveMany([id]);
+        else await shopUpdate(id, { qty: newQty });
+      } catch (e) { showToast('Errore', 3000); }
     }
 
     async function removeShoppingItem(id) {
-      const item = shoppingList.find(i => String(i.id || shoppingList.indexOf(i)) === String(id));
-      if (!item) return;
+      try { await shopRemoveMany([id]); resetShoppingForm(); } catch (e) { showToast('Errore', 3000); }
+    }
 
-      if (!useLocalStorage && db && item.id) {
-        await db.collection("shopping_list").doc(item.id).delete();
-      } else {
-        shoppingList = shoppingList.filter(i => String(i.id || shoppingList.indexOf(i)) !== String(id));
-        saveLocal();
-        renderShoppingList();
-      }
-      resetShoppingForm();
+    async function clearDoneShopping() {
+      const ids = shoppingList.filter(i => i.done).map(i => i.id);
+      if (!ids.length) { showToast('Nessun articolo segnato come comprato'); return; }
+      try { await shopRemoveMany(ids); showToast(`Rimossi ${ids.length} articoli comprati`); } catch (e) { showToast('Errore', 3000); }
     }
 
     async function confirmClearShoppingList() {
-      if (confirm("Sei sicuro di voler eliminare tutti gli elementi dalla lista della spesa?")) {
-        if (!useLocalStorage && db) {
-          const snapshot = await db.collection("shopping_list").get();
-          const batch = db.batch();
-          snapshot.docs.forEach(doc => batch.delete(doc.ref));
-          await batch.commit();
-        } else {
-          shoppingList = [];
-          saveLocal();
-          renderShoppingList();
-        }
-        resetShoppingForm();
-      }
+      if (!shoppingList.length) return;
+      if (!confirm("Sei sicuro di voler eliminare tutti gli elementi dalla lista della spesa?")) return;
+      try { await shopRemoveMany(shoppingList.map(i => i.id)); resetShoppingForm(); } catch (e) { showToast('Errore', 3000); }
     }
 
-    // =========================================================================
-    // DETTATURA VOCALE PER CLIENTI
-    // =========================================================================
-    let activeRecognition = null;
-    let isClientListening = false;
+    // =====================================================================
+    // COMANDI VOCALI
+    // =====================================================================
+    const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+    let rec = null;
+    let listening = false;
+    let voiceMode = null;      // 'client' | 'shopping'
+    let parsedVoice = null;
 
-    function startVoiceRecognition(e) {
-      if (e) e.preventDefault();
-      const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    const NUM_WORDS = { zero: 0, un: 1, uno: 1, una: 1, due: 2, tre: 3, quattro: 4, cinque: 5, sei: 6, sette: 7, otto: 8, nove: 9, dieci: 10, undici: 11, dodici: 12, tredici: 13, quattordici: 14, quindici: 15, sedici: 16, diciassette: 17, diciotto: 18, diciannove: 19, venti: 20, trenta: 30, quaranta: 40, cinquanta: 50, cento: 100 };
+    const DIGIT_WORDS = { zero: 0, uno: 1, due: 2, tre: 3, quattro: 4, cinque: 5, sei: 6, sette: 7, otto: 8, nove: 9 };
 
-      if (!SpeechRecognition) {
-        alert("Il tuo browser non supporta la dettatura vocale.");
+    function isIOSStandalone() { return window.navigator.standalone === true; }
+
+    function voiceUnsupportedReason() {
+      if (!window.isSecureContext) return "Il microfono funziona solo su pagine https (o localhost): apri il sito dall'indirizzo https di GitHub Pages.";
+      if (!SR) return "Questo browser non supporta il riconoscimento vocale (Firefox, ad esempio). Scrivi il comando qui sotto oppure usa il microfono della tastiera del telefono.";
+      if (isIOSStandalone()) return "Nell'app aggiunta alla Home di iPhone il riconoscimento vocale non è disponibile. Tocca il campo qui sotto e usa il microfono della tastiera 🎤, oppure apri il sito in Safari.";
+      return null;
+    }
+
+    function setVoiceStatus(text) { $('voice-status').innerText = text; }
+
+    function updateMicUI() {
+      const btn = $('voice-mic');
+      btn.classList.toggle('bg-red-600', listening);
+      btn.classList.toggle('mic-listening', listening);
+      btn.classList.toggle('bg-neutral-800', !listening);
+      btn.disabled = !!voiceUnsupportedReason();
+      btn.classList.toggle('opacity-40', btn.disabled);
+    }
+
+    function openVoice(mode) {
+      voiceMode = mode;
+      parsedVoice = null;
+      $('voice-title').innerText = mode === 'client' ? 'Nuovo cliente a voce' : 'Lista della spesa a voce';
+      $('voice-hint').innerHTML = mode === 'client'
+        ? 'Esempio: <em>"Aggiungi Mario Rossi, numero 333 1234567, The Grind, continuo progetto prima possibile, note: copertura braccio"</em>. Se non dici luogo o priorità, li scegli tu nel modulo.'
+        : 'Esempio: <em>"Aggiungi tre cartucce nere, due guanti medium e una scatola di aghi"</em>. Per togliere: <em>"Togli i guanti"</em>.';
+      $('voice-text').value = '';
+      $('voice-preview').innerHTML = '';
+      $('voice-confirm').disabled = true;
+      $('voice-sheet').classList.remove('hidden');
+      refreshIcons();
+
+      const reason = voiceUnsupportedReason();
+      updateMicUI();
+      if (reason) {
+        setVoiceStatus(reason);
+        setTimeout(() => $('voice-text').focus(), 100);
         return;
       }
-
-      if (isClientListening) {
-        stopClientVoice();
-        return;
-      }
-
-      activeRecognition = new SpeechRecognition();
-      activeRecognition.lang = 'it-IT';
-      activeRecognition.interimResults = false;
-      activeRecognition.continuous = false;
-
-      const pulse = document.getElementById('voice-pulse');
-      const micBtn = document.getElementById('voice-btn');
-
-      activeRecognition.onstart = function() {
-        isClientListening = true;
-        if (pulse) pulse.classList.remove('hidden');
-        if (micBtn) micBtn.classList.add('bg-red-600', 'text-white');
-      };
-
-      activeRecognition.onresult = function(event) {
-        const transcript = event.results[0][0].transcript.toLowerCase().trim();
-        parseVoiceCommand(transcript);
-      };
-
-      activeRecognition.onerror = function() {
-        stopClientVoice();
-      };
-
-      activeRecognition.onend = function() {
-        stopClientVoice();
-      };
-
-      activeRecognition.start();
+      startListening();
     }
 
-    function stopClientVoice() {
-      isClientListening = false;
-      const pulse = document.getElementById('voice-pulse');
-      const micBtn = document.getElementById('voice-btn');
-      if (pulse) pulse.classList.add('hidden');
-      if (micBtn) micBtn.classList.remove('bg-red-600', 'text-white');
-      if (activeRecognition) {
-        try { activeRecognition.stop(); } catch(e){}
-        activeRecognition = null;
-      }
+    function closeVoice() {
+      stopListening(true);
+      $('voice-sheet').classList.add('hidden');
     }
 
-    function parseVoiceCommand(text) {
-      openModal(false);
+    function toggleListening() {
+      if (listening) stopListening(false);
+      else { $('voice-text').value = ''; onVoiceTextChange(); startListening(); }
+    }
 
-      let nameMatch = text.match(/(?:aggiungi|cliente)\s+([a-zàèéìòù\s]+?)(?=\s+(?:per|a|in|nuovo|continuo|telefono|numero|$))/i);
-      if (nameMatch) {
-        document.getElementById('field-name').value = capitalizeWords(nameMatch[1].trim());
-      } else {
-        const words = text.split(' ');
-        if (words.length > 0) document.getElementById('field-name').value = capitalizeWords(words.slice(0, 2).join(' '));
+    function stopListening(abort) {
+      if (rec) {
+        try { abort ? rec.abort() : rec.stop(); } catch (e) {}
       }
+      if (abort) { rec = null; listening = false; updateMicUI(); }
+    }
 
-      const locations = getArtistLocations();
-      let matchedLoc = locations[0]?.name || 'The Grind';
+    function startListening() {
+      if (!SR || listening) return;
+      let finalText = '';
+      let gotAnything = false;
+      let hadError = false;
 
-      for (let loc of locations) {
-        if (text.includes(loc.name.toLowerCase())) {
-          matchedLoc = loc.name;
-          break;
+      rec = new SR();
+      rec.lang = 'it-IT';
+      rec.interimResults = true;
+      rec.continuous = false;
+      rec.maxAlternatives = 1;
+
+      rec.onstart = () => { listening = true; updateMicUI(); setVoiceStatus('Sto ascoltando… parla ora'); };
+
+      rec.onresult = (event) => {
+        let interim = '';
+        for (let i = event.resultIndex; i < event.results.length; i++) {
+          const t = event.results[i][0].transcript;
+          if (event.results[i].isFinal) finalText += t + ' ';
+          else interim += t;
         }
-      }
+        gotAnything = true;
+        $('voice-text').value = (finalText + interim).trim();
+        onVoiceTextChange();
+      };
 
-      document.getElementById('field-location').value = matchedLoc;
-      handleLocationChange();
+      rec.onerror = (e) => {
+        hadError = true;
+        const msgs = {
+          'not-allowed': "Microfono non autorizzato. Consenti l'accesso al microfono per questo sito nelle impostazioni del browser e riprova.",
+          'service-not-allowed': "Il browser non permette il riconoscimento vocale su questo dispositivo. Usa il microfono della tastiera.",
+          'no-speech': "Non ho sentito nulla. Tocca il microfono e riprova.",
+          'audio-capture': "Nessun microfono trovato.",
+          'network': "Il riconoscimento vocale ha bisogno di una connessione internet attiva.",
+          'language-not-supported': "Lingua italiana non supportata su questo browser."
+        };
+        if (e.error === 'aborted') return;
+        setVoiceStatus(msgs[e.error] || ('Errore del microfono (' + e.error + ').'));
+      };
 
-      const isContinuo = text.includes('continuo') || text.includes('proseguire') || text.includes('progetto');
-      const isAsap = text.includes('prima possibile') || text.includes('urgente') || text.includes('subito');
+      rec.onend = () => {
+        listening = false;
+        updateMicUI();
+        if (hadError) return;
+        if (gotAnything && $('voice-text').value.trim()) setVoiceStatus('Controlla l\'anteprima e premi Conferma. Puoi correggere il testo a mano.');
+        else setVoiceStatus('Non ho capito nulla. Tocca il microfono e riprova.');
+      };
 
-      if (isContinuo && isAsap) {
-        document.getElementById('field-priority').value = '1';
-      } else if (!isContinuo && isAsap) {
-        document.getElementById('field-priority').value = '2';
-      } else if (isContinuo && !isAsap) {
-        document.getElementById('field-priority').value = '3';
-      } else {
-        document.getElementById('field-priority').value = '4';
-      }
-
-      const phoneMatch = text.match(/\d[\d\s]{7,}\d/);
-      if (phoneMatch) {
-        document.getElementById('field-contact').value = phoneMatch[0].replace(/\s+/g, '');
-      }
-
-      document.getElementById('field-notes').value = "Inserito via voce: " + text;
+      try { rec.start(); } catch (e) { setVoiceStatus('Impossibile avviare il microfono. Riprova.'); }
     }
 
-    // =========================================================================
-    // GESTIONE LUOGHI
-    // =========================================================================
-    function openManageLocationsModal() {
-      renderManageLocationsList();
-      document.getElementById('locations-modal').classList.remove('hidden');
+    // ---------- parsing numeri/telefono ----------
+    function extractPhone(text) {
+      // "tre tre tre uno due ..." -> "3 3 3 1 2 ..."
+      const spokenRun = /\b(?:(?:zero|uno|due|tre|quattro|cinque|sei|sette|otto|nove)\s+){5,}(?:zero|uno|due|tre|quattro|cinque|sei|sette|otto|nove)\b/g;
+      const t = text.replace(spokenRun, m => m.trim().split(/\s+/).map(w => DIGIT_WORDS[w]).join(' '));
+      const m = t.match(/\+?\d[\d\s.\-]{6,}\d/);
+      if (!m) return { phone: '', rest: t };
+      return { phone: m[0].replace(/[\s.\-]/g, ''), rest: t.replace(m[0], ' ') };
     }
 
-    function closeManageLocationsModal() {
-      document.getElementById('locations-modal').classList.add('hidden');
-      populateLocationDropdowns();
-      renderList();
+    // ---------- parsing cliente ----------
+    function locationVariants(loc, all) {
+      const full = loc.name.toLowerCase();
+      const v = [full];
+      const noThe = full.replace(/^the\s+/, '');
+      if (noThe !== full) v.push(noThe);
+      const first = noThe.split(/\s+/)[0];
+      const unique = all.filter(l => l.name.toLowerCase().replace(/^the\s+/, '').split(/\s+/)[0] === first).length === 1;
+      if (first.length >= 5 && unique && !v.includes(first)) v.push(first);
+      return v;
     }
 
-    function renderManageLocationsList() {
+    function parseClientCommand(raw) {
+      let text = ' ' + raw.toLowerCase().trim() + ' ';
+
+      // note: tutto ciò che segue la parola "note"
+      let notes = '';
+      const nm = text.match(/\b(?:note|nota|annotazioni|annotazione)\b\s*[:,]?\s*(.+)$/);
+      if (nm) { notes = capFirst(nm[1].trim()); text = text.slice(0, nm.index) + ' '; }
+
+      // telefono
+      const ph = extractPhone(text);
+      const contact = ph.phone;
+      text = ph.rest;
+
+      // luogo (match più lungo per primo)
       const locations = getArtistLocations();
-      const container = document.getElementById('locations-list');
-      container.innerHTML = '';
+      let location = null;
+      const candidates = [];
+      locations.forEach(l => locationVariants(l, locations).forEach(v => candidates.push({ loc: l, v })));
+      candidates.sort((a, b) => b.v.length - a.v.length);
+      for (const c of candidates) {
+        const idx = text.indexOf(c.v);
+        if (idx !== -1) { location = c.loc; text = text.slice(0, idx) + ' ' + text.slice(idx + c.v.length); break; }
+      }
 
-      locations.forEach((loc, index) => {
-        container.innerHTML += `
-          <div class="flex items-center justify-between bg-brand-black p-2.5 rounded-xl border border-brand-border text-xs">
-            <span class="text-white font-medium">${escapeHtml(loc.name)} ${loc.isSinglePriority ? '<span class="text-[10px] text-brand-muted">(Single Rank)</span>' : ''}</span>
-            <button onclick="removeLocation(${index})" class="text-red-400 hover:text-red-300 p-1">
-              <i data-lucide="trash-2" class="w-4 h-4"></i>
-            </button>
-          </div>
-        `;
+      // formule iniziali
+      text = text.replace(/\b(?:nuovo|nuova)\s+(?:cliente|clienta)\b/g, ' ')
+                 .replace(/\b(?:aggiungi|aggiungere|inserisci|inserire|metti|registra|crea)\b/g, ' ')
+                 .replace(/\bcliente\b/g, ' ');
+
+      // tipo progetto + urgenza
+      const isContinuo = /\b(continu\w*|prosegu\w*|prosecuzione|ritocc\w*|seconda sessione|altra sessione)\b/.test(text);
+      const isAsap = /\b(asap|prima possibile|urgente|urgenza|subito|in fretta|con urgenza)\b/.test(text);
+      const isRelax = /\b(senza fretta|relax|con calma|tranquill\w*)\b/.test(text);
+      text = text.replace(/\b(continu\w*|prosegu\w*|prosecuzione|ritocc\w*|seconda sessione|altra sessione|nuovo|nuova|asap|prima possibile|urgente|urgenza|subito|in fretta|con urgenza|senza fretta|relax|con calma|tranquill\w*)\b/g, ' ');
+
+      let priority;
+      if (isContinuo && isAsap) priority = '1';
+      else if (!isContinuo && isAsap) priority = '2';
+      else if (isContinuo) priority = '3';
+      else priority = '4';
+      const priorityDetected = isContinuo || isAsap || isRelax || /\bnuov[oa]\b/.test(raw.toLowerCase());
+
+      // nome: ciò che resta, ripulito dalle parole di collegamento
+      let nameText = text
+        .replace(/\b(?:numero|telefono|cellulare|tel|luogo|sede|presso|per|a|in|il|la|lo|con|di telefono|progetto|tatuaggio|tatuaggi|priorit[aà]|lista|attesa|d'attesa|waiting|the)\b/g, ' ')
+        .replace(/[^\p{L}\s'’]/gu, ' ')
+        .replace(/\s+/g, ' ')
+        .trim();
+      const name = capitalizeWords(nameText.split(' ').slice(0, 4).join(' '));
+
+      return { kind: 'client', name, contact, location, priority, priorityDetected, notes };
+    }
+
+    // ---------- parsing spesa ----------
+    function parseShoppingCommand(raw) {
+      let t = ' ' + raw.toLowerCase().trim() + ' ';
+      let mode = 'add';
+      const rm = /^\s*(?:per favore\s+)?(?:togli|togliere|tolgo|rimuovi|rimuovere|elimina|eliminare|cancella|cancellare)\b/;
+      if (rm.test(t)) { mode = 'remove'; t = t.replace(rm, ' '); }
+      t = t.replace(/^\s*(?:per favore\s+)?(?:aggiungi|aggiungere|metti|mettere|inserisci|inserire|compra|comprare|prendi|dobbiamo comprare|bisogna comprare|ci servono|ci serve|mi servono|mi serve|servono|serve)\b/, ' ')
+           .replace(/\b(?:alla|nella|in|sulla)\s+(?:la\s+)?lista(?:\s+della\s+spesa)?\b/g, ' ')
+           .replace(/\b(?:dalla|nella)\s+lista(?:\s+della\s+spesa)?\b/g, ' ')
+           .replace(/\bper favore\b/g, ' ');
+
+      const parts = t.split(/\s*(?:,|;|\be\b|\bpoi\b|\banche\b|\binoltre\b)\s*/).map(s => s.trim()).filter(Boolean);
+      const items = [];
+      parts.forEach(p => {
+        let qty = 1;
+        let name = p;
+        const m = p.match(/^(\d+|[a-zà-ù]+)\s+(.+)$/);
+        if (m) {
+          const n = /^\d+$/.test(m[1]) ? parseInt(m[1]) : NUM_WORDS[m[1]];
+          if (n !== undefined && n > 0) { qty = Math.min(n, 999); name = m[2]; }
+        }
+        name = name.replace(/^(?:il|lo|la|i|gli|le|dei|delle|degli)\s+/, '').trim();
+        if (name) items.push({ name: capFirst(name), qty });
       });
 
-      if (window.lucide) lucide.createIcons();
+      return { kind: 'shopping', mode, items };
     }
 
-    function addCustomLocation() {
-      const input = document.getElementById('new-location-name');
-      const isSingle = document.getElementById('new-location-single-priority').checked;
-      const name = input.value.trim();
+    // ---------- anteprima + conferma ----------
+    function onVoiceTextChange() {
+      const raw = $('voice-text').value.trim();
+      const preview = $('voice-preview');
+      const confirmBtn = $('voice-confirm');
+      parsedVoice = null;
+      confirmBtn.disabled = true;
 
-      if (!name) return;
+      if (!raw) { preview.innerHTML = ''; return; }
 
-      const locations = [...getArtistLocations()];
-      locations.push({ name: name, isSinglePriority: isSingle });
-
-      if (!customLocations[currentArtistId]) customLocations[currentArtistId] = [];
-      customLocations[currentArtistId] = locations;
-
-      localStorage.setItem('custom_artist_locations', JSON.stringify(customLocations));
-      input.value = '';
-      document.getElementById('new-location-single-priority').checked = false;
-
-      renderManageLocationsList();
-    }
-
-    function removeLocation(index) {
-      let locations = [...getArtistLocations()];
-      locations.splice(index, 1);
-
-      if (!customLocations[currentArtistId]) customLocations[currentArtistId] = [];
-      customLocations[currentArtistId] = locations;
-
-      localStorage.setItem('custom_artist_locations', JSON.stringify(customLocations));
-      renderManageLocationsList();
-    }
-
-    function handleLocationChange() {
-      const selectedLoc = document.getElementById('field-location').value;
-      const priorityContainer = document.getElementById('priority-container');
-      const prioritySelect = document.getElementById('field-priority');
-      const locations = getArtistLocations();
-
-      const locObj = locations.find(l => l.name === selectedLoc);
-      if (locObj && locObj.isSinglePriority) {
-        priorityContainer.classList.add('hidden');
-        prioritySelect.removeAttribute('required');
+      if (voiceMode === 'client') {
+        const p = parseClientCommand(raw);
+        parsedVoice = p;
+        const prioText = (p.location && p.location.isSinglePriority) ? 'Iscrizione evento (nessuna priorità)' : PRIORITY_LABELS[p.priority].text + (p.priorityDetected ? '' : ' (predefinito)');
+        const row = (label, value, ok) => `<div class="flex gap-2"><span class="text-brand-muted w-16 shrink-0">${label}</span><span class="${ok ? 'text-white' : 'text-amber-400'}">${value}</span></div>`;
+        preview.innerHTML =
+          row('Nome', p.name ? escapeHtml(p.name) : 'non rilevato', !!p.name) +
+          row('Telefono', p.contact ? escapeHtml(p.contact) : 'non rilevato: lo inserisci nel modulo', !!p.contact) +
+          row('Luogo', p.location ? escapeHtml(p.location.name) : 'non rilevato: lo scegli nel modulo', !!p.location) +
+          row('Tipo', escapeHtml(prioText), true) +
+          (p.notes ? row('Note', escapeHtml(p.notes), true) : '');
+        confirmBtn.innerText = 'Apri modulo';
+        confirmBtn.disabled = !p.name;
       } else {
-        priorityContainer.classList.remove('hidden');
-        prioritySelect.setAttribute('required', 'required');
+        const p = parseShoppingCommand(raw);
+        parsedVoice = p;
+        if (!p.items.length) { preview.innerHTML = '<div class="text-amber-400">Nessun articolo riconosciuto.</div>'; return; }
+        if (p.mode === 'add') {
+          preview.innerHTML = '<div class="text-brand-muted mb-1">Verranno aggiunti:</div>' +
+            p.items.map(i => `<div class="flex items-center gap-2"><span class="text-emerald-400 font-mono">+${i.qty}</span><span class="text-white">${escapeHtml(i.name)}</span></div>`).join('');
+          confirmBtn.innerText = 'Aggiungi';
+        } else {
+          preview.innerHTML = '<div class="text-brand-muted mb-1">Verranno rimossi:</div>' +
+            p.items.map(i => {
+              const matches = findShoppingMatches(i.name);
+              return `<div class="flex items-center gap-2"><span class="text-red-400 font-mono">−</span><span class="${matches.length ? 'text-white' : 'text-amber-400'}">${escapeHtml(i.name)}${matches.length ? ' → ' + escapeHtml(matches.map(m => m.name).join(', ')) : ' (non in lista)'}</span></div>`;
+            }).join('');
+          confirmBtn.innerText = 'Rimuovi';
+        }
+        confirmBtn.disabled = false;
       }
     }
 
-    function openModal(isEdit = false) {
-      if (!isEdit) {
-        document.getElementById('client-form').reset();
-        document.getElementById('field-id').value = '';
-        document.getElementById('modal-title').innerText = 'Nuovo Cliente';
-        document.getElementById('field-date').valueAsDate = new Date();
-      }
-      handleLocationChange();
-      document.getElementById('modal').classList.remove('hidden');
+    function findShoppingMatches(name) {
+      const n = norm(name);
+      if (!n) return [];
+      return shoppingList.filter(i => { const x = norm(i.name); return x.includes(n) || n.includes(x); });
     }
 
-    function closeModal() {
-      document.getElementById('modal').classList.add('hidden');
-    }
+    async function confirmVoice() {
+      if (!parsedVoice) return;
+      const p = parsedVoice;
+      closeVoice();
 
-    function editClient(id) {
-      const client = clientsData.find(c => c.id === id);
-      if (!client) return;
-
-      document.getElementById('field-id').value = client.id;
-      document.getElementById('field-name').value = client.name;
-      document.getElementById('field-contact').value = client.contact;
-      document.getElementById('field-location').value = client.location;
-      
-      handleLocationChange();
-      if (client.priority !== undefined && client.priority !== '0') {
-        document.getElementById('field-priority').value = String(client.priority);
+      if (p.kind === 'client') {
+        openModal(false);
+        $('field-name').value = p.name;
+        $('field-contact').value = p.contact;
+        if (p.location) $('field-location').value = p.location.name;
+        handleLocationChange();
+        if (!(p.location && p.location.isSinglePriority)) $('field-priority').value = p.priority;
+        $('field-notes').value = p.notes;
+        showToast('Controlla i dati e premi "Salva Cliente"');
+        return;
       }
 
-      document.getElementById('field-date').value = client.date;
-      document.getElementById('field-notes').value = client.notes || '';
-
-      document.getElementById('modal-title').innerText = 'Modifica Cliente';
-      openModal(true);
+      try {
+        if (p.mode === 'add') {
+          for (const it of p.items) await shopUpsert(it.name, it.qty);
+          showToast(`Aggiunti ${p.items.length} articoli`);
+        } else {
+          const ids = new Set();
+          p.items.forEach(it => findShoppingMatches(it.name).forEach(m => ids.add(m.id)));
+          await shopRemoveMany([...ids]);
+          showToast(ids.size ? `Rimossi ${ids.size} articoli` : 'Nessun articolo corrispondente in lista');
+        }
+      } catch (e) {
+        console.error(e);
+        showToast('Errore nel salvataggio: riprova', 4000);
+      }
     }
 
-    async function handleFormSubmit(e) {
-      e.preventDefault();
-
-      const selectedLoc = document.getElementById('field-location').value;
-      const locations = getArtistLocations();
-      const locObj = locations.find(l => l.name === selectedLoc);
-      const isSingle = locObj ? locObj.isSinglePriority : false;
-
-      const clientData = {
-        id: document.getElementById('field-id').value || null,
-        name: document.getElementById('field-name').value.trim(),
-        contact: document.getElementById('field-contact').value.trim(),
-        priority: isSingle ? '0' : String(document.getElementById('field-priority').value),
-        location: selectedLoc,
-        date: document.getElementById('field-date').value,
-        notes: document.getElementById('field-notes').value.trim()
-      };
-
-      await saveClient(clientData);
-      closeModal();
-    }
-
-    function escapeHtml(str) {
-      if (!str) return '';
-      return str.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;");
-    }
-
-    function formatDate(dateStr) {
-      if (!dateStr) return '';
-      const parts = dateStr.split('-');
-      if (parts.length === 3) return `${parts[2]}/${parts[1]}/${parts[0]}`;
-      return dateStr;
-    }
-
-    function capitalizeWords(str) {
-      return str.replace(/\b\w/g, l => l.toUpperCase());
-    }
+    // =====================================================================
+    // AVVIO
+    // =====================================================================
+    document.addEventListener('keydown', e => {
+      if (e.key !== 'Escape') return;
+      if (!$('voice-sheet').classList.contains('hidden')) closeVoice();
+      else if (!$('locations-modal').classList.contains('hidden')) closeManageLocationsModal();
+      else if (!$('modal').classList.contains('hidden')) closeModal();
+    });
 
     document.addEventListener("DOMContentLoaded", () => {
-      if (window.lucide) lucide.createIcons();
+      buildArtistButtons();
+      renderHomeCounts();
+      renderShoppingList();
+      refreshIcons();
     });
   </script>
 </body>
 </html>
-
-```
