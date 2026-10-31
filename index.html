@@ -19,6 +19,8 @@
   <script>
     tailwind.config = {
       darkMode: 'class',
+      // Gli effetti :hover si attivano solo su dispositivi con mouse (evita il "doppio tocco" su iPhone)
+      future: { hoverOnlyWhenSupported: true },
       theme: {
         extend: {
           fontFamily: {
@@ -57,8 +59,20 @@
       input, select, textarea { font-size: 16px !important; }
     }
 
-    .safe-top { padding-top: env(safe-area-inset-top); }
-    .safe-bottom { padding-bottom: env(safe-area-inset-bottom); }
+    /* Margini di sicurezza (notch / barra di stato / home indicator).
+       !important perché altrimenti le classi p-*/py-* di Tailwind li annullano. */
+    .safe-top { padding-top: calc(env(safe-area-inset-top, 0px) + var(--pt-base, 0px)) !important; }
+    .safe-bottom { padding-bottom: calc(env(safe-area-inset-bottom, 0px) + var(--pb-base, 0px)) !important; }
+
+    /* Tocchi immediati: niente attesa/zoom da doppio tap su pulsanti e campi */
+    button, a, select, input, textarea, label, [onclick] { touch-action: manipulation; }
+
+    /* Pulsanti artista: effetto hover solo dove esiste un mouse */
+    .artist-btn { transition: all 0.2s ease; }
+    .artist-btn:active { transform: scale(0.97); }
+    @media (hover: hover) {
+      .artist-btn:hover { border-color: var(--c) !important; box-shadow: 0 0 20px var(--cg); transform: scale(1.03); }
+    }
 
     @keyframes logoSparkleBounce {
       0% { transform: translateY(0) scale(1) rotate(0deg); filter: drop-shadow(0 0 20px rgba(255,255,255,0.3)) brightness(1); }
@@ -66,8 +80,10 @@
       60% { transform: translateY(-5px) scale(1.03) rotate(1deg); filter: drop-shadow(0 0 45px rgba(255,255,255,1)) brightness(1.6); }
       100% { transform: translateY(0) scale(1) rotate(0deg); filter: drop-shadow(0 0 20px rgba(255,255,255,0.3)) brightness(1); }
     }
-    .logo-hover-effect:hover img,
     .logo-hover-effect:active img { animation: logoSparkleBounce 0.8s ease-in-out infinite alternate; }
+    @media (hover: hover) {
+      .logo-hover-effect:hover img { animation: logoSparkleBounce 0.8s ease-in-out infinite alternate; }
+    }
 
     @keyframes micRing {
       0% { box-shadow: 0 0 0 0 rgba(239,68,68,0.6); }
@@ -79,7 +95,7 @@
 <body class="flex flex-col pb-10">
 
   <!-- ===================== HOME: SELEZIONE ARTISTA + LISTA SPESA ===================== -->
-  <div id="artist-selector-screen" class="fixed inset-0 z-50 bg-brand-black flex flex-col items-center justify-start pt-6 p-4 md:p-8 overflow-y-auto safe-top">
+  <div id="artist-selector-screen" class="fixed inset-0 z-50 bg-brand-black flex flex-col items-center justify-start p-4 md:p-8 overflow-y-auto safe-top" style="--pt-base:1.5rem">
 
     <div id="home-artists-view" class="w-full max-w-2xl flex flex-col items-center space-y-4 md:space-y-6 pb-24 my-auto">
       <div class="text-center space-y-2.5 md:space-y-4 w-full">
@@ -150,7 +166,7 @@
   </div>
 
   <!-- ===================== HEADER PAGINA ARTISTA ===================== -->
-  <header class="sticky top-0 z-30 bg-brand-black/95 backdrop-blur-md border-b border-brand-border px-4 py-2.5 flex justify-between items-center gap-2 safe-top">
+  <header class="sticky top-0 z-30 bg-brand-black/95 backdrop-blur-md border-b border-brand-border px-4 pb-2.5 flex justify-between items-center gap-2 safe-top" style="--pt-base:0.625rem">
     <div class="flex items-center gap-3 min-w-0 flex-1">
       <div onclick="openArtistSelectionScreen()" class="logo-hover-effect w-11 h-11 flex items-center justify-center shrink-0 overflow-visible cursor-pointer" title="Cambia Artista">
         <img src="logo.jpg" alt="Logo" class="max-w-full max-h-full object-contain">
@@ -218,7 +234,7 @@
 
   <!-- ===================== MODALE CLIENTE ===================== -->
   <div id="modal" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm hidden flex items-end sm:items-center justify-center p-0 sm:p-4" onclick="if(event.target===this)closeModal()">
-    <div class="bg-brand-card border border-brand-border w-full max-w-md rounded-t-2xl sm:rounded-2xl p-6 space-y-5 max-h-[90vh] max-h-[90dvh] overflow-y-auto custom-scrollbar safe-bottom">
+    <div class="bg-brand-card border border-brand-border w-full max-w-md rounded-t-2xl sm:rounded-2xl p-6 space-y-5 max-h-[90vh] max-h-[90dvh] overflow-y-auto custom-scrollbar safe-bottom" style="--pb-base:1.5rem">
       <div class="flex justify-between items-center border-b border-brand-border pb-3">
         <h2 id="modal-title" class="text-lg font-bold text-white uppercase tracking-wider">Nuovo Cliente</h2>
         <button type="button" onclick="closeModal()" class="text-brand-muted hover:text-white p-1">
@@ -274,7 +290,7 @@
 
   <!-- ===================== MODALE LUOGHI ===================== -->
   <div id="locations-modal" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm hidden flex items-end sm:items-center justify-center p-0 sm:p-4" onclick="if(event.target===this)closeManageLocationsModal()">
-    <div class="bg-brand-card border border-brand-border w-full max-w-md rounded-t-2xl sm:rounded-2xl p-6 space-y-4 max-h-[90vh] max-h-[90dvh] overflow-y-auto custom-scrollbar safe-bottom">
+    <div class="bg-brand-card border border-brand-border w-full max-w-md rounded-t-2xl sm:rounded-2xl p-6 space-y-4 max-h-[90vh] max-h-[90dvh] overflow-y-auto custom-scrollbar safe-bottom" style="--pb-base:1.5rem">
       <div class="flex justify-between items-center border-b border-brand-border pb-3">
         <h2 class="text-base font-bold text-white uppercase tracking-wider">Gestione Luoghi</h2>
         <button type="button" onclick="closeManageLocationsModal()" class="text-brand-muted hover:text-white p-1">
@@ -296,7 +312,7 @@
 
   <!-- ===================== PANNELLO COMANDO VOCALE ===================== -->
   <div id="voice-sheet" class="fixed inset-0 z-[60] bg-black/80 backdrop-blur-sm hidden flex items-end sm:items-center justify-center p-0 sm:p-4" onclick="if(event.target===this)closeVoice()">
-    <div class="bg-brand-card border border-brand-border w-full max-w-md rounded-t-2xl sm:rounded-2xl p-5 space-y-3 max-h-[92vh] max-h-[92dvh] overflow-y-auto custom-scrollbar safe-bottom">
+    <div class="bg-brand-card border border-brand-border w-full max-w-md rounded-t-2xl sm:rounded-2xl p-5 space-y-3 max-h-[92vh] max-h-[92dvh] overflow-y-auto custom-scrollbar safe-bottom" style="--pb-base:1.25rem">
       <div class="flex justify-between items-center">
         <h2 id="voice-title" class="text-base font-bold text-white uppercase tracking-wider">Comando vocale</h2>
         <button type="button" onclick="closeVoice()" class="text-brand-muted hover:text-white p-1">
@@ -507,7 +523,7 @@ const firebaseConfig = {
     function buildArtistButtons() {
       const container = $('artist-buttons');
       container.innerHTML = Object.values(ARTISTS_CONFIG).map(a => `
-        <button onclick="selectArtist('${a.id}')" class="w-full max-w-[300px] md:max-w-[380px] py-2.5 px-3.5 md:py-3.5 md:px-5 rounded-xl md:rounded-2xl bg-brand-card border hover:scale-[1.03] grid grid-cols-[44px_1fr_44px] items-center transition-all duration-300 active:scale-95 group cursor-pointer" style="border-color:${a.color}4d" onmouseover="this.style.borderColor='${a.color}';this.style.boxShadow='0 0 20px ${a.color}33'" onmouseout="this.style.borderColor='${a.color}4d';this.style.boxShadow='none'">
+        <button onclick="selectArtist('${a.id}')" class="w-full max-w-[300px] md:max-w-[380px] py-2.5 px-3.5 md:py-3.5 md:px-5 rounded-xl md:rounded-2xl bg-brand-card border artist-btn grid grid-cols-[44px_1fr_44px] items-center group cursor-pointer" style="border-color:${a.color}4d; --c:${a.color}; --cg:${a.color}40">
           <div class="w-2.5 h-2.5 md:w-3.5 md:h-3.5 rounded-full justify-self-start" style="background:${a.color};box-shadow:0 0 10px ${a.color}"></div>
           <span class="font-artistHome text-sm sm:text-base md:text-lg text-white tracking-wider text-center">${escapeHtml(a.name)}</span>
           <div class="justify-self-end flex items-center gap-1.5">
